@@ -16,10 +16,9 @@ class UserTableSeeder extends Seeder
     public function run(): void
     {
         $user = User::create([
-            'name' => 'bayan software',
-            'email' => 'admin@gmail.com',
-            'password' => bcrypt('123456789'),
-            'phone_number' => '123456789',
+            'name' => 'مهند عبد الوهاب',
+            'username' => 'bayan',
+            'password' => bcrypt('123'),
         ]);
 
         // إنشاء الأدوار
@@ -27,13 +26,13 @@ class UserTableSeeder extends Seeder
 
         // جلب الصلاحيات
         $permissions_owner = Permission::pluck('id');
-    
 
         // مزامنة الصلاحيات مع الأدوار
         $owner_role->syncPermissions($permissions_owner);
-  
 
         // تعيين الدور للمستخدم
         $user->assignRole('owner');
+
+        $user->branches()->syncWithoutDetaching([1]);
     }
 }

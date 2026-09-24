@@ -1870,7 +1870,7 @@ var requirejs, require, define;
                 //Probably IE. IE (at least 6-8) do not fire
                 //script onload right after executing the script, so
                 //we cannot tie the anonymous define call to a name.
-                //However, IE reports the script as being in 'interactive'
+                //However, IE report the script as being in 'interactive'
                 //readyState at the time of the define call.
                 useInteractive = true;
 

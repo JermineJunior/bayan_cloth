@@ -39,9 +39,16 @@
                 </script>
             @endif
 
+
+
             {{--  card table   --}}
             <div class="card">
                 <div class="card-body">
+                    <div class="float-left">
+                        <a href="javascript:history.back()" class="btn btn-warning">
+                            <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                        </a>
+                    </div>
                     <div class="table-responsive">
 
                         <table class="table text-md-nowrap" id="example1">
@@ -60,13 +67,13 @@
                                 @foreach ($operations as $operation)
                                     <tr>
                                         <td>{{ $operation->type == 5 ? 'قيد يومية ' : 'قيد مركب' }}</td>
-                                        <td>{{ $operation->user->name }}</td>
+                                        <td>{{ $operation->user }}</td>
                                         <td>{{ $operation->node }}</td>
                                         <td>{{ $operation->constant_number }}</td>
-                                        <td>{{ $operation->created_at->format('Y/m/d') }}</td>
+                                        <td>{{ $operation->date }}</td>
                                         <td>
                                             <a class="btn btn-outline-success btn-sm"
-                                                href="{{ route('journalEntry.show',$operation->id) }}" title="عرض"><i
+                                                href="{{ route('journalEntry.show', $operation->id) }}" title="عرض"><i
                                                     class="fa fa-edit"></i>&nbsp;&nbsp;عرض </i></a>
                                         </td>
                                     </tr>

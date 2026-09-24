@@ -23,13 +23,11 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'barcode' =>['max:255',Rule::unique('products','barcode')->ignore($this->product->id , 'id')],
-            'name' => ['required','string','max:255',Rule::unique('products','name')->ignore($this->product->id , 'id')],
+            'barcode' =>['max:255',Rule::unique('products','barcode')->ignore($this->product->id,'id')],
+            'name' => ['required','string','max:255',Rule::unique('products','name')->ignore($this->product->id,'id')],
             'category_id' => 'required|exists:categories,id',
             'stock_id.*' => 'required|exists:stocks,id',
-            'purchase_price' => 'required|numeric|min:0',
-            'reorder_level' => 'required|integer|min:0',
-            'expire_date' => 'required|date|after_or_equal:today',
+            'reorder_level' => 'nullable|integer|min:0',
             'units.*.unit_id' => 'required|exists:units,id',
         ];
     }
@@ -40,11 +38,10 @@ class UpdateProductRequest extends FormRequest
             'barcode.unique' => 'الباركود يجب أن يكون فريدًا.',
             'name.required' => 'يرجى إدخال اسم المنتج.',
             'name.unique' => 'اسم المنتج يجب أن يكون فريدًا.',
-            'category_id.required' => 'يرجى اختيار القسم.',
-            'category_id.exists' => 'القسم المحدد غير موجود.',
+            'category_id.required' => 'يرجى اختيار الشركة.',
+            'category_id.exists' => 'الشركة المحدد غير موجود.',
             'stock_id.*.required' => 'يرجى اختيار المخزن.',
             'stock_id.*.exists' => 'المخزن المحدد غير موجود.',
-            'purchase_price.required' => 'يرجى إدخال سعر الشراء.',
             'reorder_level.required' => 'يرجى إدخال مستوى إعادة الطلب.',
             'expire_date.required' => 'يرجى تحديد تاريخ الصلاحية.',
             'expire_date.after_or_equal' => 'تاريخ الصلاحية يجب أن يكون اليوم أو بعده.',

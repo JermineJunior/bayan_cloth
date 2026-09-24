@@ -56,38 +56,65 @@ class Tree4Controller extends Controller
         return back()->with('success_deleted', 'Tree 4 deleted successfully.');
     }
 
-    public function select2(Request $request): JsonResponse
+    // public function select2(Request $request): JsonResponse
+    // {
+    //     $search = $request->get('q');
+    //     $exclude = $request->input('exclude', []);
+    //     // بدء الاستعلام الأساسي
+    //     if ($search != null) {
+    //         $query = Tree4::query();
+
+    //         // الشرط الأساسي للحالة العامة
+    //         $query->where('status', '=', '1');
+
+    //         // البحث بالنص المدخل
+    //         if (!empty($search)) {
+    //             $query->where('tree4_name', 'like', '%' . $search . '%');
+    //         }
+
+    //         // استثناء الحساب المختار في "من حساب" إذا وجد
+    //         if (!empty($exclude)) {
+    //             $query->whereNotIn('id', $exclude);
+    //         }
+
+    //         // تنفيذ الاستعلام وجلب النتائج
+    //         $tree4 = $query->get();
+
+    //         // تنسيق النتائج لـ Select2
+    //         $formattedResults = $tree4->map(function ($item) {
+    //             return [
+    //                 'id' => $item->id,
+    //                 'text' => $item->tree4_name, // الحقل الذي سيظهر في Select2
+    //             ];
+    //         });
+    //     }
+    //     return response()->json($formattedResults);
+    // }
+
+    public function filter(Request $request)
     {
-        $search = $request->get('q'); 
-        $exclude = $request->input('exclude', []);
-        // بدء الاستعلام الأساسي
-        if ($search != null) {
-            $query = Tree4::query();
-
-            // الشرط الأساسي للحالة العامة
-            $query->where('status', '=', '1');
-
-            // البحث بالنص المدخل
-            if (!empty($search)) {
-                $query->where('tree4_name', 'like', '%' . $search . '%');
-            }
-
-            // استثناء الحساب المختار في "من حساب" إذا وجد
-            if (!empty($exclude)) {
-                $query->whereNotIn('id', $exclude);
-            }
-
-            // تنفيذ الاستعلام وجلب النتائج
-            $tree4 = $query->get();
-
-            // تنسيق النتائج لـ Select2
-            $formattedResults = $tree4->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'text' => $item->tree4_name, // الحقل الذي سيظهر في Select2
-                ];
-            });
+        if ($request->type == 'all') {
+            $trees = Tree4::where('tree4_name', 'like', '%' . $request->q . '%')->get();
+        } elseif ($request->type == 'customers') {
+            $trees = Tree4::where('tree3_code', 1205)
+                ->where('tree4_name', 'like', '%' . $request->q . '%')
+                ->get();
+        } elseif ($request->type == 'suppliers') {
+            $trees = Tree4::where('tree3_code', 2301)
+                ->where('tree4_name', 'like', '%' . $request->q . '%')
+                ->get();
+        } elseif ($request->type == 'cash') {
+            $trees = Tree4::where('tree3_code', 1202)
+                ->where('tree4_name', 'like', '%' . $request->q . '%')
+                ->get();
+        } elseif ($request->type == 'others') {
+            $trees = Tree4::whereNotIn('tree3_code', [1205, 2301, 1202])
+                ->where('tree4_name', 'like', '%' . $request->q . '%')
+                ->get();
+        } else {
+            $trees = collect(); // لو ما لقى أي نوع
         }
-        return response()->json($formattedResults);
+
+        return response()->json($trees);
     }
 }

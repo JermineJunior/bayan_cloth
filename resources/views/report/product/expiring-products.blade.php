@@ -1,4 +1,4 @@
-<!-- resources/views/reports/daily_sales.blade.php -->
+<!-- resources/views/report/daily_sales.blade.php -->
 @extends('layouts.app')
 
 @section('content')

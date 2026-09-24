@@ -23,7 +23,7 @@ class UpdateBankRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', Rule::unique('banks' , 'name')->ignore($this->bank->id , 'id')],
+            'name' => ['required',Rule::unique('tree4s','tree4_name')->ignore($this->bank->id,'id')],
             'no_bank' => ['required']
         ];
     }

@@ -9,11 +9,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SaleInvoice extends Model
 {
-    protected $fillable = ['customer_id', 'invoice_number', 'stock_id', 'invoice_date','sub_total_amount', 'discount_amount', 'tax_amount', 'total_amount', 'payment_status', 'status', 'payment_method', 'cash_id', 'bank_id','cash_amount', 'bank_amount'];
+    protected $fillable = ['customer_id', '
+    _id', 'representative_id', 'invoice_number', 'date', 'sub_total_amount', 'discount_amount', 'tax_amount', 'tax_status', 'total_amount', 'process_no', 'status', 'deferend_amount', 'cash_name', 'bank_name', 'cash_amount_total', 'bank_amount_total', 'branch_id', 'invoice_status'];
 
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Tree4::class, 'customer_id');
+    }
+
+    public function tree4(): BelongsTo
+    {
+        return $this->belongsTo(Tree4::class, 'customer_id');
+    }
+
+    public function representative(): BelongsTo
+    {
+        return $this->belongsTo(Tree4::class, 'representative_id');
     }
 
     public function saleInvoiceReturn(): HasOne
@@ -23,7 +34,7 @@ class SaleInvoice extends Model
 
     public function details(): HasMany
     {
-        return $this->hasMany(SaleInvoiceDetail::class,'sale_invoice_id');
+        return $this->hasMany(SaleInvoiceDetail::class, 'sale_invoice_id');
     }
 
     public function operations(): HasMany
@@ -41,4 +52,5 @@ class SaleInvoice extends Model
         return $this->hasOne(SaleInvoiceReturn::class, 'sale_invoice_id');
     }
 
+    
 }

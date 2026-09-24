@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-header pb-0">
                     @if ($errors->any())
-                        <div class="alert alert-outline-warning" role="alert">
+                        <div class="alert alert-outline-danger" role="alert">
                             <button aria-label="Close" class="close" data-dismiss="alert" type="button">
                                 <span aria-hidden="true">&times;</span></button>
                             @foreach ($errors->all() as $error)
@@ -69,13 +69,21 @@
                         </script>
                     @endif
 
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة بنك')
-                            <a class="modal-effect btn btn-primary btn-block" data-effect="effect-super-scaled"
-                                data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة بنك
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-8 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة بنك')
+                                <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled" data-toggle="modal"
+                                    href="#addModal">
+                                    <i class="fa fa-plus"></i>&nbsp;&nbsp;إضافة بنك
+                                </a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
+
                     {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                 </div>
                 <div class="card-body">
@@ -86,7 +94,6 @@
                                     <th class="wd-5p border-bottom-0">#</th>
                                     <th class="wd-20p border-bottom-0">الاسم</th>
                                     <th class="wd-20p border-bottom-0">رقم الحساب</th>
-                                    <th class="wd-10p">الحالة</th>
                                     <th class="wd-15p border-bottom-0">العمليات </th>
 
                                 </tr>
@@ -96,21 +103,13 @@
                                 @foreach ($banks as $bank)
                                     <tr data-id="{{ $bank->id }}">
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $bank->name }}</td>
+                                        <td>{{ $bank->tree4_name }}</td>
                                         <td>{{ $bank->no_bank }}</td>
-                                        <!-- عرض عدد الحجاج في هذه الحملة -->
-                                        <td>
-                                            <button
-                                                class="btn btn-sm btn-{{ $bank->status ? 'success' : 'danger' }} toggle-status-btn"
-                                                data-id="{{ $bank->id }}">
-                                                {{ $bank->status == 1 ? 'نشط' : 'غير نشط' }}
-                                            </button>
-                                        </td>
                                         <td>
                                             @can('تعديل البنك')
                                                 <a class="modal-effect btn btn-outline-success btn-sm"
                                                     data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
-                                                    data-id="{{ $bank->id }}" data-name="{{ $bank->name }}"
+                                                    data-id="{{ $bank->id }}" data-name="{{ $bank->tree4_name }}"
                                                     data-no_bank="{{ $bank->no_bank }}" title="تعديل">
                                                     <i class="fa fa-edit">
                                                     </i></a>
@@ -141,17 +140,19 @@
                         <h6 class="modal-title">إضافة بنك جديد </h6><button aria-label="Close" class="close"
                             data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <form action="{{ route('bank.store') }}" method="post">
+                    <form id="bankForm" action="{{ route('bank.store') }}" method="post">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم البنك </label>
-                                <input type="text" name="name" id="name" class="form-control" required>
+                                <input type="text" name="name" id="name" class="form-control" autocomplete="off"
+                                    required>
                             </div>
 
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label for="exampleInputEmail1">رقم حساب البنك </label>
-                                <input type="number" name="no_bank" id="no_bank" class="form-control" required>
+                                <input type="number" name="no_bank" id="no_bank" class="form-control" autocomplete="off"
+                                    required>
                             </div>
 
                         </div>
@@ -176,14 +177,17 @@
                         @csrf
                         @method('PUT')
                         <div class="modal-body">
+                            <input type="hidden" value="" name="id" id="bank_id">
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label>اسم البنك</label>
-                                <input id="name_ed" type="text" name="name" class="form-control" required>
+                                <input id="name_ed" type="text" name="name" class="form-control"
+                                    autocomplete="off" required>
                             </div>
 
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label>رقم حساب البنك</label>
-                                <input id="no_bank_ed" type="number" name="no_bank" class="form-control" required>
+                                <input id="no_bank_ed" type="number" name="no_bank" class="form-control"
+                                    autocomplete="off" required>
                             </div>
 
                             <div class="modal-footer">
@@ -250,6 +254,11 @@
     <!--Internal  Notify js -->
     <script src="{{ URL::asset('assets/plugins/notify/js/notifIt.js') }}"></script>
     <script src="{{ URL::asset('assets/plugins/notify/js/notifit-custom.js') }}"></script>
+    {{-- form_validation --}}
+    <script src="{{ URL::asset('assets/plugins/form_validation/jquery.form.js') }}"></script>
+    <script src="{{ URL::asset('assets/plugins/form_validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/plugins/form_validation/additional-methods.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/plugins/form_validation/messages_ar.js') }}"></script>
 
     {{-- delete script  --}}
     <script>
@@ -265,6 +274,7 @@
                     id));
                 modal.find('.modal-body #name_ed').val(name);
                 modal.find('.modal-body #no_bank_ed').val(no_bank);
+                modal.find('.modal-body #bank_id').val(id);
             });
 
             $('#deleteModal').on('show.bs.modal', function(event) {
@@ -275,33 +285,104 @@
                     ':id', id));
             });
 
-            // Handling status toggle button click
-            $('.toggle-status-btn').click(function() {
-                var bankId = $(this).data('id');
-                var button = $(this);
+            $('#bankForm').validate({
+                rules: {
+                    name: {
+                        required: true,
+                        uniqueName: true,
+                    },
+                    no_bank: {
+                        required: true,
+                        number: true
+                    }
 
+                },
+                messages: {
+                    name: {
+                        required: "يرجى إدخال الاسم من فضلك.",
+                        uniqueName: 'هذا الاسم موجود بالفعل في النظام.'
+                    },
+                    no_bank: {
+                        required: "يجب ادخال رقم الحساب",
+                        'number': "يجب ان يكون رقم الحساب رقماً"
+                    }
+
+                },
+                errorPlacement: function(error, element) {
+                    if (element.closest('.input-group').length) {
+                        error.insertAfter(element.closest('.input-group'));
+                    } else if (element.hasClass('select2-hidden-accessible')) {
+                        // ✅ التعامل مع `select2`
+                        error.insertAfter(element.next('.select2'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                errorElement: "span",
+                errorClass: "text-danger",
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            $('#edit_bank').validate({
+                rules: {
+                    name: {
+                        required: true,
+                        uniqueName: true,
+                    }
+
+                },
+                messages: {
+                    name: {
+                        required: "يرجى إدخال الاسم من فضلك.",
+                        uniqueName: 'هذا الاسم موجود بالفعل في النظام.'
+                    },
+
+                },
+                errorPlacement: function(error, element) {
+                    if (element.closest('.input-group').length) {
+                        error.insertAfter(element.closest('.input-group'));
+                    } else if (element.hasClass('select2-hidden-accessible')) {
+                        // ✅ التعامل مع `select2`
+                        error.insertAfter(element.next('.select2'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                errorElement: "span",
+                errorClass: "text-danger",
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            $.validator.addMethod("uniqueName", function(value, element) {
+                if (value == '') {
+                    return isValid = true;
+                }
+                let isValid = false;
                 $.ajax({
-                    type: 'POST',
-                    url: '{{ route('bank.toggleStatus', '') }}/' + bankId,
+                    url: '{{ route('bank.checkName') }}', // مسار التحقق من الباركود
                     data: {
-                        _token: '{{ csrf_token() }}'
+                        name: value,
+                        id: $('#bank_id').val()
                     },
+                    type: 'GET',
+                    async: false, // تأكد من أن التحقق يتم بشكل متزامن
                     success: function(response) {
-                        button.toggleClass('btn-success btn-danger');
-                        button.text(response.status == 1 ? 'نشط' : 'غير نشط');
-                        notif({
-                            msg: 'تم تغيير حالة الحملة بنجاح',
-                            type: 'success'
-                        });
-                    },
-                    error: function() {
-                        notif({
-                            msg: 'حدث خطأ أثناء تغيير الحالة',
-                            type: 'error'
-                        });
+                        isValid = response.isUnique; // إذا كانت النتيجة صحيحة (فريد)
                     }
                 });
-            });
+                return isValid;
+            }, "هذا الاسم موجود بالفعل في النظام.");
+
         });
     </script>
 @endsection

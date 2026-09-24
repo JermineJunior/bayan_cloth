@@ -23,7 +23,7 @@ class UpdateStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required',Rule::unique('stocks', 'name')->ignore($this->stock->id , 'id')]
+            'name' => ['required',Rule::unique('stocks','name')->ignore($this->stock->id,'id')]
         ];
     }
 }

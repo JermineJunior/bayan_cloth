@@ -78,5 +78,19 @@ class Tree2TableSeeder extends Seeder
         $tree2->tree1_id = 2;
         $tree2->tree1_code = 2;
         $tree2->save();
+
+        $tree2  = new Tree2();
+        $tree2->tree2_code = 31;
+        $tree2->tree2_name = 'راس المال';
+        $tree2->tree1_id = 3;
+        $tree2->tree1_code = 3;
+        $tree2->save();
+
+        $tree2  = new Tree2();
+        $tree2->tree2_code = 53;
+        $tree2->tree2_name = 'منصرفات مشتريات خارجية';
+        $tree2->tree1_id = 5;
+        $tree2->tree1_code = 5;
+        $tree2->save();
     }
 }

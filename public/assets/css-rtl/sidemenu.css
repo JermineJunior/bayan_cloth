@@ -357,11 +357,7 @@
   display: inline-block; }
   .app-sidebar__user .dropdown-menu {
     top: 10px !important; }
-  .app-sidebar__user img {
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
-    border: 2px solid white;
-    box-shadow: 0px 5px 5px 0px rgba(44, 44, 44, 0.2); }
-
+  
 .app-sidebar__user-avatar {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 auto;
@@ -813,7 +809,8 @@ slide is-expanded side-menu__item {
   font-size: 1rem; }
 
 .app-sidebar .mCS-minimal.mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar {
-  background: rgb(0 0 0 / 9%) }
+  background: rgb(0 0 0 / 70%);
+}
 
 .app-sidebar .mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar, .app-sidebar .mCSB_scrollTools .mCSB_draggerRail {
   background: rgba(255, 255, 255, 0.2); }

@@ -24,10 +24,8 @@ class StoreTransformRequest extends FormRequest
         return [
             'product_id' => 'required|array',
             'product_id.*' => 'required|exists:products,id',
-            'stock_id_from' => 'required|array',
-            'stock_id_from.*' => 'required|exists:stocks,id',
-            'stock_id_to' => 'required|array',
-            'stock_id_to.*' => 'required|exists:stocks,id',
+            'stock_id_from' => 'required|exists:stocks,id',
+            'stock_id_to' => 'required|exists:stocks,id',
             'qty' => 'required|array',
             'qty.*' => 'required|numeric',
             'unit_id' => 'required|array',

@@ -64,7 +64,7 @@
                                         <td>{{ $sale_return->invoice_number }}</td>
                                         <td>{{ $sale_return->details()->count() }}</td>
                                         <td>{{ number_format($sale_return->total_amount, 2) }}</td>
-                                        <td>{{ $sale_return->created_at->format('Y-m-d') }}</td>
+                                        <td>{{ $sale_return->d }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>

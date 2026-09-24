@@ -3,29 +3,23 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Transform extends Model
 {
-    protected $fillable = ['product_id', 'stock_id_from', 'stock_id_to', 'quantity', 'unit_id'];
+    protected $fillable = ['stock_from', 'stock_to', 'branch_id'];
 
-    public function product(): BelongsTo
+    public function fromStock()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Stock::class, 'stock_from');
     }
 
-    public function stockFrom(): BelongsTo
+    public function toStock()
     {
-        return $this->belongsTo(Stock::class,'stock_id_from');
+        return $this->belongsTo(Stock::class, 'stock_to');
     }
 
-    public function stockTo(): BelongsTo
+    public function transformDetails()
     {
-        return $this->belongsTo(Stock::class,'stock_id_to');
-    }
-
-    public function unit(): BelongsTo
-    {
-        return $this->belongsTo(Unit::class);
+        return $this->hasMany(Transform_details::class);
     }
 }

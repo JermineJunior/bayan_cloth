@@ -64,12 +64,18 @@
                         </script>
                     @endif
 
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة خزنة')
-                            <a class=" btn btn-primary btn-block" href="{{ route('role.create') }}"><i class="fa fa-plus">
-                                </i>&nbsp;&nbsp;إضافة صلاحية
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة صلاحية')
+                                <a class=" btn btn-primary " href="{{ route('role.create') }}"><i class="fa fa-plus">
+                                    </i>&nbsp;&nbsp;إضافة صلاحية
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                     {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                 </div>

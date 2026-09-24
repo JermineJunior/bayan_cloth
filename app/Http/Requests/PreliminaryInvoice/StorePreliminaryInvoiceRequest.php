@@ -24,7 +24,7 @@ class StorePreliminaryInvoiceRequest extends FormRequest
         return [
             'customer_id' => 'nullable|exists:tree4s,id',
             'invoice_number' => 'required|numeric',
-            'invoice_date' => 'required|date',
+            'date' => 'required|date',
             'sub_total' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
             'total' => 'required|numeric|min:0',
@@ -54,8 +54,8 @@ class StorePreliminaryInvoiceRequest extends FormRequest
             'invoice_number.required' => 'يجب إدخال رقم الفاتورة.',
             'invoice_number.numeric' => 'يجب أن يكون رقم الفاتورة عددًا صحيحًا.',
 
-            'invoice_date.required' => 'يجب إدخال تاريخ الفاتورة.',
-            'invoice_date.date' => 'تاريخ الفاتورة غير صالح.',
+            'date.required' => 'يجب إدخال تاريخ الفاتورة.',
+            'date.date' => 'تاريخ الفاتورة غير صالح.',
 
             'sub_total.required' => 'يجب إدخال المبلغ الإجمالي مع الضريبة.',
             'sub_total.numeric' => 'يجب أن يكون المبلغ الإجمالي مع الضريبة رقمًا صحيحًا أو عشريًا.',

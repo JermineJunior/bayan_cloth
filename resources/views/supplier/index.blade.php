@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-header pb-0">
                     @if ($errors->any())
-                        <div class="alert alert-outline-warning" role="alert">
+                        <div class="alert alert-outline-danger" role="alert">
                             <button aria-label="Close" class="close" data-dismiss="alert" type="button">
                                 <span aria-hidden="true">&times;</span></button>
                             @foreach ($errors->all() as $error)
@@ -69,12 +69,18 @@
                         </script>
                     @endif
 
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة مورد')
-                            <a class="modal-effect btn btn-primary btn-block" data-effect="effect-super-scaled"
-                                data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة مورد
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة مورد')
+                                <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled" data-toggle="modal"
+                                    href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة مورد
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                     {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                 </div>
@@ -86,7 +92,7 @@
                                     <th class="wd-5p border-bottom-0">#</th>
                                     <th class="wd-20p border-bottom-0">الاسم</th>
                                     <th class="wd-20p border-bottom-0">رقم الهاتف</th>
-                                    <th class="wd-10p">الحالة</th>
+                                    <th class="wd-20p border-bottom-0">الرصيد</th>
                                     <th class="wd-15p border-bottom-0">العمليات </th>
                                 </tr>
                             </thead>
@@ -95,22 +101,16 @@
                                 @foreach ($suppliers as $supplier)
                                     <tr data-id="{{ $supplier->id }}">
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $supplier->name }}</td>
+                                        <td>{{ $supplier->tree4_name }}</td>
                                         <td>{{ $supplier->phone }}</td>
-                                        <td>
-                                            <button
-                                                class="btn btn-sm btn-{{ $supplier->status ? 'success' : 'danger' }} toggle-status-btn"
-                                                data-id="{{ $supplier->id }}">
-                                                {{ $supplier->status == 1 ? 'نشط' : 'غير نشط' }}
-                                            </button>
-                                        </td>
+                                        <td>{{ number_format($supplier->total_madin - $supplier->total_dain) }}</td>
                                         <td>
                                             @can('تعديل المورد')
                                                 <a class="modal-effect btn btn-outline-success btn-sm"
                                                     data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
-                                                    data-id="{{ $supplier->id }}" data-name="{{ $supplier->name }}"
+                                                    data-id="{{ $supplier->id }}" data-name="{{ $supplier->tree4_name }}"
                                                     data-phone="{{ $supplier->phone }}" data-email="{{ $supplier->email }}"
-                                                    data-address="{{ $supplier->address }}" data- title="تعديل">
+                                                    data-address="{{ $supplier->address }}" data-supplier="{{ $supplier->supplier_id }}" data- title="تعديل">
                                                     <i class="fa fa-edit">
                                                     </i></a>
                                             @endcan
@@ -140,28 +140,30 @@
                         <h6 class="modal-title">إضافة مورد جديد </h6><button aria-label="Close" class="close"
                             data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                     </div>
-                    <form action="{{ route('supplier.index') }}" method="post">
+                    <form id="addSupplier" action="{{ route('supplier.store') }}" method="post">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم المورد </label>
-                                <input type="text" name="name" id="name" class="form-control" required>
+                                <input type="text" name="name" id="name" class="form-control" autocomplete="off">
                             </div>
 
                             <div class="form-group">
                                 <label for="exampleInputEmail1">البريد الالكتروني للمورد
                                 </label>
-                                <input type="email" name="email" id="email" class="form-control">
+                                <input type="email" name="email" id="email" autocomplete="off" class="form-control">
                             </div>
 
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label for="exampleInputEmail1">رقم هاتف المورد </label>
-                                <input type="number" name="phone" id="phone" class="form-control" required>
+                                <label for="exampleInputEmail1">رقم هاتف المورد </label>
+                                <input type="number" name="phone" id="phone" class="form-control"
+                                    autocomplete="off">
                             </div>
 
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label for="exampleInputEmail1">عنوان المورد </label>
-                                <input type="text" name="address" id="address" class="form-control" required>
+                                <label for="exampleInputEmail1">عنوان المورد </label>
+                                <input type="text" name="address" id="address" class="form-control"
+                                    autocomplete="off">
                             </div>
 
                         </div>
@@ -187,20 +189,26 @@
                         @method('PUT')
                         <div class="modal-body">
                             <div class="form-group">
+                                <input type="hidden" id="id" value="">
+                                <input type="hidden" id="supplier_id" value="">
                                 <span class="tx-danger">*</span><label>اسم المورد</label>
-                                <input id="name_ed" type="text" name="name" class="form-control" required>
+                                <input id="name_ed" type="text" name="name" class="form-control"
+                                    autocomplete="off">
                             </div>
                             <div class="form-group">
                                 <label>البريد الالكتروني للمورد</label>
-                                <input id="email_ed" type="email" name="email" class="form-control">
+                                <input id="email_ed" type="email" name="email" class="form-control"
+                                    autocomplete="off">
                             </div>
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label>رقم هاتف المورد</label>
-                                <input id="phone_ed" type="number" name="phone" class="form-control" required>
+                                <label>رقم هاتف المورد</label>
+                                <input id="phone_ed" type="number" name="phone" class="form-control"
+                                    autocomplete="off">
                             </div>
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label>عنوان المورد</label>
-                                <input id="address_ed" type="text" name="address" class="form-control" required>
+                                <label>عنوان المورد</label>
+                                <input id="address_ed" type="text" name="address" class="form-control"
+                                    autocomplete="off">
                             </div>
                             <div class="modal-footer">
                                 <button class="btn ripple btn-primary" type="submit">تحديث البيانات </button>
@@ -266,6 +274,11 @@
     <!--Internal  Notify js -->
     <script src="{{ URL::asset('assets/plugins/notify/js/notifIt.js') }}"></script>
     <script src="{{ URL::asset('assets/plugins/notify/js/notifit-custom.js') }}"></script>
+    {{-- form_validation --}}
+    <script src="{{ URL::asset('assets/plugins/form_validation/jquery.form.js') }}"></script>
+    <script src="{{ URL::asset('assets/plugins/form_validation/jquery.validate.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/plugins/form_validation/additional-methods.min.js') }}"></script>
+    <script src="{{ URL::asset('assets/plugins/form_validation/messages_ar.js') }}"></script>
 
     {{-- delete script  --}}
     <script>
@@ -278,6 +291,7 @@
                 var email = button.data('email');
                 var phone = button.data('phone');
                 var address = button.data('address');
+                var supplier_id = button.data('supplier');
                 var modal = $(this);
                 $('#edit_supplier').attr('action', '{{ route('supplier.update', ':id') }}'.replace(':id',
                     id));
@@ -285,6 +299,8 @@
                 modal.find('.modal-body #email_ed').val(email);
                 modal.find('.modal-body #phone_ed').val(phone);
                 modal.find('.modal-body #address_ed').val(address);
+                modal.find('.modal-body #supplier_id').val(supplier_id);
+                modal.find('.modal-body #id').val(id);
             });
 
             $('#deleteModal').on('show.bs.modal', function(event) {
@@ -295,33 +311,159 @@
                     ':id', id));
             });
 
-            // Handling status toggle button click
-            $('.toggle-status-btn').click(function() {
-                var supplierId = $(this).data('id');
-                var button = $(this);
+            $('#addSupplier').validate({
+                rules: {
+                    name: {
+                        required: true,
+                        uniqueNameSupplier: true,
+                    },
+                    email: {
+                        uniqueEmailsupplier: true,
+                        email: true,
+                    },
+                    phone: {
+                        uniquephonesupplier: true,
+                        number: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "يرجى إدخال اسم المورد.",
+                    },
+                    email: {
+                        email: "الرجاء إدخال بريد إلكتروني صالح.",
+                    },
+                    phone: {
+                        required: "يرجى إدخال رقم المورد.",
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.closest('.input-group').length) {
+                        error.insertAfter(element.closest('.input-group'));
+                    } else if (element.hasClass('select2-hidden-accessible')) {
+                        // ✅ التعامل مع `select2`
+                        error.insertAfter(element.next('.select2'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                errorElement: "span",
+                errorClass: "text-danger",
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
 
+            $('#edit_supplier').validate({
+                rules: {
+                    name: {
+                        required: true,
+                        uniqueNameSupplier: true,
+                    },
+                    email: {
+                        uniqueEmailsupplier: true,
+                        email: true,
+                    },
+                    phone: {
+                        uniquephonesupplier: true,
+                        number: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "يرجى إدخال اسم المورد.",
+                    },
+                    email: {
+                        email: "الرجاء إدخال بريد إلكتروني صالح.",
+                    },
+                    phone: {
+                        required: "يرجى إدخال رقم المورد.",
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    if (element.closest('.input-group').length) {
+                        error.insertAfter(element.closest('.input-group'));
+                    } else if (element.hasClass('select2-hidden-accessible')) {
+                        // ✅ التعامل مع `select2`
+                        error.insertAfter(element.next('.select2'));
+                    } else {
+                        error.insertAfter(element);
+                    }
+                },
+                errorElement: "span",
+                errorClass: "text-danger",
+                highlight: function(element) {
+                    $(element).closest('.form-group').addClass('has-error');
+                },
+                unhighlight: function(element) {
+                    $(element).closest('.form-group').removeClass('has-error');
+                }
+            });
+
+            $.validator.addMethod("uniqueEmailsupplier", function(value, element) {
+                let isValid = false;
+                if(value == ''){
+                    return isValid = true;
+                }
                 $.ajax({
-                    type: 'POST',
-                    url: '{{ route('supplier.toggleStatus', '') }}/' + supplierId,
+                    url: '{{ route('supplier.checkEmail') }}',
                     data: {
-                        _token: '{{ csrf_token() }}'
+                        email: value,
+                        id: $('#id').val()
+
                     },
+                    type: 'GET',
+                    async: false, // تأكد من أن التحقق يتم بشكل متزامن
                     success: function(response) {
-                        button.toggleClass('btn-success btn-danger');
-                        button.text(response.status == 1 ? 'نشط' : 'غير نشط');
-                        notif({
-                            msg: 'تم تغيير حالة الحملة بنجاح',
-                            type: 'success'
-                        });
-                    },
-                    error: function() {
-                        notif({
-                            msg: 'حدث خطأ أثناء تغيير الحالة',
-                            type: 'error'
-                        });
+                        isValid = response.isUnique;
                     }
                 });
-            });
+                return isValid;
+            }, "هذا البريد الالكتروني موجود بالفعل في النظام.");
+
+            $.validator.addMethod("uniquephonesupplier", function(value, element) {
+                let isValid = false;
+                if(value == ''){
+                    return isValid = true;
+                }
+                $.ajax({
+                    url: '{{ route('supplier.checkPhone') }}',
+                    data: {
+                        phone: value,
+                        id: $('#id').val()
+                    },
+                    type: 'GET',
+                    async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                    success: function(response) {
+                        isValid = response.isUnique;
+                    }
+                });
+                return isValid;
+            }, "هذا رقم المورد موجود بالفعل في النظام.");
+
+            $.validator.addMethod("uniqueNameSupplier", function(value, element) {
+                let isValid = false;
+                if(value == ''){
+                    return isValid = true;
+                }
+                $.ajax({
+                    url: '{{ route('supplier.checkName') }}',
+                    data: {
+                        name: value,
+                        id: $('#supplier_id').val()
+                    },
+                    type: 'GET',
+                    async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                    success: function(response) {
+                        isValid = response.isUnique;
+                    }
+                });
+                return isValid;
+            }, "هذا اسم المورد موجود بالفعل في النظام.");
+
         });
     </script>
 @endsection

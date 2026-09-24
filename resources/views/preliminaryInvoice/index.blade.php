@@ -30,7 +30,7 @@
             <div class="card">
                 <div class="card-header pb-0">
                     @if ($errors->any())
-                        <div class="alert alert-outline-warning" role="alert">
+                        <div class="alert alert-outline-danger" role="alert">
                             <button aria-label="Close" class="close" data-dismiss="alert" type="button">
                                 <span aria-hidden="true">&times;</span></button>
                             @foreach ($errors->all() as $error)
@@ -60,12 +60,18 @@
                         </script>
                     @endif
 
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة فاتورة مبدئية')
-                            <a class="btn btn-primary btn-block" href="{{ route('preliminaryInvoice.create') }}"><i
-                                    class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة فاتورة مبدئية
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة فاتورة مبدئية')
+                                <a class="btn btn-primary" href="{{ route('preliminaryInvoice.create') }}"><i
+                                        class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة فاتورة مبدئية
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -73,14 +79,12 @@
                         <table class="table text-md-nowrap" id="example1">
                             <thead>
                                 <tr>
-                                    <th class="wd-3p border-bottom-0">#</th>
-                                    <th class="wd-15p border-bottom-0">رقم الفاتورة</th>
-                                    <th class="wd-15p border-bottom-0"> اجمالي المبلغ</th>
-                                    <th class="wd-15p border-bottom-0"> الخصم</th>
-                                    <th class="wd-15p border-bottom-0">قيمة الضريبة</th>
-                                    <th class="wd-15p border-bottom-0">تاريخ الفاتورة</th>
-                                    <th class="wd-15p border-bottom-0"> العميل</th>
-                                    <th class="wd-15p border-bottom-0">العمليات </th>
+                                    <th class="wd-10p border-bottom-0">#</th>
+                                    <th class="wd-20p border-bottom-0">رقم الفاتورة</th>
+                                    <th class="wd-20p border-bottom-0">تاريخ الفاتورة</th>
+                                    <th class="wd-20p border-bottom-0"> اسم العميل</th>
+                                    <th class="wd-20p border-bottom-0"> صافي المبلغ</th>
+                                    <th class="wd-20p border-bottom-0">العمليات </th>
 
                                 </tr>
                             </thead>
@@ -90,16 +94,20 @@
                                     <tr data-id="{{ $preliminaryInvoice->id }}">
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $preliminaryInvoice->invoice_number }}</td>
-                                        <td>{{ $preliminaryInvoice->total_amount }}</td>
-                                        <td>{{ $preliminaryInvoice->discount_amount }}</td>
-                                        <td>{{ $preliminaryInvoice->tax_amount }}</td>
-                                        <td>{{ $preliminaryInvoice->invoice_date }}</td>
+                                        <td>{{ $preliminaryInvoice->date }}</td>
                                         <td>{{ $preliminaryInvoice->customer->tree4_name ?? 'لا يوجد عميل' }}</td>
+                                        <td>{{ number_format($preliminaryInvoice->total_amount, 2) }}</td>
                                         <td>
+                                            @can('طباعة فاتورة مبدئية')
+                                                <a class="btn btn-outline-info btn-sm"
+                                                    href="{{ route('PreliminaryInvoice.print', $preliminaryInvoice->id) }}" title="طباعة">
+                                                    <i class="fa fa-print"></i>
+                                                </a>
+                                            @endcan
                                             @can('حذف فاتورة مبدئية')
                                                 <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
-                                                    data-toggle="modal" href="#deleteModal" data-id="{{ $preliminaryInvoice->id }}"
-                                                    title="حذف">
+                                                    data-toggle="modal" href="#deleteModal"
+                                                    data-id="{{ $preliminaryInvoice->id }}" title="حذف">
                                                     <i class="fa fa-trash">
                                                     </i></a>
                                             @endcan
@@ -109,7 +117,6 @@
                                                     title="اضافة مردودات مبيعات">
                                                     <i class="fa fa-reply"></i>
                                                 </a>
-                                                
                                             @endcan
                                         </td>
                                     </tr>
@@ -184,7 +191,8 @@
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
                 var modal = $(this);
-                $('#delete_preliminaryInvoice').attr('action', '{{ route('preliminaryInvoice.destroy', ':id') }}'
+                $('#delete_preliminaryInvoice').attr('action',
+                    '{{ route('preliminaryInvoice.destroy', ':id') }}'
                     .replace(
                         ':id', id));
             });

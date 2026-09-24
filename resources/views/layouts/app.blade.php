@@ -13,7 +13,8 @@
     @include('layouts.head')
 </head>
 
-<body class="main-body app sidebar-mini">
+<body
+    class="main-body app sidebar-mini {{ Route::is('sale_invoice.create') || Route::is('sale_invoice.edit') || Route::is('purchase_invoice.create') || Route::is('purchase_invoice.edit') || Route::is('sale_invoice_return.create') || Route::is('sale_invoice_return.edit') || Route::is('purchase_invoice_return.create') || Route::is('purchase_invoice_reutrn.edit') || Route::is('preliminaryInvoice.create') || Route::is('preliminaryInvoice.transform') ? 'sidenav-toggled' : '' }}">
     <!-- Loader -->
     <div id="global-loader">
         <img src="{{ URL::asset('assets/img/loader.svg') }}" class="loader-img" alt="Loader">
@@ -22,7 +23,20 @@
     @include('layouts.main-sidebar')
     <!-- main-content -->
     <div class="main-content app-content">
-        @include('layouts.main-header')
+        {{-- @if (
+            (Route::is('sale_invoice.create') ||
+                Route::is('sale_invoice.edit') ||
+                Route::is('purchase_invoice.create') ||
+                Route::is('purchase_invoice.edit') ||
+                Route::is('sale_invoice_return.create') ||
+                Route::is('sale_invoice_return.edit') ||
+                Route::is('purchase_invoice_return.create') ||
+                Route::is('purchase_invoice_reutrn.edit') ||
+                Route::is('preliminaryInvoice.create') ||
+                Route::is('preliminaryInvoice.transform')
+            )) --}}
+            @include('layouts.main-header')
+        {{-- @endif --}}
         <!-- container -->
         <div class="container-fluid">
             @yield('page-header')
@@ -34,4 +48,5 @@
 
 
 </body>
+
 </html>

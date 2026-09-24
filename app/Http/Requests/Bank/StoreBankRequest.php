@@ -22,7 +22,7 @@ class StoreBankRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:banks,name',
+            'name' => 'required|unique:tree4s,tree4_name',
             'no_bank' => 'required'
         ];
     }

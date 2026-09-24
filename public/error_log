@@ -1,0 +1,63 @@
+[01-Jul-2025 07:20:42 UTC] PHP Fatal error:  Composer detected issues in your platform: Your Composer dependencies require a PHP version ">= 8.2.0". You are running 7.3.33. in /home/almawadd/public_html/pos_bayan/vendor/composer/platform_check.php on line 24
+[01-Jul-2025 09:37:17 UTC] PHP Warning:  require(/home/almawadd/public_html/pos_bayan/vendor/autoload.php): Failed to open stream: No such file or directory in /home/almawadd/public_html/index.php on line 13
+[01-Jul-2025 09:37:17 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/almawadd/public_html/pos_bayan/vendor/autoload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/almawadd/public_html/index.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/index.php on line 13
+[01-Jul-2025 10:13:31 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:23
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 23
+[01-Jul-2025 10:15:41 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:15:43 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:15:44 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:15:44 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:17 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:19 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:20 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:31 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:32 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:58 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 10:16:59 UTC] PHP Fatal error:  Uncaught Error: Call to undefined function shell_exec() in /home/almawadd/public_html/optimize.php:3
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/optimize.php on line 3
+[01-Jul-2025 14:02:45 UTC] PHP Warning:  require(/home/almawadd/public_html/pos_bayan/vendor/autoload.php): Failed to open stream: No such file or directory in /home/almawadd/public_html/index.php on line 13
+[01-Jul-2025 14:02:45 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/almawadd/public_html/pos_bayan/vendor/autoload.php' (include_path='.:/opt/alt/php82/usr/share/pear:/opt/alt/php82/usr/share/php:/usr/share/pear:/usr/share/php') in /home/almawadd/public_html/index.php:13
+Stack trace:
+#0 {main}
+  thrown in /home/almawadd/public_html/index.php on line 13

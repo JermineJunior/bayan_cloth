@@ -7,14 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Unit extends Model
 {
-    protected $fillable = ['name', 'status'];
+    protected $fillable = ['name'];
 
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_units')->withPivot('price');
-    }
-    public function scopeStatusActive($query)
-    {
-        return $query->whereStatus(1);
     }
 }

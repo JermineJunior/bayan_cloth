@@ -64,18 +64,28 @@
             </ul>
         </div>
     @endif
-    <form id="roleForm" action="{{ route('role.update',$role->id) }}" method="POST">
+    <form id="roleForm" action="{{ route('role.update', $role->id) }}" method="POST">
         @csrf
         @method('PUT')
         <div class="row">
             <div class="col-md-12">
                 <div class="card mg-b-20">
+                    <div class="card-header pb-0">
+                        <div class="col-sm-1 col-md-12">
+                            <div class="float-left">
+                                <a href="javascript:history.back()" class="btn btn-warning">
+                                    <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card-body">
                         <div class="main-content-label mg-b-5">
                             <div class="col-md-7">
                                 <div class="form-group">
                                     <label><span class="tx-danger">*</span> اسم الصلاحية</label>
-                                    <input type="text" class="form-control" name="name" required value="{{ $role->name }}">
+                                    <input type="text" class="form-control" name="name" required
+                                        value="{{ $role->name }}">
                                 </div>
                             </div>
                         </div>
@@ -91,7 +101,8 @@
                         <div class="permission-container">
                             @foreach ($permissions as $permission)
                                 <label class="permission-label">
-                                    <input type="checkbox" @checked($role->permissions->contains('name',$permission->name)) class="custom-checkbox permission-checkbox" name="permission[]"
+                                    <input type="checkbox" @checked($role->permissions->contains('name', $permission->name))
+                                        class="custom-checkbox permission-checkbox" name="permission[]"
                                         value="{{ $permission->name }}">
                                     {{ $permission->name }}
                                 </label>

@@ -23,7 +23,7 @@ class UpdateSafeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required',Rule::unique('safes','name')->ignore($this->safe->id , 'id')]
+            'name' => ['required',Rule::unique('tree4s','tree4_name')->ignore($this->safe->id,'id')]
         ];
     }
 }

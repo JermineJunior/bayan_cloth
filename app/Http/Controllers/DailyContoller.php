@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Daily\StoreDailyRequest;
 use App\Models\Tree4;
-use App\Models\Operation;
 use Illuminate\View\View;
 use App\Models\Restriction;
 use Illuminate\Http\Request;
@@ -16,14 +15,67 @@ class DailyContoller extends Controller
 {
     public function index(): View
     {
-        $operations = Operation::with('restrictions')->whereIn('type',[5,6])->orderByDesc('id')->get();
-        return view('daily.index', compact('operations'));
+        // فقط السطور المدين، لتجنب التكرار
+        $restrictions = Restriction::with(['tree4', 'user'])
+            ->where('branch_id', session('branch_id'))
+            ->whereIn('type', [5, 6])
+            ->orderByDesc('id')
+            ->get();
+
+        // نجمع القيود بحسب رقم المعاملة
+        $grouped = $restrictions->where('branch_id',session('branch_id'))->groupBy('constant_number');
+
+        $results = $grouped
+            ->map(function ($group) {
+                // كل عناصر هذا القيد
+                $madinAccounts = [];
+                $dainAccounts = [];
+                $id = null;
+                $date = null;
+                $user = null;
+                $type = null;
+                $node = null;
+                $constant_number = null;
+
+                foreach ($group as $entry) {
+                    $name = $entry->tree4->tree4_name ?? '';
+                    if ($entry->madin > 0) {
+                        $madinAccounts[] = $name . ' (' . number_format($entry->madin, 2) . ')';
+                    }
+                    if ($entry->dain > 0) {
+                        $dainAccounts[] = $name . ' (' . number_format($entry->dain, 2) . ')';
+                    }
+                    $id = $entry->id;
+                    $date = $entry->date;
+                    $user = $entry->user->name ?? '';
+                    $type = $entry->type;
+                    $node = $entry->node;
+                    $constant_number = $entry->constant_number;
+                }
+
+                return (object) [
+                    'id' => $id,
+                    'constant_number' => $constant_number,
+                    'date' => $date,
+                    'madin_name' => implode(' + ', $madinAccounts),
+                    'dain_name' => implode(' + ', $dainAccounts),
+                    'user' => $user,
+                    'type' => $type,
+                    'node' => $node,
+                    'price' => $group->sum('madin') ?? $group->sum('dain'),
+                ];
+            })
+            ->values(); // ترتيب النتائج
+
+        return view('daily.index', ['operations' => $results]);
     }
+
     public function create(): View
     {
-        $maxInvoiceNumber = Restriction::max('constant_number');
+        $maxInvoiceNumber = Restriction::where('branch_id', session('branch_id'))->max('constant_number');
         $constant_number = $maxInvoiceNumber + 1;
-        return view('daily.create', compact('constant_number'));
+        $trees = Tree4::get();
+        return view('daily.create', compact('constant_number', 'trees'));
     }
 
     public function store(StoreDailyRequest $request): RedirectResponse
@@ -32,17 +84,6 @@ class DailyContoller extends Controller
             DB::beginTransaction();
             $madin = Tree4::find($request->madin);
             $dain = Tree4::find($request->dain);
-            $operation = Operation::create([
-                'madin_id' => $request->madin,
-                'dain_id' => $request->dain,
-                'madin' => $madin->tree4_code,
-                'dain' => $dain->tree4_code,
-                'price' => $request->price,
-                'constant_number' => $request->constant_number,
-                'node' => $request->node,
-                'type' => 5,
-                'user_id' => Auth::id(),
-            ]);
 
             Restriction::create([
                 'tree4_id' => $madin->id,
@@ -53,8 +94,8 @@ class DailyContoller extends Controller
                 'node' => $request->node,
                 'constant_number' => $request->constant_number,
                 'type' => 5,
+                'branch_id' => session('branch_id'),
                 'user_id' => Auth::id(),
-                'operation_id' => $operation->id,
             ]);
 
             Restriction::create([
@@ -66,26 +107,31 @@ class DailyContoller extends Controller
                 'node' => $request->node,
                 'constant_number' => $request->constant_number,
                 'type' => 5,
+                'branch_id' => session('branch_id'),
                 'user_id' => Auth::id(),
-                'operation_id' => $operation->id,
             ]);
 
             DB::commit();
-            return redirect()->route('daily.index')->with('success_created', 'successfully created');
+            return redirect()->route('daily.show', $request->constant_number)->with('success_created', 'successfully created');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->route('daily.index')->withErrors($e->getMessage());
         }
     }
 
-    public function destroy(Request $request):RedirectResponse
+    public function show($constant_number)
     {
-        $operation = Operation::find($request->id);
-        if (!$operation){
+        $restrictions = Restriction::with('tree4')->where('branch_id', session('branch_id'))->where('constant_number', $constant_number)->get();
+        return view('daily.print', compact('restrictions'));
+    }
+
+    public function destroy(Request $request): RedirectResponse
+    {
+        $operation = Restriction::find($request->id);
+        if (!$operation) {
             return back()->withErrors('حدث خطا ما يرجى المحاولة مرة اخرى');
         }
-        $operation->delete();
+        Restriction::where('constant_number', $operation->constant_number)->where('branch_id',session('branch_id'))->delete();
         return back()->with('success_deleted', 'successfully deleted');
-         
     }
 }

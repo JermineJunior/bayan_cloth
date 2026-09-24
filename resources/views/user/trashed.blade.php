@@ -16,7 +16,7 @@
         <div class="my-auto">
             <div class="d-flex">
                 <h4 class="content-title mb-0 my-auto">المستخدمين</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ قائمة
-                    المستخدمين المحذوفين</span>
+                    المستخدمين الموؤرشفين</span>
             </div>
         </div>
     </div>
@@ -39,14 +39,21 @@
     <div class="row row-sm">
         <div class="col-xl-12">
             <div class="card">
+                <div class="card-header pb-0">
+                    <div class="float-left">
+                        <a href="javascript:history.back()" class="btn btn-warning">
+                            <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                        </a>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="table-responsive hoverable-table">
                         <table class="table table-hover" id="example1" data-page-length='50' style=" text-align: center;">
                             <thead>
                                 <tr>
                                     <th class="wd-10p border-bottom-0">م</th>
-                                    <th class="wd-15p border-bottom-0">اسم المستخدم</th>
-                                    <th class="wd-20p border-bottom-0">البريد الالكتروني</th>
+                                    <th class="wd-15p border-bottom-0">الاسم</th>
+                                    <th class="wd-20p border-bottom-0">اسم المستخدم</th>
                                     <th class="wd-15p border-bottom-0">حالة المستخدم</th>
                                     <th class="wd-10p border-bottom-0">العمليات</th>
                                 </tr>
@@ -56,7 +63,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $user->name }}</td>
-                                        <td>{{ $user->email }}</td>
+                                        <td>{{ $user->username }}</td>
                                         <td>
                                             <button
                                                 class="btn btn-sm btn-{{ $user->status ? 'success' : 'danger' }} toggle-status-btn"

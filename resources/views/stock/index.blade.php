@@ -15,8 +15,8 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h5 class="content-title mb-0 my-auto"> ادارة المخزون</h5><span class="text-muted mt-1 tx-13 mr-2 mb-0">/
-                    قائمة المخزون</span>
+                <h5 class="content-title mb-0 my-auto"> ادارة المخزن</h5><span class="text-muted mt-1 tx-13 mr-2 mb-0">/
+                    قائمة المخزن</span>
             </div>
         </div>
     </div>
@@ -29,7 +29,7 @@
             <div class="card">
                 <div class="card-header pb-0">
                     @if ($errors->any())
-                        <div class="alert alert-outline-warning" role="alert">
+                        <div class="alert alert-outline-danger" role="alert">
                             <button aria-label="Close" class="close" data-dismiss="alert" type="button">
                                 <span aria-hidden="true">&times;</span></button>
                             @foreach ($errors->all() as $error)
@@ -69,12 +69,18 @@
                         </script>
                     @endif
 
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة مخزون')
-                            <a class="modal-effect btn btn-primary btn-block" data-effect="effect-super-scaled"
-                                data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة مخزون
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة مخزن')
+                                <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled"
+                                    data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة مخزن
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                     {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                 </div>
@@ -85,7 +91,6 @@
                                 <tr>
                                     <th class="wd-5p border-bottom-0">#</th>
                                     <th class="wd-20p border-bottom-0">الاسم</th>
-                                    <th class="wd-10p">الحالة</th>
                                     <th class="wd-15p border-bottom-0">العمليات </th>
 
                                 </tr>
@@ -96,16 +101,8 @@
                                     <tr data-id="{{ $stock->id }}">
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $stock->name }}</td>
-                                        <!-- عرض عدد الحجاج في هذه الحملة -->
                                         <td>
-                                            <button
-                                                class="btn btn-sm btn-{{ $stock->status ? 'success' : 'danger' }} toggle-status-btn"
-                                                data-id="{{ $stock->id }}">
-                                                {{ $stock->status == 1 ? 'نشط' : 'غير نشط' }}
-                                            </button>
-                                        </td>
-                                        <td>
-                                            @can('تعديل المخزون')
+                                            @can('تعديل المخزن')
                                                 <a class="modal-effect btn btn-outline-success btn-sm"
                                                     data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
                                                     data-id="{{ $stock->id }}" data-name="{{ $stock->name }}"
@@ -113,7 +110,7 @@
                                                     <i class="fa fa-edit">
                                                     </i></a>
                                             @endcan
-                                            @can('حذف المخزون')
+                                            @can('حذف المخزن')
                                                 <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
                                                     data-toggle="modal" href="#deleteModal" data-id="{{ $stock->id }}"
                                                     title="حذف">
@@ -136,14 +133,14 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content modal-content-demo">
                     <div class="modal-header">
-                        <h6 class="modal-title">إضافة مخزون جديد </h6><button aria-label="Close" class="close"
+                        <h6 class="modal-title">إضافة مخزن جديد </h6><button aria-label="Close" class="close"
                             data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <form action="{{ route('stock.index') }}" method="post">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم المخزون </label>
+                                <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم المخزن </label>
                                 <input type="text" name="name" id="name" class="form-control" required>
                             </div>
 
@@ -162,7 +159,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content modal-content-demo">
                     <div class="modal-header">
-                        <h6 class="modal-title">تعديل مخزون </h6><button aria-label="Close" class="close"
+                        <h6 class="modal-title">تعديل مخزن </h6><button aria-label="Close" class="close"
                             data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <form action="#" method="post" id="edit_stock">
@@ -170,7 +167,7 @@
                         @method('PUT')
                         <div class="modal-body">
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label>اسم المخزون</label>
+                                <span class="tx-danger">*</span><label>اسم المخزن</label>
                                 <input id="name_ed" required type="text" name="name" class="form-control"
                                     required>
                             </div>
@@ -259,34 +256,6 @@
                 var modal = $(this);
                 $('#delete_stock').attr('action', '{{ route('stock.destroy', ':id') }}'.replace(
                     ':id', id));
-            });
-
-            // Handling status toggle button click
-            $('.toggle-status-btn').click(function() {
-                var stockId = $(this).data('id');
-                var button = $(this);
-
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('stock.toggleStatus', '') }}/' + stockId,
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        button.toggleClass('btn-success btn-danger');
-                        button.text(response.status == 1 ? 'نشط' : 'غير نشط');
-                        notif({
-                            msg: 'تم تغيير حالة الحملة بنجاح',
-                            type: 'success'
-                        });
-                    },
-                    error: function() {
-                        notif({
-                            msg: 'حدث خطأ أثناء تغيير الحالة',
-                            type: 'error'
-                        });
-                    }
-                });
             });
         });
     </script>

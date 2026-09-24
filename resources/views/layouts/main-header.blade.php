@@ -3,14 +3,38 @@
     <div class="container-fluid">
         <div class="main-header-left ">
             <div class="responsive-logo">
-                <a href="{{ url('/' . ($page = 'home')) }}"><img src="{{ URL::asset('assets/img/brand/logo.png') }}"
-                        class="logo-1" alt="logo"></a>
-                <a href="{{ url('/' . ($page = 'home')) }}"><img src="{{ URL::asset('assets/img/brand/logo-white.png') }}"
-                        class="dark-logo-1" alt="logo"></a>
-                <a href="{{ url('/' . ($page = 'home')) }}"><img src="{{ URL::asset('assets/img/brand/favicon.png') }}"
-                        class="logo-2" alt="logo"></a>
-                <a href="{{ url('/' . ($page = 'home')) }}"><img src="{{ URL::asset('assets/img/brand/favicon.png') }}"
-                        class="dark-logo-2" alt="logo"></a>
+
+                <a href="{{ url('/' . ($page = 'home')) }}">
+                    @if (GeneralSiteSettings('logo'))
+                        <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo-1" alt="logo">
+                    @else
+                        <img src="{{ Avatar::create('phone') }}" class="logo-1" alt="logo">
+                    @endif
+                </a>
+                <a href="{{ url('/' . ($page = 'home')) }}">
+                    @if (GeneralSiteSettings('logo'))
+                        <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="dark-logo-1"
+                            alt="logo">
+                    @else
+                        <img src="{{ Avatar::create('phone') }}" class="dark-logo-1" alt="logo">
+                    @endif
+                </a>
+                <a href="{{ url('/' . ($page = 'home')) }}">
+                    @if (GeneralSiteSettings('logo'))
+                        <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo-2"
+                            alt="logo">
+                    @else
+                        <img src="{{ Avatar::create('phone') }}" class="logo-2" alt="logo">
+                    @endif
+                </a>
+                <a href="{{ url('/' . ($page = 'home')) }}">
+                    @if (GeneralSiteSettings('logo'))
+                        <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="dark-logo-2"
+                            alt="logo">
+                    @else
+                        <img src="{{ Avatar::create('phone') }}" class="dark-logo-2" alt="logo">
+                    @endif
+                </a>
             </div>
             <div class="app-sidebar__toggle" data-toggle="sidebar">
                 <a class="open-toggle" href="#"><i class="header-icon fe fe-align-left"></i></a>
@@ -164,7 +188,7 @@
 								</div>
 							</div>  --}}
                 {{-- @if (countNotifications() > 0) --}}
-                    {{-- <div class="dropdown nav-item main-header-notification">
+                {{-- <div class="dropdown nav-item main-header-notification">
                         <a class="new nav-link" href="#">
                             <svg xmlns="http://www.w3.org/2000/svg" class="header-icon-svgs" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -217,14 +241,25 @@
                         </svg></a>
                 </div>
                 <div class="dropdown main-profile-menu nav nav-item nav-link">
-                    <a class="profile-user d-flex" href=""><img alt=""
-                            src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}"></a>
+                    <a class="profile-user d-flex" href="">
+                        @if (GeneralSiteSettings('logo'))
+                            <img alt="" src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}">
+                        @else
+                            <img alt="" src="{{ Avatar::create('phone') }}">
+                        @endif
+                    </a>
                     <div class="dropdown-menu">
                         <div class="main-header-profile bg-primary p-3">
                             <div class="d-flex wd-100p">
-                                <div class="main-img-user"><img alt=""
-                                        src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}"
-                                        class=""></div>
+                                <div class="main-img-user">
+                                    @if (GeneralSiteSettings('logo'))
+                                        <img alt=""
+                                            src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}"
+                                            class="">
+                                    @else
+                                        <img alt="" src="{{ Avatar::create('phone') }}" class="">
+                                    @endif
+                                </div>
                                 <div class="mr-3 my-auto">
                                     <h6>{{ Auth::user()->name }}</h6><span>{{ Auth::user()->email }}</span>
                                 </div>
@@ -247,7 +282,7 @@
                         {{--  <a class="dropdown-item" href="{{ url('/' . $page='page-signin') }}"><i class="bx bx-log-out"></i> Sign Out</a>  --}}
                     </div>
                 </div>
-                <div class="dropdown main-header-message right-toggle">
+                {{-- <div class="dropdown main-header-message right-toggle">
                     <a class="nav-link pr-0" data-toggle="sidebar-left" data-target=".sidebar-left">
                         <svg xmlns="http://www.w3.org/2000/svg" class="header-icon-svgs" viewBox="0 0 24 24"
                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -257,7 +292,7 @@
                             <line x1="3" y1="18" x2="21" y2="18"></line>
                         </svg>
                     </a>
-                </div>
+                </div> --}}
             </div>
         </div>
     </div>

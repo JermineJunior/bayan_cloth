@@ -100,10 +100,24 @@ class Tree3TableSeeder extends Seeder
         $tree3->save();
 
         $tree3 = new Tree3();
-        $tree3->tree3_code = 2302;
-        $tree3->tree3_name = 'العمال';
-        $tree3->tree2_id = 9;
-        $tree3->tree2_code = 23;
+        $tree3->tree3_code = 1206;
+        $tree3->tree3_name = 'مدينون المناديب ';
+        $tree3->tree2_id = 2;
+        $tree3->tree2_code = 12;
+        $tree3->save();
+
+        $tree3 = new Tree3();
+        $tree3->tree3_code = 3101;
+        $tree3->tree3_name = 'راس المال';
+        $tree3->tree2_id = 10;
+        $tree3->tree2_code = 31;
+        $tree3->save();
+
+        $tree3 = new Tree3();
+        $tree3->tree3_code = 5301;
+        $tree3->tree3_name = 'منصرفات مشتريات خارجية';
+        $tree3->tree2_id = 11;
+        $tree3->tree2_code = 53;
         $tree3->save();
     }
 }

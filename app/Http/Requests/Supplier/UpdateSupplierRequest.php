@@ -23,10 +23,10 @@ class UpdateSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' =>'required|string|max:255',
-            'email' =>['nullable' ,'email' ,Rule::unique('suppliers','email')->ignore($this->supplier->id , 'id')],
-            'phone' => ['required', Rule::unique('suppliers','phone')->ignore($this->supplier->id , 'id')],
-            'address' => 'required|string|max:255'
+            'name' => ['required', 'string', 'max:255', Rule::unique('tree4s', 'tree4_name')->ignore($this->supplier->id, 'id')],
+            'email' => ['nullable', 'email', Rule::unique('tree4s', 'email')->ignore($this->supplier->id, 'id')],
+            'phone' => ['nullable', Rule::unique('tree4s', 'phone')->ignore($this->supplier->id, 'id')],
+            'address' => 'nullable|string|max:255',
         ];
     }
 }

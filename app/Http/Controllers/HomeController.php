@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
-use App\Models\Restriction;
 use App\Models\SaleInvoice;
 use App\Models\PurchaseInvoice;
 use App\Models\SaleInvoiceReturn;
@@ -19,7 +17,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // أسماء الأشهر بالعربية
         $arabicMonths = [
             1 => 'يناير',
             2 => 'فبراير',
@@ -36,11 +33,9 @@ class HomeController extends Controller
         ];
 
         // إحضار بيانات المبيعات حسب الأشهر
-        $sales = SaleInvoice::selectRaw('SUM(total_amount) as total, MONTH(created_at) as month')->groupBy('month')->orderBy('month')->get()->keyBy('month');
-
+        $sales = SaleInvoice::selectRaw('MONTH(created_at) as month, SUM(total_amount) as total')->whereYear('created_at', now()->year)->where('branch_id', session('branch_id'))->groupByRaw('MONTH(created_at)')->orderByRaw('MONTH(created_at)')->get()->keyBy('month');
         // إحضار بيانات المشتريات حسب الأشهر
-        $purchases = PurchaseInvoice::selectRaw('SUM(total_amount) as total, MONTH(created_at) as month')->groupBy('month')->orderBy('month')->get()->keyBy('month');
-
+        $purchases = PurchaseInvoice::selectRaw('MONTH(created_at) as month, SUM(total_amount) as total')->whereYear('created_at', now()->year)->where('branch_id', session('branch_id'))->groupByRaw('MONTH(created_at)')->orderByRaw('MONTH(created_at)')->get()->keyBy('month');
         // تجهيز بيانات الأشهر لكل المخططات
         $months = [];
         $salesTotals = [];
@@ -53,12 +48,12 @@ class HomeController extends Controller
         }
 
         // حساب إجمالي المبيعات والمردودات
-        $totalSales = SaleInvoice::whereMonth('created_at', now()->month)->count();
-        $totalSalesReturns = SaleInvoiceReturn::whereMonth('created_at', now()->month)->count();
+        $totalSales = SaleInvoice::whereMonth('created_at', now()->month)->where('branch_id', session('branch_id'))->count();
+        $totalSalesReturns = SaleInvoiceReturn::whereMonth('created_at', now()->month)->where('branch_id', session('branch_id'))->count();
 
         // حساب إجمالي المشتريات والمردودات
-        $totalPurchases = PurchaseInvoice::whereMonth('created_at', now()->month)->count();
-        $totalPurchaseReturns = PurchaseInvoiceReturn::whereMonth('created_at', now()->month)->count();
+        $totalPurchases = PurchaseInvoice::whereMonth('created_at', now()->month)->where('branch_id', session('branch_id'))->count();
+        $totalPurchaseReturns = PurchaseInvoiceReturn::whereMonth('created_at', now()->month)->where('branch_id', session('branch_id'))->count();
 
         // مخطط المبيعات (Bar Chart)
         $salesChart = new Chart();
@@ -99,7 +94,6 @@ class HomeController extends Controller
                 'responsive' => true,
                 'maintainAspectRatio' => false,
             ]);
-
-        return view('dashboard.index', compact('totalSales','totalSalesReturns','totalPurchases','totalPurchaseReturns','salesChart', 'purchaseChart', 'salesComparisonChart', 'purchaseComparisonChart'));
+        return view('dashboard.index', compact('totalSales', 'totalSalesReturns', 'totalPurchases', 'totalPurchaseReturns', 'salesChart', 'purchaseChart', 'salesComparisonChart', 'purchaseComparisonChart'));
     }
 }

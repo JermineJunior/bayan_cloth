@@ -22,10 +22,10 @@ class StoreSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' =>'required|string|max:255',
-            'email' =>'nullable|email|unique:suppliers,email',
-            'address' =>'required|string|max:255',
-            'phone' =>'required|unique:suppliers,phone',
+            'name' =>'required|string|max:255|unique:tree4s,tree4_name',
+            'email' =>'nullable|email|unique:tree4s,email',
+            'address' =>'nullable|string|max:255',
+            'phone' =>'nullable|unique:tree4s,phone',
         ];
     }
 }

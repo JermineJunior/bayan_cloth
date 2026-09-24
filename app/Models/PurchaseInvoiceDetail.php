@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseInvoiceDetail extends Model
 {
-    protected $fillable = ['purchase_invoice_id', 'product_id', 'unit_id', 'qty', 'price', 'row_sub_total'];
+    protected $fillable = ['purchase_invoice_id', 'product_id', 'unit_id', 'qty', 'bounce','expire_date', 'price', 'row_sub_total'];
 
     public function product(): BelongsTo
     {
@@ -17,5 +17,10 @@ class PurchaseInvoiceDetail extends Model
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    public function purchase_invoice()
+    {
+        return $this->belongsTo(PurchaseInvoice::class);
     }
 }

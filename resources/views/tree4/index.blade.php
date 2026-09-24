@@ -69,12 +69,18 @@
                             }
                         </script>
                     @endif
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة نشاط')
-                            <a class="modal-effect btn btn-primary btn-block" data-effect="effect-super-scaled"
-                                data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة نشاط')
+                                <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled" data-toggle="modal"
+                                    href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -105,7 +111,7 @@
                                                     <i class="fa fa-edit">
                                                     </i>&nbsp;&nbsp;تعديل </i></a>
                                             @endcan
-                                            @can('حذف نشاط')
+                                            {{-- @can('حذف نشاط')
                                                 <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
                                                     data-toggle="modal" href="#modaldemo5" data-id="{{ $tree->id }}"
                                                     data-tree4_name="{{ $tree->tree4_name }}"
@@ -113,7 +119,7 @@
                                                     data-tree3_name="{{ $tree->tree3->tree3_name }}" title="تعديل">
                                                     <i class="fa fa-trash">
                                                     </i>&nbsp;&nbsp;حذف </i></a>
-                                            @endcan
+                                            @endcan --}}
                                         </td>
 
                                     </tr>
@@ -152,7 +158,8 @@
                             </div>
                             <div class="modal-footer">
                                 <button class="btn ripple btn-primary" type="submit">اضافة</button>
-                                <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">إغلاق</button>
+                                <button class="btn ripple btn-secondary" data-dismiss="modal"
+                                    type="button">إغلاق</button>
                             </div>
                         </div>
                     </form>

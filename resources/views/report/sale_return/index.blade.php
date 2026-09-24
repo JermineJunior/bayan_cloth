@@ -23,7 +23,7 @@
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <div class="card-body">
-                            <form method="POST" action="{{ route('reports.sale_return.show') }}" id="demo-form2" class="form-horizontal form-label-left">
+                            <form method="POST" action="{{ route('report.sale_return.show') }}" id="demo-form2" class="form-horizontal form-label-left">
                                 @csrf
                                 <div class="row">
                                     <div class="col">

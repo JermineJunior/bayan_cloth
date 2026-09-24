@@ -14,19 +14,23 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Models\Branch;
 
 class UserController extends Controller
 {
     public function index(): View
     {
-        $users = User::where('id', '!=', 1)->get();
+        $users = User::whereHas('branches',function($query){
+            $query->where('branch_id',session('branch_id'));
+        })->where('id', '!=', 1)->get();
         return view('user.index', compact('users'));
     }
 
     public function create(): View
     {
         $roles = Role::select('name', 'id')->get();
-        return view('user.create', compact('roles'));
+        $branches = Branch::get();
+        return view('user.create', compact('roles', 'branches'));
     }
 
     public function store(StoreUserRequest $request): RedirectResponse
@@ -35,13 +39,16 @@ class UserController extends Controller
             DB::beginTransaction();
             $user = User::create([
                 'name' => $request->name,
-                'email' => $request->email,
+                'username' => $request->username,
                 'password' => bcrypt($request->password),
-                'phone_number' => $request->phone_number,
+                
             ]);
+            foreach ($request->branch as $branch) {
+                $user->branches()->syncWithoutDetaching([$branch]);
+            }
 
-            $role = Role::find($request->roles_name)->pluck('name');
-            $user->assignRole($role[0]);
+            $role = Role::find($request->roles_name);
+            $user->assignRole($role);
 
             DB::commit();
             return redirect()->route('user.index')->with('success_created', 'تم اضافة المستخدم بنجاح');
@@ -54,7 +61,8 @@ class UserController extends Controller
     public function edit(User $user): View
     {
         $roles = Role::select('id', 'name')->get();
-        return view('user.edit', compact('user', 'roles'));
+        $branches = Branch::get();
+        return view('user.edit', compact('user', 'roles', 'branches'));
     }
 
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
@@ -65,8 +73,7 @@ class UserController extends Controller
             // تحديث بيانات المستخدم
             $user->update([
                 'name' => $request->name,
-                'email' => $request->email,
-                'phone_number' => $request->phone_number,
+                'username' => $request->username,
             ]);
 
             if ($request->filled('password')) {
@@ -75,9 +82,12 @@ class UserController extends Controller
             }
 
             // تحديث الصلاحية
-            $role = Role::find($request->roles_name)->name; // الحصول على اسم الدور
+            $role = Role::find($request->roles_name); // الحصول على اسم الدور
             $user->syncRoles($role); // حذف الأدوار القديمة وتعيين الدور الجديد
 
+            foreach ($request->branch as $branch) {
+                $user->branches()->syncWithoutDetaching([$branch]);
+            }
             DB::commit();
 
             return redirect()->route('user.index')->with('success_updated', 'تم تعديل البيانات بنجاح');
@@ -171,12 +181,6 @@ class UserController extends Controller
         return redirect()->route('user.trashed_users')->with('success_deleted', 'تم حذف المستخدم نهائيا ');
     }
 
-    public function toggleStatus(User $user): JsonResponse
-    {
-        $user->update(['status' => !$user->status]);
-        return response()->json(['status' => $user->status]);
-    }
-
     public function profile(): View
     {
         $user = User::whereId(Auth::id())->first();
@@ -189,12 +193,12 @@ class UserController extends Controller
 
         $this->validate($request, [
             'name' => 'required',
-            'email' => ['required', Rule::unique('users')->ignore($user)],
+            'username' => ['required', Rule::unique('users')->ignore($user)],
             'password' => 'same:password_confirmation',
         ]);
 
         $user->name = $request->name;
-        $user->email = $request->email;
+        $user->username = $request->username;
         if ($request->password) {
             $user->password = Hash::make($request->password);
         }
@@ -203,17 +207,12 @@ class UserController extends Controller
         return back();
     }
 
-    public function checkPhoneNumber(Request $request): JsonResponse
+    public function checkUserName(Request $request): JsonResponse
     {
         $id = $request->input('id');
-        $exists = User::where('phone_number', $request->phone_number)->where('id', '!=', $id)->exists(); // تحقق من وجود الباركود في قاعدة البيانات
-        return response()->json(['isUnique' => !$exists]);
-    }
-
-    public function checkEmail(Request $request): JsonResponse
-    {
-        $id = $request->input('id');
-        $exists = User::where('email', $request->email)->where('id', '!=', $id)->exists(); // تحقق من وجود الباركود في قاعدة البيانات
+        $exists = User::whereHas('branches',function($query){
+            $query->where('branch_id',session('branch_id'));
+        })->where('username', $request->username)->where('id', '!=', $id)->exists(); // تحقق من وجود الباركود في قاعدة البيانات
         return response()->json(['isUnique' => !$exists]);
     }
 }

@@ -61,12 +61,18 @@
                             }
                         </script>
                     @endif
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('الارصدة الافتتاحية')
-                            <a class="btn btn-primary btn-block" href="{{ route('opening.create') }}"><i class="fa fa-plus">
-                                </i>&nbsp;&nbsp;إضافة رصيد افتتاحي
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة رصيد افتتاحي')
+                                <a class="btn btn-primary" href="{{ route('opening.create') }}"><i class="fa fa-plus">
+                                    </i>&nbsp;&nbsp;إضافة رصيد افتتاحي
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -87,17 +93,18 @@
                             <tbody>
                                 @foreach ($operations as $operation)
                                     <tr>
-                                        @if ($operation->tree4_madin == null)
+                                        @if ($operation->madin == 0)
                                             <td> دائن </td>
                                         @else
                                             <td> مدين </td>
                                         @endif
-                                        <td>{{ $operation->tree4_dain->tree4_name ?? $operation->tree4_madin->tree4_name }}</td>
+                                        <td>{{ $operation->tree4->tree4_name }}</td>
                                         <td>{{ $operation->user->name }}</td>
-                                        <td>{{ number_format($operation->price, 2) }}</td>
+                                        <td>{{ number_format($operation->dain == 0 ? $operation->madin : $operation->dain, 2) }}
+                                        </td>
                                         <td>{{ $operation->node }}</td>
                                         <td>{{ $operation->constant_number }}</td>
-                                        <td>{{ $operation->created_at->format('Y/m/d') }}</td>
+                                        <td>{{ $operation->date }}</td>
                                         <td>
                                             <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#modaldemo5"
                                                 data-toggle="modal" href="#modaldemo5" data-id="{{ $operation->id }}"
@@ -174,7 +181,7 @@
             var button = $(event.relatedTarget);
             var id = button.data('id');
             var modal = $(this);
-            $('#openingForm').attr('action', '{{ route('opening.destroy', ':id') }}'.repalce(':id', id));
+            $('#openingForm').attr('action', '{{ route('opening.destroy', ':id') }}'.replace(':id', id));
             modal.find('.modal-body #id').val(id);
         })
     </script>

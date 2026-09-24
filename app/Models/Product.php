@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Product extends Model
 {
-    protected $fillable = ['barcode', 'name', 'category_id', 'purchase_price', 'reorder_level', 'unit_purchase_price', 'unit_reorder_level', 'status', 'expire_date'];
+    protected $fillable = ['barcode', 'name', 'name_en', 'category_id', 'reorder_level', 'unit_reorder_level', 'expire_date'];
 
     protected $casts = [
         'stock_id' => 'array',
@@ -21,7 +21,7 @@ class Product extends Model
 
     public function units(): BelongsToMany
     {
-        return $this->belongsToMany(Unit::class, 'product_units')->withPivot('price', 'conversion_factor');
+        return $this->belongsToMany(Unit::class, 'product_units')->withPivot('price', 'price_purchase', 'conversion_factor');
     }
 
     public function stocks(): BelongsToMany
@@ -31,19 +31,31 @@ class Product extends Model
 
     public function convertQuantity($quantity)
     {
-        $result = [];
+        if ($this->units()->count() > 0) {
+            $units = $this->units->sortByDesc(fn($unit) => $unit->pivot->conversion_factor);
 
-        // ترتيب الوحدات من الأكبر إلى الأصغر
-        $units = $this->units->sortByDesc(fn($unit) => $unit->pivot->conversion_factor);
-
-        foreach ($units as $unit) {
-            if ($quantity >= $unit->pivot->conversion_factor) {
-                $count = floor($quantity / $unit->pivot->conversion_factor);
-                $quantity = $quantity % $unit->pivot->conversion_factor;
-                $result[] = "$count {$unit->name}";
+            // حالة الكمية صفر أو سالبة
+            if ($quantity <= 0) {
+                $smallestUnit = $this->units->sortBy(fn($unit) => $unit->pivot->conversion_factor)->first();
+                return "{$quantity} {$smallestUnit->name}";
             }
-        }
 
-        return implode(' و ', $result);
+            $result = [];
+
+            foreach ($units as $unit) {
+                if ($quantity >= $unit->pivot->conversion_factor) {
+                    $count = floor($quantity / $unit->pivot->conversion_factor);
+                    $quantity = $quantity % $unit->pivot->conversion_factor;
+                    $result[] = "$count {$unit->name}";
+                }
+            }
+
+            return implode(' و ', $result);
+        }
+    }
+
+    public function stockDetails()
+    {
+        return $this->hasMany(StockDetail::class, 'product_id');
     }
 }

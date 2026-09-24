@@ -30,7 +30,7 @@
             <div class="card">
                 <div class="card-header pb-0">
                     @if ($errors->any())
-                        <div class="alert alert-outline-warning" role="alert">
+                        <div class="alert alert-outline-danger" role="alert">
                             <button aria-label="Close" class="close" data-dismiss="alert" type="button">
                                 <span aria-hidden="true">&times;</span></button>
                             @foreach ($errors->all() as $error)
@@ -70,12 +70,18 @@
                         </script>
                     @endif
 
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة فاتورة مبيعات')
-                            <a class="btn btn-primary btn-block" href="{{ route('sale_invoice.create') }}"><i
-                                    class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة فاتورة مبيعات
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة فاتورة مبيعات')
+                                <a class="btn btn-primary" href="{{ route('sale_invoice.create') }}"><i class="fa fa-plus">
+                                    </i>&nbsp;&nbsp;إضافة فاتورة مبيعات
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                     {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                 </div>
@@ -84,14 +90,12 @@
                         <table class="table text-md-nowrap" id="example1">
                             <thead>
                                 <tr>
-                                    <th class="wd-3p border-bottom-0">#</th>
-                                    <th class="wd-15p border-bottom-0">رقم الفاتورة</th>
-                                    <th class="wd-15p border-bottom-0"> اجمالي المبلغ</th>
-                                    <th class="wd-15p border-bottom-0"> الخصم</th>
-                                    <th class="wd-15p border-bottom-0">قيمة الضريبة</th>
-                                    <th class="wd-15p border-bottom-0">تاريخ الفاتورة</th>
-                                    <th class="wd-10p">الحالة</th>
-                                    <th class="wd-15p border-bottom-0">العمليات </th>
+                                    <th class="wd-10p border-bottom-0">#</th>
+                                    <th class="wd-10p border-bottom-0">رقم الفاتورة</th>
+                                    <th class="wd-20p border-bottom-0"> تاريخ الفاتورة</th>
+                                    <th class="wd-20p border-bottom-0"> اسم العميل</th>
+                                    <th class="wd-20p border-bottom-0">صافي الفاتورة</th>
+                                    <th class="wd-20p border-bottom-0">العمليات </th>
 
                                 </tr>
                             </thead>
@@ -101,18 +105,23 @@
                                     <tr data-id="{{ $sale_invoice->id }}">
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $sale_invoice->invoice_number }}</td>
-                                        <td>{{ $sale_invoice->total_amount }}</td>
-                                        <td>{{ $sale_invoice->discount_amount }}</td>
-                                        <td>{{ $sale_invoice->tax_amount }}</td>
-                                        <td>{{ $sale_invoice->invoice_date }}</td>
+                                        <td>{{ $sale_invoice->date }}</td>
+                                        <td>{{ $sale_invoice->customer->tree4_name ?? '-' }}</td>
+                                        <td>{{ number_format($sale_invoice->total_amount, 2) }}</td>
                                         <td>
-                                            <button
-                                                class="btn btn-sm btn-{{ $sale_invoice->status ? 'success' : 'danger' }} toggle-status-btn"
-                                                data-id="{{ $sale_invoice->id }}">
-                                                {{ $sale_invoice->status == 1 ? 'نشط' : 'غير نشط' }}
-                                            </button>
-                                        </td>
-                                        <td>
+                                            @if ($sale_invoice->deferend_amount > 0)
+                                                <a class="btn btn-outline-primary btn-sm"
+                                                    href="{{ route('sale_invoice.pay.create', $sale_invoice->id) }}"
+                                                    title="سداد">
+                                                    <i class="fas fa-dollar-sign"></i>
+                                                </a>
+                                            @endif
+                                            @can('طباعة فاتورة مبيعات')
+                                                <a class="btn btn-outline-info btn-sm"
+                                                    href="{{ route('sale_invoice.pdf', $sale_invoice->id) }}" title="طباعة">
+                                                    <i class="fa fa-print"></i>
+                                                </a>
+                                            @endcan
                                             @can('تعديل فاتورة مبيعات')
                                                 <a class="btn btn-outline-success btn-sm"
                                                     href="{{ route('sale_invoice.edit', $sale_invoice->id) }}" title="تعديل">
@@ -126,7 +135,7 @@
                                                     <i class="fa fa-trash">
                                                     </i></a>
                                             @endcan
-                                            @if (!$sale_invoice->returnInvoice)
+                                            {{-- @if (!$sale_invoice->returnInvoice)
                                                 @can('اضافة مردودات المبيعات')
                                                     <a class="btn btn-outline-info btn-sm"
                                                         href="{{ route('sale_invoice_return.create', ['sale_invoice' => $sale_invoice->id]) }}"
@@ -134,7 +143,7 @@
                                                         <i class="fa fa-reply"></i>
                                                     </a>
                                                 @endcan
-                                            @endif
+                                            @endif --}}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -171,6 +180,7 @@
             </div>
         </div>
     </div>
+
     <!-- Container closed -->
     </div>
     <!-- main-content closed -->
@@ -213,33 +223,6 @@
                         ':id', id));
             });
 
-            // Handling status toggle button click
-            $('.toggle-status-btn').click(function() {
-                var sale_invoiceId = $(this).data('id');
-                var button = $(this);
-
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('sale_invoice.toggleStatus', '') }}/' + sale_invoiceId,
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        button.toggleClass('btn-success btn-danger');
-                        button.text(response.status == 1 ? 'نشط' : 'غير نشط');
-                        notif({
-                            msg: 'تم تغيير حالة الحملة بنجاح',
-                            type: 'success'
-                        });
-                    },
-                    error: function() {
-                        notif({
-                            msg: 'حدث خطأ أثناء تغيير الحالة',
-                            type: 'error'
-                        });
-                    }
-                });
-            });
         });
     </script>
 @endsection

@@ -59,14 +59,14 @@
 
                             <div class="row mg-b-20">
                                 <div class="parsley-input col-md-6" id="fnWrapper">
-                                    <label>اسم المستخدم: <span class="tx-danger">*</span></label>
+                                    <span class="tx-danger">*</span><label>الاسم </label>
                                     <input type="text" class="form-control" name="name" value="{{ $user->name }}"
                                         required>
                                 </div>
 
                                 <div class="parsley-input col-md-6 mg-t-20 mg-md-t-0" id="lnWrapper">
-                                    <label>البريد الالكتروني: <span class="tx-danger">*</span></label>
-                                    <input type="text" class="form-control" name="email"value="{{ $user->email }}"
+                                    <span class="tx-danger">*</span><label>اسم المستخدم: </label>
+                                    <input type="text" class="form-control" name="username"value="{{ $user->username }}"
                                         required>
                                 </div>
                             </div>
@@ -75,13 +75,13 @@
 
                         <div class="row mg-b-20">
                             <div class="parsley-input col-md-6 mg-t-20 mg-md-t-0" id="lnWrapper">
-                                <label>كلمة المرور: <span class="tx-danger">*</span></label>
+                                <label>كلمة المرور: </label>
                                 <input type="password" name="password" class="form-control" id="password">
                             </div>
 
                             <div class="parsley-input col-md-6 mg-t-20 mg-md-t-0" id="lnWrapper">
-                                <label> تاكيد كلمة المرور: <span class="tx-danger">*</span></label>
-                                <input type="password" name="password_confirmation" class="form-control"> 
+                                <label> تاكيد كلمة المرور: </label>
+                                <input type="password" name="password_confirmation" class="form-control">
                             </div>
                         </div>
 
@@ -128,28 +128,37 @@
                 name: {
                     required: true,
                 },
-                email: {
-                    uniqueEmail: true
+                username: {
+                    required: true,
+                    uniqueUserName: true
 
                 },
-                password_confirmation: {
-                    required: function() {
-                        return $('#password').val().trim() !== ''; 
-                    },
+                'password_confirmation': {
                     equalTo: "#password"
-                }
+                },
 
             },
             messages: {
                 name: {
-                    required: "يرجى إدخال اسم المستخدم.",
+                    required: "يرجى إدخال الاسم .",
                 },
-                emil: {
-                    uniqueEmail: "هذا البريد الالكتروني مستخدم من قبل."
+                username: {
+                    required: "يجب ادخال اسم المستخدم.",
+                    uniqueUserName: "هذا اسم المستخدم موجود بالفعل في النظام."
+                },
+                password: {
+                    required: "يرجى إدخال كلمة المرور.",
                 },
                 'password_confirmation': {
-                    required: "يرجى ادخال تاكيد كلمة المرور.",
-                    equalTo: "يرجى تأكيد كلمة المرور بشكل صحيح."
+                    required: "يرجى إدخال تاكيد كلمة المرور.",
+                    equalTo: "يرجى تأكيد كلمة المرور بشكل صحيح.",
+                },
+                roles_name: {
+                    required: "يرجى إدخال اسم الصلاحية.",
+                    number: "يجب أن تكون الصلاحية عدداً.",
+                },
+                'branch[]': {
+                    required: "يجب اختيار احد الفروع على الاقل"
                 }
             },
             errorPlacement: function(error, element) {
@@ -172,12 +181,16 @@
             }
         });
 
-        $.validator.addMethod("uniqueEmail", function(value, element) {
+        $.validator.addMethod("uniqueUserName", function(value, element) {
             let isValid = false;
+
+            if (value == '') {
+                return isValid = true;
+            }
             $.ajax({
-                url: '{{ route('user.checkEmail') }}', // مسار التحقق من الباركود
+                url: '{{ route('user.checkUserName') }}', // مسار التحقق من الباركود
                 data: {
-                    email: value,
+                    username: value,
                     id: {{ $user->id }}
                 },
                 type: 'GET',
@@ -187,7 +200,6 @@
                 }
             });
             return isValid;
-        }, "هذا البريد الالكتروني موجود بالفعل في النظام.");
-
+        }, "هذا اسم المستخدم موجود بالفعل في النظام.");
     </script>
 @endsection

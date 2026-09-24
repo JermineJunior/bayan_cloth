@@ -11,6 +11,11 @@
     <!-- breadcrumb -->
     &nbsp;
     <!-- /breadcrumb -->
+    <style>
+        i{
+            margin-left: 5px
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -70,7 +75,7 @@
                 <span id="compositeline3" class="pt-1">5,10,5,20,22,12,15,18,20,15,8,12,22,5,10,12,22,15,16,10</span>
             </div>
         </div>
-        <!-- Card for Expenses -->
+        <!-- Card for expense -->
         <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
             <div class="card overflow-hidden sales-card bg-warning-gradient">
                 <div class="pl-3 pt-3 pr-3 pb-2 pt-0">

@@ -23,10 +23,10 @@ class UpdateCustomerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' =>'required|string|max:255',
-            'email' =>['nullable' ,'email' ,Rule::unique('customers','email')->ignore($this->customer->id , 'id')],
-            'phone' => ['required', Rule::unique('customers','phone')->ignore($this->customer->id , 'id')],
-            'address' => 'required|string|max:255'
+            'name' =>['required','string','max:255',Rule::unique('tree4s','tree4_name')->ignore($this->customer->id ,'id')],
+            'email' =>['nullable' ,'email' ,Rule::unique('tree4s','email')->ignore($this->customer->id , 'id')],
+            'phone' => ['nullable', Rule::unique('tree4s','phone')->ignore($this->customer->id , 'id')],
+            'address' => 'nullable|string|max:255'
         ];
     }
 }

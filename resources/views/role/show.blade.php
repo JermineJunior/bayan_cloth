@@ -76,12 +76,19 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0 page-title">تفاصيل الصلاحية</h5>
+                    <div class="d-flex justify-content-between gap-2">
+                        <h5 class="mb-0 page-title">تفاصيل الصلاحية</h5>
+
+                        <a href="javascript:history.back()" class="btn btn-warning">
+                            <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="form-group">
                         <label class="font-weight-bold"> اسم الصلاحية</label>
-                        <input type="text" class="form-control custom-input" name="name" readonly value="{{ $role->name }}">
+                        <input type="text" class="form-control custom-input" name="name" readonly
+                            value="{{ $role->name }}">
                     </div>
 
                     <div class="mt-4">

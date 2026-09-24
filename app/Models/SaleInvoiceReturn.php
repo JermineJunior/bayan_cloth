@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SaleInvoiceReturn extends Model
 {
-     protected $fillable = ['customer_id', 'sale_invoice_id','stock_id', 'sale_invoice_number', 'invoice_date', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount', 'discount_amount', 'payment_status', 'status', 'payment_method', 'bank_id', 'cash_id', 'cash_amount', 'bank_amount'];
+    protected $fillable = ['customer_id', 'representative_id', 'user_id', 'date', 'stock_id', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount', 'tax_status', 'discount_amount', 'status', 'bank_name', 'cash_name', 'cash_amount_total', 'bank_amount_total', 'process_no', 'deferend_amount', 'branch_id', 'invoice_status'];
 
     public function details(): HasMany
     {
-        return $this->hasMany(SaleReturnDetail::class,'sale_invoice_return_id');
+        return $this->hasMany(SaleReturnDetail::class, 'sale_invoice_return_id');
     }
 
     public function operations(): HasMany
@@ -23,5 +24,19 @@ class SaleInvoiceReturn extends Model
     {
         return $this->hasMany(Restriction::class);
     }
-    
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Tree4::class, 'customer_id');
+    }
+
+    public function tree4(): BelongsTo
+    {
+        return $this->belongsTo(Tree4::class, 'customer_id');
+    }
+
+    public function representative(): BelongsTo
+    {
+        return $this->belongsTo(Tree4::class, 'representatvie_id');
+    }
 }

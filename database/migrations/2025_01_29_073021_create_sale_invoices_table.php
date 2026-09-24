@@ -13,20 +13,24 @@ return new class extends Migration {
         Schema::create('sale_invoices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('customer_id')->nullable()->constrained('tree4s')->cascadeOnDelete();
-            $table->date('invoice_date'); // تاريخ الفاتورة
-            $table->string('invoice_number')->unique(); // رقم الفاتورة
-            $table->foreignId('stock_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('representative_id')->nullable()->constrained('tree4s')->cascadeOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->date('date'); // تاريخ الفاتورة
+            $table->bigInteger('invoice_number'); // رقم الفاتورة
             $table->decimal('total_amount', 15, 2); // المبلغ الإجمالي
             $table->decimal('sub_total_amount', 15, 2); // المبلغ الإجمالي قبل الضرائب
             $table->decimal('tax_amount', 15, 2); // قيمة الضريبة
-            $table->decimal('discount_amount', 15, 2)->default(0); // قيمة الخصم
-            $table->tinyInteger('payment_status'); // حالة الدفع (قيد الانتظار، مدفوعة، متأخرة)
+            $table->tinyInteger('tax_status')->default(0);
+            $table->decimal('discount_amount', 15, 2)->default(0)->nullable(); // قيمة الخصم
             $table->tinyInteger('status')->default(1); // حالة الفاتورة (مفعلة، ملغاة، مسودة)
-            $table->tinyInteger('payment_method')->nullable(); // طريقة الدفع (مثل: نقدي، بطاقة ائتمان، تحويل بنكي)
-            $table->tinyInteger('bank_id')->nullable();
-            $table->tinyInteger('cash_id')->nullable();
-            $table->decimal('cash_amount', 15, 2)->nullable();
-            $table->decimal('bank_amount', 15, 2)->nullable();
+            $table->integer('bank_name')->nullable();
+            $table->integer('cash_name')->nullable();
+            $table->decimal('cash_amount_total', 15, 2)->nullable();
+            $table->decimal('bank_amount_total', 15, 2)->nullable();
+            $table->bigInteger('process_no')->nullable();
+            $table->decimal('deferend_amount', 15, 2)->nullable();
+            $table->tinyInteger('invoice_status');
+            $table->foreignId('branch_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }

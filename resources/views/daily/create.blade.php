@@ -65,53 +65,69 @@
                         </script>
                     @endif
 
-                    <div class="d-flex">
+                    <div class="d-flex justify-content-between gap-2">
                         <h5 class="content-title mb-0 my-auto"> إضاف قيد جديد :</h5>
+
+                        <a href="javascript:history.back()" class="btn btn-warning">
+                            <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                        </a>
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <div class="card-body">
                             <form id="dailyForm" action="{{ route('daily.store') }}" method="POST"
                                 class="form-horizontal form-label-left">
                                 @csrf
-                                <div class="col">
+                                <div class="col-xl-12">
                                     {{--  <span class="tx-danger">*</span><label for="inputName" class="control-label"> رقم القيد</label>  --}}
                                     <input required type="hidden" value="{{ $constant_number }}" name="constant_number"
                                         class="form-control" title="يرجي ادخال إسم الحساب">
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-6">
-                                        <span class="tx-danger">*</span><label for="from_account">الحساب المدين</label>
-                                        <select class="select2-from form-control" name="madin">
-                                        </select>
+                                    <div class="col-xl-6">
+                                        <div class="form-group">
+                                            <span class="tx-danger">*</span><label for="from_account">الحساب المدين</label>
+                                            <select class="select2-from form-control" name="madin">
+                                                <option value="">-- من فضلك قم باختيار حساب --</option>
+                                                @foreach ($trees as $tree)
+                                                    <option value="{{ $tree->id }}">{{ $tree->tree4_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
-                                    <div class="col-6">
-                                        <span class="tx-danger">*</span><label for="to_account">الحساب الدائن</label>
-                                        <select class="select2-to form-control" name="dain" disabled>
-                                        </select>
+                                    <div class="col-xl-6">
+                                        <div class="form-group">
+                                            <span class="tx-danger">*</span><label for="to_account">الحساب الدائن</label>
+                                            <select class="select2-to form-control" name="dain" disabled>
+                                                <option value="">-- من فضلك قم باختيار حساب --</option>
+                                                @foreach ($trees as $tree)
+                                                    <option value="{{ $tree->id }}">{{ $tree->tree4_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
                                 </br>
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label for="inputName" class="control-label">
                                             المبلغ</label>
-                                        <input  type="number" name="price" class="form-control"
-                                            title="يرجي ادخال المبلغ" >
+                                        <input type="text" name="price" class="form-control price"
+                                            title="يرجي ادخال المبلغ">
                                     </div>
                                     </br>
-                                    <div class="col">
+                                    <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label for="inputName" class="control-label">
                                             التاريخ </label>
-                                        <input  type="date" name="date" value="<?php echo date('Y-m-d'); ?>"
+                                        <input type="date" name="date" value="<?php echo date('Y-m-d'); ?>"
                                             class="form-control" title="يرجي ادخال التاريخ">
                                     </div>
                                 </div>
                                 </br>
                                 <div class="row">
-                                    <div class="col">
-                                        <span class="tx-danger">*</span><label>البيان</label>
+                                    <div class="col-xl-12">
+                                        <label>البيان</label>
                                         <textarea rows="5" name="node" class="form-control"></textarea>
                                     </div>
                                 </div>
@@ -140,49 +156,9 @@
     <script src="{{ URL::asset('assets/plugins/form_validation/messages_ar.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // تهيئة الحقل "من حساب"
-            $('.select2-from').select2({
-                ajax: {
-                    url: "{{ route('select2.tree4') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term // نص البحث
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true,
-                },
-                placeholder: 'يرجى اختيار الحساب من',
-            });
 
-            // تهيئة الحقل "إلى حساب"
-            $('.select2-to').select2({
-                ajax: {
-                    url: "{{ route('select2.tree4') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term, // نص البحث
-                            exclude: getExcludedAccounts() // إرسال القيمة المختارة في "من حساب" كـ exclude
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true,
-                },
-                placeholder: 'يرجى اختيار الحساب الى',
-            });
-
+            $('.select2-from').select2();
+            $('.select2-to').select2();
             // تحديث الحقل "إلى حساب" عند تغيير الحقل "من حساب"
             $('.select2-from').on('change', function() {
                 $('.select2-to').val(null).trigger('change'); // إعادة تعيين الحقل "إلى حساب"
@@ -216,17 +192,35 @@
             });
 
             $('#dailyForm').validate({
-                rules:{
-                    madin:{required: true},
-                    dain:{required: true},
-                    price:{required: true,number:true},
-                    date:{required:true}
+                rules: {
+                    madin: {
+                        required: true
+                    },
+                    dain: {
+                        required: true
+                    },
+                    price: {
+                        required: true,
+                        number: true
+                    },
+                    date: {
+                        required: true
+                    }
                 },
-                messages:{
-                    madin:{required: "يرجي اختيار  الحساب المدين"},
-                    dain:{required: "يرجي اختيار الحساب الدائن"},
-                    price:{required: "يرجي ادخال المبلغ", number: "يرجي ادخال قيمة رقمية"},
-                    date:{required: "يرجي ادخال التاريخ"}
+                messages: {
+                    madin: {
+                        required: "يرجي اختيار  الحساب المدين"
+                    },
+                    dain: {
+                        required: "يرجي اختيار الحساب الدائن"
+                    },
+                    price: {
+                        required: "يرجي ادخال المبلغ",
+                        number: "يرجي ادخال قيمة رقمية"
+                    },
+                    date: {
+                        required: "يرجي ادخال التاريخ"
+                    }
                 },
                 errorPlacement: function(error, element) {
                     if (element.closest('.input-group').length) {
@@ -247,6 +241,12 @@
                     $(element).closest('.form-group').removeClass('has-error');
                 }
             });
+
+            document.getElementById('dailyForm').addEventListener('submit', function(e) {
+                cleanNumbersBeforeSubmit();
+            });
+
+            attachCommaFormatter('.price');
 
             // دالة لجلب الحسابات المستبعدة
             function getExcludedAccounts() {
@@ -290,5 +290,59 @@
                 return selectedAccounts;
             }
         });
+
+        function attachCommaFormatter(selector) {
+
+            document.querySelectorAll(selector).forEach(input => {
+
+                input.addEventListener('input', function() {
+
+                    /* ـــ حالة المؤشر قبل التعديل ـــ */
+                    const oldPos = this.selectionStart;
+                    const oldVal = this.value;
+
+                    /* 1) إزالة كل ما ليس رقمًا أو نقطة */
+                    let cleaned = oldVal.replace(/[^0-9.]/g, '');
+
+                    /* 2) الاحتفاظ بأول نقطة فقط ومسح البقية */
+                    const firstDot = cleaned.indexOf('.');
+                    if (firstDot !== -1) {
+                        cleaned = cleaned.slice(0, firstDot + 1) +
+                            cleaned.slice(firstDot + 1).replace(/\./g, '');
+                    }
+
+                    /* 3) تقسيم إلى جزء صحيح وعشرى */
+                    const [rawInt = '', rawDec = ''] = cleaned.split('.');
+
+                    /* 4) إضافة فواصل للجزء الصحيح */
+                    const intPart = rawInt.replace(/^0+(?!$)/, ''); // أصفار زائدة
+                    const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                    /* 5) إعادة التجميع */
+                    let formatted = intWithCommas;
+                    if (firstDot !== -1) {
+                        // لو المستخدم كتب نقطة ولم يكتب أرقام بعدها نحافظ على النقطة
+                        formatted += '.' + rawDec;
+                    }
+
+                    this.value = formatted;
+
+                    /* 6) إعادة المؤشر لموضعه الطبيعى */
+                    const diff = formatted.length - oldVal.length;
+                    this.setSelectionRange(oldPos + diff, oldPos + diff);
+                });
+
+            });
+        }
+
+        function cleanNumbersBeforeSubmit() {
+            // الحقول ذات الأسماء المتكررة كمصفوفات (price[], row_sub_total[], qty[] ... الخ)
+            // نفترض ان الفورم يحتوي على هذه الحقول، نمر عليها كلها
+            document.querySelectorAll('input[name^="price"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+        }
     </script>
 @endsection

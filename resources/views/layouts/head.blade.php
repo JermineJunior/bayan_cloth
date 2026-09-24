@@ -1,5 +1,5 @@
 <!-- Title -->
-<title> B2B - Travel Sudan </title>
+<title> @yield('title') </title>
 <!-- Favicon -->
 <link rel="icon" href="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" type="image/x-icon" />
 <!-- Icons css -->

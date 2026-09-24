@@ -4,314 +4,564 @@
     <!-- Internal Notify -->
     <link href="{{ URL::asset('assets/plugins/notify/css/notifIt.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
+    <style>
+        .scrollable-card {
+            max-height: 75vh;
+            /* أو أي ارتفاع يناسبك */
+            overflow-y: hidden;
+            /* نخفي الاسكرول افتراضيًا */
+            scrollbar-width: none;
+            /* لإخفاء الأسهم في فايرفوكس */
+        }
+
+        /* إظهار الاسكرول عند الـ hover */
+        .scrollable-card:hover {
+            overflow-y: auto;
+            /* نعيده عند تمرير الماوس */
+            scrollbar-width: thin;
+            /* فايرفوكس */
+            scrollbar-color: #888 #f1f1f1;
+            /* ألوان الاسكرول */
+        }
+
+        /* تنسيق الاسكرول في كروم وباقي المتصفحات */
+        .scrollable-card::-webkit-scrollbar {
+            width: 8px;
+            display: none;
+            /* نخفيه افتراضيًا */
+        }
+
+        .scrollable-card:hover::-webkit-scrollbar {
+            display: block;
+            /* نظهره عند hover */
+        }
+
+        .scrollable-card::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .scrollable-card::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .scrollable-card::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .invoice-card {
+            height: 75vh;
+            /* الكرت بطول الشاشة */
+        }
+
+        .invoice-body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* فقط المنتجات تتحرك */
+        .invoice-products {
+            flex: 1;
+            overflow-y: auto;
+            /* اسكرول رأسي */
+            overflow-x: auto;
+            /* اسكرول أفقي */
+            border: 1px solid #ddd;
+            white-space: nowrap;
+            /* يمنع التفاف الأعمدة */
+        }
+
+        .invoice-products table th,
+        .invoice-products table td {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+            border-bottom: 2px solid #ccc;
+            padding: 4px 6px !important;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .invoice-products input {
+            padding: 2px 6px;
+            font-size: 13px;
+        }
+
+
+        /* الحسابات ثابتة */
+        .invoice-summary {
+            background: #f9f9f9;
+            padding: 10px;
+            border-top: 2px solid #ccc;
+        }
+
+        .form-row-inline {
+            display: flex;
+            align-items: center;
+            /* gap: 1px; */
+        }
+
+        .form-row-inline label {
+            /* min-width: 120px; */
+            /* عرض ثابت لكل اللّيبلات */
+            margin: 0;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+    </style>
 @endsection
 
 @section('page-header')
     <!-- breadcrumb -->
-    <div class="breadcrumb-header justify-content-between">
+    {{-- <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
                 <h5 class="content-title mb-0 my-auto">إدارة فواتير المبيعات</h5>
                 <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ تعديل فاتورة مبيعات </span>
             </div>
         </div>
-    </div>
+    </div> --}}
     <!-- breadcrumb -->
 @endsection
 
 @section('content')
 
-    <!-- row opened -->
-    <div class="row row-sm">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-header pb-0">
-                    @if ($errors->any())
-                        <div class="alert alert-outline-warning" role="alert">
-                            <button aria-label="Close" class="close" data-dismiss="alert" type="button">
-                                <span aria-hidden="true">&times;</span></button>
-                            @foreach ($errors->all() as $error)
-                                <strong>خطأ!</strong> {{ $error }} <br />
-                            @endforeach
-                        </div>
-                    @endif
-                    @if (session()->has('success_created'))
-                        <script>
-                            window.onload = function() {
-                                notif({
-                                    msg: " تم حفط البيانات بنجاح",
-                                    type: "success"
-                                })
-                            }
-                        </script>
-                    @endif
-
-                    @if (session()->has('success_updated'))
-                        <script>
-                            window.onload = function() {
-                                notif({
-                                    msg: " تم تحديث البيانات بنجاح",
-                                    type: "success"
-                                })
-                            }
-                        </script>
-                    @endif
-                    @if (session()->has('success_deleted'))
-                        <script>
-                            window.onload = function() {
-                                notif({
-                                    msg: " تم حذف البيانات بنجاح",
-                                    type: "success"
-                                })
-                            }
-                        </script>
-                    @endif
-                    {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
-                </div>
-                <div class="card-body">
-                    <form id="invoiceForm" action="{{ route('sale_invoice.update', $sale_invoice->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="invoice_date">تاريخ الفاتورة</label>
-                                    <input type="date" name="invoice_date" id="invoice_date" class="form-control"
-                                        value="{{ old('invoice_date', $sale_invoice->invoice_date) }}" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="invoice_number">رقم الفاتورة</label>
-                                    <input type="text" name="invoice_number" id="invoice_number" class="form-control"
-                                        value="{{ old('invoice_number', $sale_invoice->invoice_number) }}" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="customer_id">العميل</label>
-                                    <select name="customer_id" id="customer_id" class="form-control">
-                                        <option value="">عميل كاش</option>
-                                        @foreach ($customers as $customer)
-                                            <option {{ $sale_invoice->customer_id == $customer->id ? 'selected' : '' }}
-                                                value="{{ $customer->id }}">{{ $customer->tree4_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="payment_status">الحالة</label>
-                                    <select name="payment_status" id="payment_status" class="form-control">
-                                        <option {{ $sale_invoice->payment_status == 0 ? 'selected' : '' }} value="0">
-                                            مدفوع</option>
-                                        <option {{ $sale_invoice->payment_status == 1 ? 'selected' : '' }} value="1">
-                                            آجل</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="stock_id">المخزن</label>
-                                    <select name="stock_id" id="stock_id" class="form-control"
-                                        data-stock_id="{{ $sale_invoice->stock_id }}">
-                                        @foreach ($stocks as $stock)
-                                            <option {{ $sale_invoice->stock_id == $stock->id ? 'selected' : '' }}
-                                                value="{{ $stock->id }}">{{ $stock->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row my-4">
-                            <div class="col-md-12">
-                                <input type="text" id="add-product" class="form-control"
-                                    placeholder="قم بالبحث عن طريق الباركود أو الاسم">
-                                <div id="error-message" class="error-message"></div>
-
-                            </div>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>الاسم</th>
-                                        <th>الوحدة</th>
-                                        <th>الكمية</th>
-                                        <th>السعر</th>
-                                        <th>الإجمالي</th>
-                                        <th>الإجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="product-rows">
-                                    @foreach ($sale_invoice->details as $item)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
-                                                <input type="text" id="product_name_{{ $loop->iteration }}"
-                                                    name="product_name[{{ $loop->iteration }}]"
-                                                    class="form-control product_name" value="{{ $item->product->name }}"
-                                                    readonly>
-                                                <input type="hidden" id="product_id_{{ $loop->iteration }}"
-                                                    name="product_id[{{ $loop->iteration }}]" class="product_id"
-                                                    value="{{ $item->product_id }}">
-                                            </td>
-                                            <td>
-                                                <select id="unit_id_{{ $loop->iteration }}" class="form-control unit_id"
-                                                    name="unit_id[{{ $loop->iteration }}]"
-                                                    data-product-id="{{ $item->product_id }}"
-                                                    data-unit_id="{{ $item->unit_id }}">
-                                                    @foreach ($item->product->units as $unit)
-                                                        <option
-                                                            {{ $item->unit_id == $unit->pivot->unit_id ? 'selected' : '' }}
-                                                            value="{{ $unit->pivot->unit_id }}">
-                                                            {{ $unit->name }}</option>
-                                                    @endforeach
-
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input type="number" id="qty_{{ $loop->iteration }}"
-                                                    class="form-control qty" name="qty[{{ $loop->iteration }}]"
-                                                    step="1" min="1" value="{{ $item->qty }}"
-                                                    data-qty="{{ $item->qty }}">
-                                            </td>
-                                            <td>
-                                                <input type="number" id="price_{{ $loop->iteration }}"
-                                                    class="form-control price" name="price[{{ $loop->iteration }}]"
-                                                    step="0.01" min="0" value="{{ $item->price }}" readonly>
-                                            </td>
-                                            <td>
-                                                <input type="number" id="row_sub_total_{{ $loop->iteration }}"
-                                                    class="form-control row_sub_total"
-                                                    name="row_sub_total[{{ $loop->iteration }}]"
-                                                    step="
-                                                    step="0.01"
-                                                    value="{{ $item->row_sub_total }}" readonly>
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn btn-danger remove-product"><i
-                                                        class="fa fa-trash"></i></button>
-                                            </td>
-                                        </tr>
+    <form id="invoiceForm" action="{{ route('sale_invoice.update', $sale_invoice->id) }}" method="POST">
+        @csrf
+        @method('PUT')
+        <div class="row row-sm">
+            <div class="row">
+                <div class="col-xl-12">
+                    <div class="card">
+                        <div class="">
+                            @if ($errors->any())
+                                <div class="alert alert-outline-danger" role="alert">
+                                    <button aria-label="Close" class="close" data-dismiss="alert" type="button">
+                                        <span aria-hidden="true">&times;</span></button>
+                                    @foreach ($errors->all() as $error)
+                                        <strong>خطأ!</strong> {{ $error }} <br />
                                     @endforeach
-                                </tbody>
-                                <tfoot>
-                                    <tr>
-                                        <td colspan="4"></td>
-                                        <th>الاجمالي قبل الضريبة</th>
-                                        <td colspan="2"><input type="number" class="form-control sub_total"
-                                                id="sub_total" name="sub_total"
-                                                value="{{ $sale_invoice->sub_total_amount }}" min="0" readonly>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4"></td>
-                                        <th>قيمة الضريبة(17%)</th>
-                                        <td colspan="2"><input type="number" class="form-control tax" id="tax"
-                                                name="tax" value="{{ $sale_invoice->tax_amount }}" min="0"
-                                                readonly></td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4"></td>
-                                        <th>الخصم</th>
-                                        <td colspan="2"><input type="number" class="form-control discount"
-                                                id="discount" name="discount" step="0.01"
-                                                value="{{ $sale_invoice->discount_amount ?? 0.0 }}" min="0">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="4"></td>
-                                        <th> الاجمالي النهائي</th>
-                                        <td colspan="2"><input type="number" class="form-control total"
-                                                id="total" name="total" value="{{ $sale_invoice->total_amount }}"
-                                                min="0" readonly></td>
-                                    </tr>
-                            </table>
-                        </div>
+                                </div>
+                            @endif
+                            @if (session()->has('success_created'))
+                                <script>
+                                    window.onload = function() {
+                                        notif({
+                                            msg: " تم حفط البيانات بنجاح",
+                                            type: "success"
+                                        })
+                                    }
+                                </script>
+                            @endif
 
-                        <div class="row mt-4">
-                            <div class="col-md-12 text-right">
-                                <button type="button" class="btn btn-primary" id="save-invoice">حفظ الفاتورة</button>
-                            </div>
+                            @if (session()->has('success_updated'))
+                                <script>
+                                    window.onload = function() {
+                                        notif({
+                                            msg: " تم تحديث البيانات بنجاح",
+                                            type: "success"
+                                        })
+                                    }
+                                </script>
+                            @endif
+                            @if (session()->has('success_deleted'))
+                                <script>
+                                    window.onload = function() {
+                                        notif({
+                                            msg: " تم حذف البيانات بنجاح",
+                                            type: "success"
+                                        })
+                                    }
+                                </script>
+                            @endif
+                            {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                         </div>
-                        <!-- زر الحفظ -->
-
-                        <!-- Modal -->
-                        <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog"
-                            aria-labelledby="paymentModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="paymentModalLabel">وسيلة الدفع</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="date">تاريخ الفاتورة</label>
+                                        <input type="date" name="date" id="date" class="form-control"
+                                            value="{{ old('date', $sale_invoice->date) }}" readonly>
                                     </div>
-                                    <div class="modal-body">
-                                        {{-- <form id="payment-form"> --}}
-                                        <div class="form-group">
-                                            <label for="payment_method">اختر وسيلة الدفع</label>
-                                            <select name="payment_method" id="payment_method" class="form-control"
-                                                style="width: 100%" required>
-                                                <option value="">-- اختر وسيلة الدفع --</option>
-                                                <option value="1">نقداً</option>
-                                                <option value="2">بنكي</option>
-                                                <option value="3">كاش وبنكك</option>
-                                            </select>
-                                        </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="invoice_number">رقم الفاتورة</label>
+                                        <input type="text" name="invoice_number" id="invoice_number" class="form-control"
+                                            value="{{ old('invoice_number', $sale_invoice->invoice_number) }}" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="customer_id">العميل</label>
+                                        <div class="d-flex align-items-start gap-1">
+                                            {{-- زر الإضافة --}}
+                                            <a class="modal-effect btn btn-outline-info" data-target="#customerModal"
+                                                data-toggle="modal" href="#customerModal" data-id=""
+                                                title="اضافة عميل جديد">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
 
-                                        <div class="form-group d-none" id="cash-list">
-                                            <label for="cash_name">اختر الخزينة</label>
-                                            <select name="cash_id" id="cash_name" class="form-control"
-                                                style="width: 100%"></select>
-                                        </div>
+                                            {{-- الحقل داخل div عشان يتحكم فيه بالعرض الكامل --}}
+                                            <div class="flex-grow-1">
+                                                <select name="customer_id" id="customer_id" class="form-control select2">
+                                                    <option value="">-- اختر اسم العميل --</option>
+                                                    @foreach ($customers as $customer)
+                                                        <option @selected($customer->id == $sale_invoice->customer_id) value="{{ $customer->id }}">
+                                                            {{ $customer->tree4_name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
 
-                                        <div class="form-group d-none" id="bank-list">
-                                            <label for="bank_name">اختر البنك</label>
-                                            <select name="bank_id" id="bank_name" class="form-control"
-                                                style="width: 100%"></select>
-                                        </div>
-
-                                        <div class="form-group d-none" id="cash-input">
-                                            <label for="cash_amount">المبلغ نقداً</label>
-                                            <input type="number" name="cash_amount" id="cash_amount"
-                                                class="form-control" min="0" placeholder="المبلغ نقداً">
-                                        </div>
-
-                                        <div class="form-group d-none" id="cash-id">
-                                            <label for="cash_amount">اختر الخزينة</label>
-                                            <div class="input-group">
-                                                <select name="cash_id" id="cash_id" class="form-control"
-                                                    style="width: 100%"></select>
+                                                {{-- خطأ التحقق تحت السلكت فقط --}}
+                                                @error('customer_id')
+                                                    <span class="text-danger small">{{ $message }}</span>
+                                                @enderror
                                             </div>
                                         </div>
-                                        <div class="form-group d-none" id="bank-input">
-                                            <label for="bank_amount">المبلغ عبر البنك</label>
-                                            <input type="number" name="bank_amount" id="bank_amount"
-                                                class="form-control" min="0" placeholder="المبلغ بالبنك">
-                                        </div>
-                                        <div class="form-group d-none" id="bank-id">
-                                            <label for="bank_amount"> اختر البنك</label>
-                                            <select name="bank_id" id="bank_id" class="form-control"
-                                                style="width: 100%"></select>
-                                        </div>
-                                        <div class="modal-footer d-flex justify-content-start">
-                                            <button type="button" class="btn btn-primary" id="confirm-payment">تأكيد
-                                                وحفظ</button>
-                                            <button type="button" class="btn btn-secondary"
-                                                data-dismiss="modal">إغلاق</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="representative_id">المندوب</label>
+                                        <div class="d-flex">
+                                            <a class="modal-effect btn btn-outline-info" data-target="#representativeModal"
+                                                data-toggle="modal" href="#representativeModal" data-id=""
+                                                title="اضافة مندوب جديد">
+                                                <i class="fa fa-plus">
+                                                </i></a>
+                                            <select name="representative_id" id="representative_id" class="form-control">
+                                                <option value="">-- اختر اسم المندوب -- </option>
+                                                @foreach ($representatives as $representative)
+                                                    <option @selected($representative->id == $sale_invoice->representative_id) value="{{ $representative->id }}">
+                                                        {{ $representative->tree4_name }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
+
+                <div class="col-xl-3">
+                    <div class="card">
+                        <div class="card-body scrollable-card">
+                            <input type="text" name="search" id="search" class="form-control search"
+                                placeholder="قم بالبحث هنا ">
+                            <div class="table-responsive">
+                                <table class="table  table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th width="80%">المنتج</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body_search">
+                                        @foreach ($products as $product)
+                                            <tr>
+                                                <th>{{ $product->name }}</th>
+                                                <th><a href="#"
+                                                        class="btn btn-add-invoice {{ in_array($product->id, $productIds) ? 'btn-white disabled' : 'btn-primary' }}"
+                                                        data-id="{{ $product->id }}"><i class="fa fa-plus"></i></a>
+                                                </th>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-9">
+                    <div class="card invoice-card">
+                        <div class="card-body invoice-body">
+                            <input type="text" id="add-product" class="form-control mb-4"
+                                placeholder="قم بالبحث عن طريق الباركود أو الاسم">
+                            <div id="error-message" class="error-message"></div>
+                            <div class="table-responsive invoice-products scrollable-card">
+                                <table class="table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>الاسم</th>
+                                            <th>المخزن</th>
+                                            <th>ك بالمخزن</th>
+                                            <th>الوحدة</th>
+                                            <th>الكمية</th> <!-- صغير -->
+                                            <th>البونص</th>
+                                            <th>تاريخ الصلاحية</th>
+                                            <th>السعر</th> <!-- أكبر -->
+                                            <th>الإجمالي</th> <!-- أكبر -->
+                                            <th>حذف</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="product-rows">
+                                        @foreach ($sale_invoice->details as $item)
+                                            <tr>
+                                                <td>
+                                                    <input type="text" id="product_name_{{ $loop->iteration }}"
+                                                        style="width:200px; text-align: left"
+                                                        name="product_name[{{ $loop->iteration }}]"
+                                                        class="form-control product_name"
+                                                        value="{{ $item->product->name }}" readonly>
+                                                    <input type="hidden" id="product_id_{{ $loop->iteration }}"
+                                                        name="product_id[{{ $loop->iteration }}]" class="product_id"
+                                                        value="{{ $item->product_id }}">
+                                                </td>
+                                                <td>
+                                                    <select id="stock_id_{{ $loop->iteration }}"
+                                                        class="form-control stock_id" style="width:140px"
+                                                        name="stock_id[{{ $loop->iteration }}]"
+                                                        data-product-id="{{ $item->product_id }}"
+                                                        data-stock_id="{{ $item->stock_id }}">
+                                                        @foreach ($item->product->stocks as $stock)
+                                                            <option
+                                                                {{ $item->stock_id == $stock->pivot->stock_id ? 'selected' : '' }}
+                                                                value="{{ $stock->pivot->stock_id }}">
+                                                                {{ $stock->name }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="qty_in_stock{{ $loop->iteration }}"
+                                                        class="form-control qty_in_stock" style="width:50px" disabled
+                                                        value="{{ number_format($item->product->stocks()->where('stock_id', $item->stock_id)->first()->pivot->quantity) }}">
+                                                </td>
+                                                <td>
+                                                    <select id="unit_id_{{ $loop->iteration }}"
+                                                        class="form-control unit_id" style="width:70px"
+                                                        name="unit_id[{{ $loop->iteration }}]"
+                                                        data-product-id="{{ $item->product_id }}"
+                                                        data-unit_id="{{ $item->unit_id }}">
+                                                        @foreach ($item->product->units as $unit)
+                                                            <option
+                                                                {{ $item->unit_id == $unit->pivot->unit_id ? 'selected' : '' }}
+                                                                value="{{ $unit->pivot->unit_id }}">
+                                                                {{ $unit->name }}</option>
+                                                        @endforeach
+
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="qty_{{ $loop->iteration }}"
+                                                        class="form-control qty" style="width:50px"
+                                                        name="qty[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->qty) }}"
+                                                        data-qty="{{ $item->qty }}">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="bounce_{{ $loop->iteration }}"
+                                                        class="form-control bounce" style="width:50px"
+                                                        name="bounce[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->bounce) }}"
+                                                        data-bounce="{{ $item->bounce }}">
+                                                </td>
+                                                <td>
+                                                    <input type="date" id="expire_date_{{ $loop->iteration }}"
+                                                        class="form-control expire_date"
+                                                        name="expire_date[{{ $loop->iteration }}]"
+                                                        value="{{ $item->expire_date }}"
+                                                        data-expire_date="{{ $item->expire_date }}">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="price_{{ $loop->iteration }}"
+                                                        class="form-control price" style="width:90px"
+                                                        name="price[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->price) }}">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="row_sub_total_{{ $loop->iteration }}"
+                                                        class="form-control row_sub_total" style="width:100px"
+                                                        name="row_sub_total[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->row_sub_total, 2) }}" readonly>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger remove-product"><i
+                                                            class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="invoice-summary">
+                                <input type="hidden" name="sub_total" class="form-control" id="sub_total" readonly
+                                    value="{{ number_format($sale_invoice->sub_total_amount) }}">
+                                <div class="row g-2">
+                                    <div class="col-md-3">
+                                        <label>
+                                            قيمة الضريبة (17%)
+                                            <input type="checkbox" @checked($sale_invoice->tax_status) name="tax_status"
+                                                id="apply_tax"> تطبيق
+                                        </label>
+                                        <input type="text" name="tax" class="form-control" id="tax"
+                                            value="{{ number_format($sale_invoice->tax_amount) }}" readonly>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <label>الخصم</label>
+                                        <input type="text" name="discount" class="form-control" id="discount"
+                                            value="{{ number_format($sale_invoice->discount_amount) }}">
+                                    </div>
+                                    <div class="col-md-7">
+                                        <label>الإجمالي النهائي</label>
+                                        <input type="text" name="total" class="form-control" id="total"
+                                            readonly value="{{ number_format($sale_invoice->total_amount) }}">
+                                    </div>
+                                </div>
+
+                                <div class="row g-2">
+                                    <div class="col-md-5"></div>
+                                    <div class="col-md-7">
+                                        <label>كاش</label>
+                                        <div class="form-row-inline">
+                                            <select id="cash_name" name="cash_name" class="form-control">
+                                                @foreach ($safes as $safe)
+                                                    <option @selected($sale_invoice->cash_name == $safe->id) value="{{ $safe->id }}">
+                                                        {{ $safe->tree4_name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="text" name="cash_amount_total" id="cash_amount_total"
+                                                class="form-control" placeholder="المبلغ نقداً"
+                                                value="{{ $sale_invoice->cash_amount_total == 0.0 ? null : number_format($sale_invoice->cash_amount_total) }}">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-5"></div>
+                                    <div class="col-md-7">
+                                        <label>بنك</label>
+                                        <div class="form-row-inline">
+                                            <select id="bank_name" name="bank_name" class="form-control">
+                                                @foreach ($banks as $bank)
+                                                    <option @selected($sale_invoice->bank_name == $bank->id) value="{{ $bank->id }}">
+                                                        {{ $bank->tree4_name }} -
+                                                        {{ $bank->no_bank }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="text" name="bank_amount_total" id="bank_amount_total"
+                                                class="form-control" placeholder="المبلغ بالبنك"
+                                                value="{{ $sale_invoice->bank_amount_total == 0.0 ? null : number_format($sale_invoice->bank_amount_total) }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="deferend_amount" name="deferend_amount" class="form-control"
+                                    value="{{ number_format($sale_invoice->deferend_amount) }}" readonly>
+
+                                <div class="text-center mt-1">
+                                    <button type="submit" class="btn btn-primary">حفظ الفاتورة</button>
+                                    <a href="javascript:history.back()" class="btn btn-warning">رجوع</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+    </div>
+    </div>
+    </div>
+
+    <div class="modal" id="customerModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">إضافة عميل جديد </h6><button aria-label="Close" class="close"
+                        data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <form id="addCustomer" action="#" method="post">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم العميل </label>
+                            <input type="text" name="name" id="name" class="form-control"
+                                autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">البريد الالكتروني للعميل
+                            </label>
+                            <input type="text" name="email" id="email" class="form-control"
+                                autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">رقم هاتف العميل </label>
+                            <input type="number" name="phone" id="phone" class="form-control"
+                                autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">عنوان العميل </label>
+                            <input type="text" name="address" id="address" class="form-control"
+                                autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">اسم المندوب </label>
+                            <select name="representative_id" id="representative_id_customer" class="form-control">
+                                <option value="">قم باختيار مندوب</option>
+                                @foreach ($representatives as $representative)
+                                    <option value="{{ $representative->id }}">{{ $representative->tree4_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="btnAddCustomer">إضافة </button>
+                        <button class="btn btn-secondary" data-dismiss="modal" type="button">إغلاق</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="representativeModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">إضافة مندوب جديد </h6><button aria-label="Close" class="close"
+                        data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <form id="addRepresentative" action="#" method="post">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم المندوب </label>
+                            <input type="text" name="name_representative" id="name_representative"
+                                class="form-control" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">البريد الالكتروني للعميل
+                            </label>
+                            <input type="text" name="email_representative" id="email_representative"
+                                class="form-control" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">رقم هاتف المندوب </label>
+                            <input type="number" name="phone_representative" id="phone_representative"
+                                class="form-control" autocomplete="off">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">عنوان المندوب </label>
+                            <input type="text" name="address_representative" id="address_representative"
+                                class="form-control" autocomplete="off">
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="btnAddRepresentative">إضافة </button>
+                        <button class="btn btn-secondary" data-dismiss="modal" type="button">إغلاق</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -329,14 +579,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let deletedProducts = [];
+            let productIds = @json($productIds);
             document.getElementById('add-product').focus();
             $('select').select2();
-            $('#payment_method').select2({
-                dropdownParent: $('#paymentModal'),
-                dir: 'rtl',
-                placeholder: 'قم باختيار وسيلة الدفع'
-            });
+            let addedProducts = [];
 
             let debounceTimer;
             $('#add-product').on('input', function() {
@@ -352,120 +598,126 @@
                                 },
                                 body: JSON.stringify({
                                     name: productName,
-                                    stock_id: $('#stock_id').val()
+                                    type: 1
                                 })
                             })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.success) {
+                                    if (addedProducts.includes(data.product.id)) {
+                                        return
+                                    }
+                                    addedProducts.push(data.product.id);
                                     const tbody = $('#product-rows');
                                     const rowCount = tbody.find('tr').length + 1;
                                     const unitIndex = rowCount;
 
                                     const row = `
                                         <tr>
-                                            <td>${rowCount}</td>
                                             <td>
-                                                <input type="text" id="product_name_${unitIndex}" name="product_name[${unitIndex}]" class="form-control product_name" value="${data.product.name}" readonly>
+                                                <input type="text" id="product_name_${unitIndex}" style="width:200px; text-align:left" name="product_name[${unitIndex}]" class="form-control product_name" value="${data.product.name}" readonly>
                                                 <input type="hidden" id="product_id_${unitIndex}" name="product_id[${unitIndex}]" class="product_id" value="${data.product.id}">
                                             </td>
                                             <td>
-                                                <select id="unit_id_${unitIndex}" class="form-control unit_id" name="unit_id[${unitIndex}]" data-product-id="${data.product.id}">
+                                                <select id="stock_id_${unitIndex}" class="form-control stock_id" style="width:140px" name="stock_id[${unitIndex}]" data-product-id="${data.product.id}">
+                                                    ${data.stocks.map(stock => `<option value="${stock.id}">${stock.name}</option>`).join('')}
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" id="qty_in_stock_${unitIndex}" class="form-control qty_in_stock" style="width:50px" name="qty_in_stock_[${unitIndex}]" disabled value="${data.qty_in_stock}">
+                                            </td>
+                                            <td>
+                                                <select id="unit_id_${unitIndex}" class="form-control unit_id" style="width:70px" name="unit_id[${unitIndex}]" data-product-id="${data.product.id}">
                                                     ${data.units.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="number" id="qty_${unitIndex}" class="form-control qty" name="qty[${unitIndex}]" step="1" min="1" value="1">
+                                                <input type="text" id="qty_${unitIndex}" class="form-control qty" style="width:50px" name="qty[${unitIndex}]" value="1">
                                             </td>
                                             <td>
-                                                <input type="number" id="price_${unitIndex}" class="form-control price" name="price[${unitIndex}]" step="0.01" min="0" value="${data.product.units[0].pivot.price}" readonly>
+                                                <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:50px" name="bounce[${unitIndex}]" value="0">
                                             </td>
                                             <td>
-                                                <input type="number" id="row_sub_total_${unitIndex}" class="form-control row_sub_total" name="row_sub_total[${unitIndex}]" step="0.01" value="${data.product.units[0].pivot.price}" readonly>
+                                                <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
+                                            </td>
+                                            <td>
+                                            <input type="text" id="price_${unitIndex}" class="form-control price" style="width:90px" name="price[${unitIndex}]" value="${Number(data.product.units[0].pivot.price).toLocaleString('en-US', {minimumFractionDigits: 2,maximumFractionDigits: 2})}">
+                                            </td>
+                                            <td>
+                                                <input type="text" id="row_sub_total_${unitIndex}" class="form-control row_sub_total" style="width:100px" name="row_sub_total[${unitIndex}]" value="${Number(data.product.units[0].pivot.price).toLocaleString('en-US', {minimumFractionDigits: 2,maximumFractionDigits: 2})}" readonly>
                                             </td>
                                             <td>
                                                 <button type="button" class="btn btn-danger remove-product"><i class="fa fa-trash"></i></button>
                                             </td>
                                         </tr>
                                     `;
-                                    $.ajax({
-                                        url: '{{ route('product.checkQty') }}',
-                                        method: 'POST',
-                                        headers: {
-                                            'Content-Type': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                                        },
-                                        data: JSON.stringify({
-                                            unit_id: data.units[0].pivot
-                                                .unit_id,
-                                            product_id: data.product.id,
-                                            qty: 1,
-                                            stock_id: $('#stock_id').val()
-                                        })
-                                    }).done(function(result) {
-                                        if (result.success) {
-                                            tbody.append(row);
-                                            $('.unit_id').select2();
-                                            $('#add-product').val('');
-                                            $(`#product_name_${unitIndex}`).rules(
-                                                'add', {
-                                                    required: true,
-                                                    messages: {
-                                                        required: "يرجى إدخال اسم المنتج"
-                                                    }
-                                                });
+                                    tbody.prepend(row);
+                                    attachCommaFormatter(`#qty_${unitIndex}`);
+                                    attachCommaFormatter(
+                                        `#bounce_${unitIndex}`);
+                                    attachCommaFormatter(`#price_${unitIndex}`);
+                                    $('.btn-add-invoice').each(function(index,
+                                        button) {
+                                        const $btn = $(
+                                            button
+                                        ); // تحويل العنصر إلى jQuery object
 
-                                            $(`#unit_id_${unitIndex}`).rules('add', {
-                                                required: true,
-                                                messages: {
-                                                    required: "يرجى اختيار الوحدة"
-                                                }
-                                            });
-
-                                            $(`#qty_${unitIndex}`).rules('add', {
-                                                required: true,
-                                                number: true,
-                                                min: 1,
-                                                messages: {
-                                                    required: "يرجى إدخال الكمية",
-                                                    number: "الكمية يجب أن تكون رقمًا",
-                                                    min: "يجب أن تكون الكمية 1 أو أكثر"
-                                                }
-                                            });
-
-                                            $(`#price_${unitIndex}`).rules('add', {
-                                                required: true,
-                                                number: true,
-                                                min: 0,
-                                                messages: {
-                                                    required: "يرجى إدخال السعر",
-                                                    number: "السعر يجب أن يكون رقمًا",
-                                                    min: "يجب أن يكون السعر 0 أو أكثر"
-                                                }
-                                            });
-
-                                            $(`#row_sub_total_${unitIndex}`).rules(
-                                                'add', {
-                                                    required: true,
-                                                    number: true,
-                                                    messages: {
-                                                        required: "يرجى إدخال المجموع الفرعي",
-                                                        number: "المجموع الفرعي يجب أن يكون رقمًا"
-                                                    }
-                                                });
-                                            totalPrice();
-                                        } else {
-                                            notif({
-                                                msg: result.message,
-                                                type: 'error'
-                                            });
+                                        if ($btn.data('id') == data
+                                            .product.id) {
+                                            $btn.addClass(
+                                                'btn-white disabled'
+                                            ).removeClass(
+                                                'btn-primary');
                                         }
-                                    }).fail(function() {
-                                        notif({
-                                            msg: "حدث خطأ أثناء الاتصال بالسيرفر.",
-                                            type: 'error'
-                                        });
                                     });
+                                    $('.unit_id').select2();
+                                    $('.stock_id').select2();
+                                    $('#add-product').val('');
+                                    $(`#product_name_${unitIndex}`).rules(
+                                        'add', {
+                                            required: true,
+                                            messages: {
+                                                required: "يرجى إدخال اسم المنتج"
+                                            }
+                                        });
+
+                                    $(`#stock_id_${unitIndex}`).rules('add', {
+                                        required: true,
+                                        messages: {
+                                            required: "يرجى اختيار المخزن"
+                                        }
+                                    });
+
+                                    $(`#unit_id_${unitIndex}`).rules('add', {
+                                        required: true,
+                                        messages: {
+                                            required: "يرجى اختيار الوحدة"
+                                        }
+                                    });
+
+                                    $(`#qty_${unitIndex}`).rules('add', {
+                                        required: true,
+                                        messages: {
+                                            required: "يرجى إدخال الكمية",
+                                        }
+                                    });
+
+                                    $(`#price_${unitIndex}`).rules('add', {
+                                        required: true,
+
+                                        messages: {
+                                            required: "يرجى إدخال السعر"
+                                        }
+                                    });
+
+                                    $(`#row_sub_total_${unitIndex}`).rules(
+                                        'add', {
+                                            required: true,
+                                            messages: {
+                                                required: "يرجى إدخال المجموع الفرعي",
+                                            }
+                                        });
+                                    totalPrice();
 
                                 } else {
                                     notif({
@@ -484,17 +736,49 @@
                 }, 500);
             });
 
+
             $(document).on('click', '.remove-product', function() {
+
                 let currentRow = $(this).closest('tr');
-                let productId = currentRow.find('.product_id').val();
-                let originalQuantity = currentRow.find('.qty').data('qty');
-                let unitId = currentRow.find('.unit_id').data('unit_id');
-                deletedProducts.push({
-                    id: productId,
-                    qty: originalQuantity,
-                    unitId: unitId
-                });
+
+                let productId = Number(currentRow.find('.product_id').val());
+                let qty = Number(currentRow.find('.qty').val().replace(/,/g, '')) || 0;
+                let bounce = Number(currentRow.find('.bounce').val().replace(/,/g, '')) || 0;
+                let unitId = Number(currentRow.find('.unit_id').val());
+
+                let originalQuantity = qty + bounce;
+
+                // إزالة من المنتجات المضافة
+                addedProducts = addedProducts.filter(id => Number(id) !== productId);
+
+                // إزالة الصف
                 currentRow.remove();
+
+                // إعادة تفعيل زر الإضافة
+                $('.btn-add-invoice').each(function() {
+                    const $btn = $(this);
+                    if (Number($btn.data('id')) === productId) {
+                        $btn.removeClass('btn-white disabled')
+                            .addClass('btn-primary')
+                            .prop('disabled', false);
+                    }
+                });
+
+                totalPrice();
+            });
+
+            $(document).on('input', '.price', function() {
+                const $this = $(this);
+                const closestRow = $this.closest('tr');
+                let priceVal = parseFloat($this.val().replace(/,/g, ''));
+                let qtyVal = parseFloat(closestRow.find('.qty').val().replace(/,/g, ''));
+                let subTotal = (priceVal * qtyVal);
+
+                closestRow.find('.row_sub_total').val(Number(subTotal).toLocaleString(
+                    'en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
                 totalPrice();
             });
 
@@ -504,7 +788,9 @@
                 let productId = unitSelect.data('product-id');
                 const currentRow = unitSelect.closest('tr');
                 const qtyInput = currentRow.find('.qty');
+                const qtyBounce = currentRow.find('.bounce');
                 let oldPrice = currentRow.find('.price').val();
+                let stockId = currentRow.find('.stock_id').val();
 
                 $.ajax({
                     url: '{{ route('product.getUnitPrice') }}',
@@ -515,23 +801,30 @@
                     },
                     data: JSON.stringify({
                         unitId: unitId,
-                        productId: productId
+                        productId: productId,
+                        stockId: stockId,
                     })
                 }).done(function(data) {
                     if (data.success) {
                         const price = parseFloat(data.price) || 0;
-                        const qty = parseFloat(qtyInput.val()) || 0;
-                        const subTotal = (price * qty).toFixed(2);
-                        currentRow.find('.price').val(price.toFixed(2));
-                        currentRow.find('.row_sub_total').val(subTotal);
+                        const qty = parseFloat(qtyInput.val().replace(/,/g, '')) || 0;
+                        const subTotal = (price * qty);
+                        currentRow.find('.price').val(Number(price).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        }));
+                        currentRow.find('.row_sub_total').val(Number(subTotal).toLocaleString(
+                            'en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            }));
                         totalPrice();
-                        checkQuantity(unitSelect, productId, qtyInput, data.firstPrice);
                     } else {
                         notif({
                             msg: data.message,
                             type: 'error',
                         });
-                        resetSelect2(unitSelect, qtyInput, data.firstPrice);
+                        resetSelect2(unitSelect, qtyInput, qtyBounce, data.firstPrice);
                         totalPrice();
                     }
                 }).fail(function() {
@@ -542,66 +835,56 @@
                 });
             });
 
-            $('#product-rows').on('blur', '.qty', function() {
-                const currentRow = $(this).closest('tr');
-                const price = parseFloat(currentRow.find('.price')
-                    .val()) || 0;
-                const qty = parseFloat($(this).val()) || 0;
-                const subTotal = (price * qty).toFixed(2);
-                let unitSelect = currentRow.find('.unit_id'); // تحديد الـ select
-                let productId = currentRow.find('.product_id'); // قيمة المنتج
-                let qtyInput = currentRow.find('.qty'); // حقل الكمية
-
+            $('#product-rows').on('change', '.stock_id', function() {
+                const stockSelect = $(this);
+                let stockId = stockSelect.val();
+                const currentRow = stockSelect.closest('tr');
+                let productId = currentRow.find('.product_id').val();
+                let unitId = currentRow.find('.unit_id').val();
                 $.ajax({
-                    url: '{{ route('product.checkQty') }}',
+                    url: '{{ route('product.getUnitPrice') }}',
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     data: JSON.stringify({
-                        unit_id: unitSelect.val(),
-                        product_id: productId.val(),
-                        qty: qtyInput.val(),
-                        stock_id: $('#stock_id').val()
+                        unitId: unitId,
+                        productId: productId,
+                        stockId: stockId,
                     })
-                }).done(function(result) {
-                    if (!result.success) {
-                        notif({
-                            msg: result
-                                .message, // رسالة الخطأ
-                            type: 'error',
-                        });
-
-                        let firstOption = unitSelect.find('option:first').val();
-                        unitSelect.val(firstOption).trigger(
-                            'change.select2'); // إعادة تعيين الـ select
-                        qtyInput.val(1); // إعادة تعيين الكمية إلى 1
-                        unitSelect.closest('tr').find('.price').val(result.product.units[0].pivot
-                            .price);
-                        unitSelect.closest('tr').find('.row_sub_total').val((result.product.units[0]
-                            .pivot.price * 1).toFixed(2));
-                        totalPrice();
-
-                    } else {
-                        currentRow.find('.row_sub_total').val(subTotal);
-                        totalPrice();
+                }).done(function(data) {
+                    if (data.success) {
+                        $('.qty_in_stock').val(data.qty_in_stock);
                     }
-                }).fail(function() {
-                    notif({
-                        msg: 'حدث خطأ أثناء الاتصال بالسيرفر.',
-                        type: 'error',
-                    });
-                    let firstOption = unitSelect.find('option:first').val();
-                    unitSelect.val(firstOption).trigger('change.select2'); // إعادة تعيين الـ select
-                    qtyInput.val(1); // إعادة تعيين الكمية إلى 1
-                    unitSelect.closest('tr').find('.price').val(parseFloat(oldPrice));
-                    unitSelect.closest('tr').find('.row_sub_total').val((parseFloat(oldPrice) * 1)
-                        .toFixed(2));
-                    totalPrice();
+                });
+            });
+
+            $('#product-rows').on('blur', '.qty', function() {
+                const currentRow = $(this).closest('tr');
+
+                const unformat = str => parseFloat(String(str).replace(/,/g, '')) || 0;
+                const format = num => num.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
                 });
 
+                const price = unformat(currentRow.find('.price').val());
+                const qty = unformat($(this).val());
+                const subTotal = price * qty;
+                let unitSelect = currentRow.find('.unit_id'); // تحديد الـ select
+                let productId = currentRow.find('.product_id'); // قيمة المنتج
+                let qtyInput = currentRow.find('.qty'); // حقل الكمية
+                let qtyBounce = currentRow.find('.bounce');
+
+                currentRow.find('.row_sub_total').val(Number(subTotal).toLocaleString(
+                    'en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }));
+                totalPrice();
             });
+
 
             document.getElementById('discount').addEventListener('input', function() {
                 totalPrice();
@@ -609,7 +892,7 @@
 
             $('#invoiceForm').validate({
                 rules: {
-                    invoice_date: {
+                    date: {
                         required: true,
                         date: true // تصحيح القاعدة بدلاً من `data: required`
                     },
@@ -619,37 +902,36 @@
                     },
                     customer_id: {
                         required: function(element) {
-                            return document.getElementById('payment_status').value == 1;
+                            return document.getElementById('deferend_amount').value != '0.00' ||
+                                document.getElementById('representative_id').value != '';;
                         },
                         number: true
                     },
-                    payment_status: {
-                        required: true,
-                        number: true
-                    },
                     sub_total: {
-                        required: true,
-                        number: true,
-                        min: 0
+                        required: true
                     },
                     tax: {
-                        required: true,
-                        number: true,
-                        min: 0
-                    },
-                    discount: {
-                        number: true,
-                        min: 0
+                        required: true
                     },
                     total: {
                         required: true,
-                        number: true,
-                        min: 0
+                        amountMismatch: true
+                    },
+
+                    deferend_amount: {
+                        required: true,
+                        nonNegativeDefer: true
+                    },
+                    cash_amount_total: {
+                        requiredCashNameIfAmount: true
+                    },
+                    bank_amount_total: {
+                        requiredBankNameIfAmount: true
                     },
 
                 },
                 messages: {
-                    invoice_date: {
+                    date: {
                         required: "يرجى إدخال تاريخ الفاتورة.",
                         date: "يرجى إدخال تاريخ صحيح."
                     },
@@ -661,29 +943,16 @@
                         required: "يرجى إدخال اسم العميل.",
                         number: "يجب أن يكون اسم العميل عدداً."
                     },
-                    payment_status: {
-                        required: "يرجى إدخال حالة الفاتورة.",
-                        number: "يجب أن تكون حالة الفاتورة عدداً."
-                    },
                     sub_total: {
-                        required: "يرجى إدخال الاجمالي قبل الضريبة للفاتورة.",
-                        number: "يجب أن يكون الاجمالي قبل الضريبة للفاتورة عدداً.",
-                        min: "يجب ان يكون اجمالي الضريبةاكبر من الصفراً."
+                        required: "يرجى إدخال الاجمالي قبل الضريبة للفاتورة."
                     },
                     tax: {
                         required: "يرجى إدخال قيمة الضريبة للفاتورة.",
-                        number: "يجب أن تكون قيمة الضريبة للفاتورة عدداً.",
-                        min: "يجب أن تكون قيمة الضريبة اكبر من الصفر."
-                    },
-                    discount: {
-                        number: "يجب أن يكون خصم الفاتورة عدداً.",
-                        min: "يجب أن يكون الخصم اكبر من الصفر."
                     },
                     total: {
                         required: "يرجى إدخال الاجمالي للفاتورة.",
-                        number: "يجب أن يكون الاجمالي للفاتورة عدداً.",
-                        min: "يجب أن يكون الاجمالي اكبر من الصفر."
-                    }
+                    },
+
                 },
                 errorPlacement: function(error, element) {
                     if (element.closest('.input-group').length) {
@@ -702,20 +971,614 @@
                 },
                 unhighlight: function(element) {
                     $(element).closest('.form-group').removeClass('has-error');
+                },
+                submitHandler: function(form) {
+                    cleanNumbersBeforeSubmit();
+                    form.submit();
                 }
             });
 
-            document.getElementById('save-invoice').addEventListener('click', function() {
-                if ($('#invoiceForm').valid()) {
-                    let paymentStatusVal = $('#payment_status').val();
-                    if (paymentStatusVal == 1) {
-                        $('#invoiceForm').submit();
-                        updateProductQty(deletedProducts);
+            $.validator.addMethod("requiredCashName", function(value, element) {
+                return
+                $('#cash_amount_total').val() !== '' ||
+                    $('#bank_amount_total').val() !== '';
+            });
 
-                    } else {
-                        $('#paymentModal').modal('show');
+            $.validator.addMethod(
+                "amountMismatch",
+                function(value, element) {
+                    /* دالّة مساعدة تزيل الفواصل ثم تُحوّل إلى رقم */
+                    const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+
+                    const cash = unformat($('#cash_amount_total').val());
+                    const bank = unformat($('#bank_amount_total').val());
+                    const defer = unformat($('#deferend_amount').val());
+                    const total = unformat($('#total').val());
+
+                    const paid = cash + bank + defer;
+
+                    /* هام: فارق بسيط للسماح بالأخطاء العائمة (0.01 = قرش) */
+                    return Math.abs(paid - total) < 0.01;
+                },
+                "المبلغ المدفوع غير مطابق لقيمة الفاتورة"
+            );
+
+            $(document).ready(function() {
+                $.validator.addMethod("requiredCashNameIfAmount", function(value, element) {
+                    const cashAmount = ($('#cash_amount_total').val() || '').trim();
+                    const cashName = ($('#cash_name').val() || '').trim();
+
+                    if (cashAmount !== '' && cashName === '') {
+                        return false;
                     }
+
+                    return true;
+                }, "يرجى إدخال اسم الخزينة إذا قمت بإدخال المبلغ نقداً.");
+
+
+                $.validator.addMethod("requiredBankNameIfAmount", function(value, element) {
+                    const bankAmount = ($('#bank_amount_total').val() || '').trim();
+                    const bankName = ($('#bank_name').val() || '').trim();
+
+                    if (bankAmount !== '' && bankName === '') {
+                        return false;
+                    }
+
+                    return true;
+                }, "يرجى إدخال اسم البنك إذا قمت بإدخال المبلغ بالبنك.");
+
+                $.validator.addMethod(
+                    "nonNegativeDefer",
+                    function(value, element) {
+                        const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+                        const defer = unformat(value);
+                        return defer >= 0;
+                    },
+                    "المبلغ الآجل لا يمكن أن يكون أقل من الصفر"
+                );
+
+                $.validator.addMethod("uniqueEmailCustomer", function(value, element) {
+                    let isValid = false;
+                    if (isValid == '') {
+                        return isValid = true;
+                    }
+                    $.ajax({
+                        url: '{{ route('customer.checkEmail') }}',
+                        data: {
+                            email: value
+                        },
+                        type: 'GET',
+                        async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                        success: function(response) {
+                            isValid = response.isUnique;
+                        }
+                    });
+                    return isValid;
+                }, "هذا البريد الالكتروني موجود بالفعل في النظام.");
+
+                $.validator.addMethod("uniquePhoneCustomer", function(value, element) {
+                    let isValid = false;
+                    if (isValid == '') {
+                        return isValid = true;
+                    }
+                    $.ajax({
+                        url: '{{ route('customer.checkPhone') }}',
+                        data: {
+                            phone: value
+                        },
+                        type: 'GET',
+                        async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                        success: function(response) {
+                            isValid = response.isUnique;
+                        }
+                    });
+                    return isValid;
+                }, "هذا رقم العميل موجود بالفعل في النظام.");
+
+                $.validator.addMethod("uniqueNameCustomer", function(value, element) {
+                    let isValid = false;
+                    $.ajax({
+                        url: '{{ route('customer.checkName') }}',
+                        data: {
+                            name: value
+                        },
+                        type: 'GET',
+                        async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                        success: function(response) {
+                            isValid = response.isUnique;
+                        }
+                    });
+                    return isValid;
+                }, "هذا المنتج موجود بالفعل في النظام.");
+
+                $('#addCustomer').validate({
+                    rules: {
+                        name: {
+                            required: true,
+                            uniqueNameCustomer: true,
+                        },
+                        email: {
+                            uniqueEmailCustomer: true,
+                            email: true,
+                        },
+                        phone: {
+                            uniquePhoneCustomer: true,
+                            number: true
+                        }
+                    },
+                    messages: {
+                        name: {
+                            required: "يرجى إدخال اسم العميل.",
+                        },
+                        email: {
+                            email: "الرجاء إدخال بريد إلكتروني صالح.",
+                        },
+                        phone: {
+                            number: "يجب أن يكون رقم العميل عدداً."
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.closest('.input-group').length) {
+                            error.insertAfter(element.closest('.input-group'));
+                        } else if (element.hasClass('select2-hidden-accessible')) {
+                            error.insertAfter(element.next('.select2'));
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    },
+                    errorElement: "span",
+                    errorClass: "text-danger",
+                    highlight: function(element) {
+                        $(element).closest('.form-group').addClass('has-error');
+                    },
+                    unhighlight: function(element) {
+                        $(element).closest('.form-group').removeClass('has-error');
+                    },
+                    submitHandler: function(form) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '{{ route('add.customer') }}',
+                            data: $(form).serialize(),
+                            success: function(response) {
+                                if (response.success === true) {
+                                    notif({
+                                        msg: 'تم إضافة العميل بنجاح',
+                                        type: 'success'
+                                    });
+
+                                    // إخفاء المودال (تأكد من أن مودالك يحتوي على هذا ID)
+                                    $('#customerModal').modal('hide');
+
+                                    // إعادة تعيين الفورم
+                                    form.reset();
+
+                                    var newOption = new Option(response
+                                        .newCustomer
+                                        .name, response.newCustomer.id,
+                                        true,
+                                        true);
+                                    $('#customer_id').append(newOption).trigger(
+                                        'change');
+
+                                    var select = $('#representative_id');
+                                    var value = String(response.representative.id);
+                                    var text = response.representative.name;
+
+                                    // لو المندوب غير موجود ضيفه
+                                    if (select.find('option[value="' + value + '"]')
+                                        .length === 0) {
+                                        select.append(new Option(text, value, true,
+                                            true));
+                                    }
+
+                                    // اعمل select
+                                    select.val(value).trigger('change');
+
+                                } else {
+                                    notif({
+                                        msg: ' لم يتم إضافة العميل',
+                                        type: 'error'
+                                    });
+                                }
+                            },
+
+                        });
+                    }
+                });
+
+                // ربط الزر مع الفورم
+                $('#btnAddCustomer').on('click', function() {
+                    $('#addCustomer').submit();
+                });
+
+                $('#customer_id').on('change', function() {
+
+                    var customerId = $(this).val();
+                    var url = "{{ route('customer.representative', ':id') }}";
+                    url = url.replace(':id', customerId);
+                    if (!customerId) return;
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        success: function(response) {
+
+                            if (response.success) {
+
+                                var select = $('#representative_id');
+                                var value = String(response.representative.id);
+                                var text = response.representative.name;
+
+                                // لو المندوب غير موجود ضيفه
+                                if (select.find('option[value="' + value + '"]')
+                                    .length === 0) {
+                                    select.append(new Option(text, value, true, true));
+                                }
+
+                                // اعمل select
+                                select.val(value).trigger('change');
+                            }
+                        }
+                    });
+                });
+
+                $.validator.addMethod("uniqueEmail", function(value, element) {
+                    let isValid = false;
+                    if (isValid == '') {
+                        return isValid = true;
+                    }
+                    $.ajax({
+                        url: '{{ route('representative.checkEmail') }}',
+                        data: {
+                            email: value
+                        },
+                        type: 'GET',
+                        async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                        success: function(response) {
+                            isValid = response.isUnique;
+                        }
+                    });
+                    return isValid;
+                }, "هذا البريد الالكتروني موجود بالفعل في النظام.");
+
+                $.validator.addMethod("uniquePhone", function(value, element) {
+                    let isValid = false;
+                    if (isValid == '') {
+                        return isValid = true;
+                    }
+                    $.ajax({
+                        url: '{{ route('representative.checkPhone') }}',
+                        data: {
+                            phone: value
+                        },
+                        type: 'GET',
+                        async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                        success: function(response) {
+                            isValid = response.isUnique;
+                        }
+                    });
+                    return isValid;
+                }, "هذا رقم العميل موجود بالفعل في النظام.");
+
+                $.validator.addMethod("uniqueName", function(value, element) {
+                    let isValid = false;
+                    $.ajax({
+                        url: '{{ route('representative.checkName') }}',
+                        data: {
+                            name: value
+                        },
+                        type: 'GET',
+                        async: false, // تأكد من أن التحقق يتم بشكل متزامن
+                        success: function(response) {
+                            isValid = response.isUnique;
+                        }
+                    });
+                    return isValid;
+                }, "هذا المنتج موجود بالفعل في النظام.");
+
+                $('#addRepresentative').validate({
+                    rules: {
+                        name_representative: {
+                            required: true,
+                            uniqueName: true,
+                        },
+                        email_representative: {
+                            uniqueEmail: true,
+                            email: true,
+                        },
+                        phone_representative: {
+                            uniquePhone: true,
+                            number: true
+                        },
+                        representative_id: {
+                            required: true
+                        }
+                    },
+                    messages: {
+                        name_representative: {
+                            required: "يرجى إدخال اسم المندوب.",
+                        },
+                        email_representative: {
+                            email: "الرجاء إدخال بريد إلكتروني صالح.",
+                        },
+                        phone_representative: {
+                            number: "يجب أن يكون رقم المندوب عدداً."
+                        },
+                        representative_id: {
+                            required: "يجب اختيار اسم المندوب"
+                        }
+                    },
+                    errorPlacement: function(error, element) {
+                        if (element.closest('.input-group').length) {
+                            error.insertAfter(element.closest('.input-group'));
+                        } else if (element.hasClass('select2-hidden-accessible')) {
+                            error.insertAfter(element.next('.select2'));
+                        } else {
+                            error.insertAfter(element);
+                        }
+                    },
+                    errorElement: "span",
+                    errorClass: "text-danger",
+                    highlight: function(element) {
+                        $(element).closest('.form-group').addClass('has-error');
+                    },
+                    unhighlight: function(element) {
+                        $(element).closest('.form-group').removeClass('has-error');
+                    },
+                    submitHandler: function(form) {
+                        $.ajax({
+                            type: 'POST',
+                            url: '{{ route('add.representative') }}',
+                            data: {
+                                name: $('#name_representative').val(),
+                                email: $('#email_representative').val(),
+                                phone: $('#phone_representative')
+                                    .val(), // ← بدون علامات تنصيص
+                                address: $('#address_representative').val(),
+                                _token: '{{ csrf_token() }}'
+
+                            },
+
+                            success: function(response) {
+                                if (response.success === true) {
+                                    notif({
+                                        msg: 'تم إضافة المندوب بنجاح',
+                                        type: 'success'
+                                    });
+
+                                    // إخفاء المودال (تأكد من أن مودالك يحتوي على هذا ID)
+                                    $('#representativeModal').modal('hide');
+
+                                    // إعادة تعيين الفورم
+                                    form.reset();
+
+                                    var newOption = new Option(response
+                                        .newRepresentative
+                                        .name, response.newRepresentative
+                                        .id,
+                                        true,
+                                        true);
+                                    $('#representative_id').append(newOption)
+                                        .trigger(
+                                            'change');
+                                } else {
+                                    notif({
+                                        msg: ' لم يتم إضافة المندوب',
+                                        type: 'error'
+                                    });
+                                }
+                            },
+
+                        });
+                    }
+                });
+
+                // ربط الزر مع الفورم
+                $('#btnAddRepresentative').on('click', function() {
+                    $('#addRepresentative').submit();
+                });
+            });
+
+            $(document).on('click', '.btn-add-invoice', function(e) {
+                e.preventDefault();
+
+                const button = $(this);
+                const productId = button.data('id');
+                if (addedProducts.includes(productId)) {
+                    return;
                 }
+                addedProducts.push(productId);
+
+                $.ajax({
+                    url: '{{ route('invoice.getProduct') }}',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        product_id: button.data('id'),
+                        stock_id: $('#stock_id').val()
+                    }),
+                    success(data) {
+                        if (data.success) {
+                            const tbody = $('#product-rows');
+                            const rowCount = tbody.find('tr').length + 1;
+                            const unitIndex = rowCount;
+
+                            const row = `
+                                <tr>
+                                    <td>
+                                        <input type="text" id="product_name_${unitIndex}" style="width:200px; text-align:left" name="product_name[${unitIndex}]" class="form-control product_name" value="${data.product.name}" readonly>
+                                        <input type="hidden" id="product_id_${unitIndex}" name="product_id[${unitIndex}]" class="product_id" value="${data.product.id}">
+                                    </td>
+                                    <td>
+                                        <select id="stock_id_${unitIndex}" class="form-control stock_id" style="width:140px" name="stock_id[${unitIndex}]" data-product-id="${data.product.id}">
+                                            ${data.stocks.map(stock => `<option value="${stock.id}">${stock.name}</option>`).join('')}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="qty_in_stock_${unitIndex}" class="form-control qty_in_stock" style="width:50px" name="qty_in_stock_[${unitIndex}]" disabled value="${data.qty_in_stock}">
+                                    </td>
+                                    <td>
+                                        <select id="unit_id_${unitIndex}" class="form-control unit_id" style="width:70px" name="unit_id[${unitIndex}]" data-product-id="${data.product.id}">
+                                            ${data.units.map(unit => `<option value="${unit.id}">${unit.name}</option>`).join('')}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" id="qty_${unitIndex}" class="form-control qty" style="width:50px" name="qty[${unitIndex}]" value="1">
+                                    </td>
+                                    <td>
+                                        <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:50px" name="bounce[${unitIndex}]" value="0">
+                                    </td>
+                                    <td>
+                                        <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
+                                    </td>
+                                    <td>
+                                    <input type="text" id="price_${unitIndex}" class="form-control price" style="width:90px" name="price[${unitIndex}]" value="${Number(data.product.units[0].pivot.price).toLocaleString('en-US', {minimumFractionDigits: 2,maximumFractionDigits: 2})}">
+                                    </td>
+                                    <td>
+                                        <input type="text" id="row_sub_total_${unitIndex}" class="form-control row_sub_total" style="width:100px" name="row_sub_total[${unitIndex}]" value="${Number(data.product.units[0].pivot.price).toLocaleString('en-US', {minimumFractionDigits: 2,maximumFractionDigits: 2})}" readonly>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger remove-product"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            `;
+                            tbody.prepend(row);
+                            attachCommaFormatter(`#qty_${unitIndex}`);
+                            attachCommaFormatter(
+                                `#bounce_${unitIndex}`);
+                            attachCommaFormatter(`#price_${unitIndex}`);
+                            $('.btn-add-invoice').each(function(index,
+                                button) {
+                                const $btn = $(
+                                    button
+                                ); // تحويل العنصر إلى jQuery object
+
+                                if ($btn.data('id') == data
+                                    .product.id) {
+                                    $btn.addClass(
+                                        'btn-white disabled'
+                                    ).removeClass(
+                                        'btn-primary');
+                                }
+                            });
+                            $('.unit_id').select2();
+                            $('.stock_id').select2();
+                            $('#add-product').val('');
+                            $(`#product_name_${unitIndex}`).rules(
+                                'add', {
+                                    required: true,
+                                    messages: {
+                                        required: "يرجى إدخال اسم المنتج"
+                                    }
+                                });
+
+                            $(`#unit_id_${unitIndex}`).rules('add', {
+                                required: true,
+                                messages: {
+                                    required: "يرجى اختيار الوحدة"
+                                }
+                            });
+
+                            $(`#stock_id${unitIndex}`).rules('add', {
+                                required: true,
+                                messages: {
+                                    required: "يرجى اختيار المخزن"
+                                }
+                            });
+
+                            $(`#qty_${unitIndex}`).rules('add', {
+                                required: true,
+                                messages: {
+                                    required: "يرجى إدخال الكمية",
+                                }
+                            });
+
+                            // $(`#bounce_${unitIndex}`).rules('add', {
+                            //     required: true,
+                            //     messages: {
+                            //         required: "يجب ان يكون البونص على الاقل يساوي الصفر كاقل قيمة ممكنة",
+                            //     }
+                            // });
+
+                            $(`#price_${unitIndex}`).rules('add', {
+                                required: true,
+
+                                messages: {
+                                    required: "يرجى إدخال السعر"
+                                }
+                            });
+
+                            $(`#row_sub_total_${unitIndex}`).rules(
+                                'add', {
+                                    required: true,
+                                    messages: {
+                                        required: "يرجى إدخال المجموع الفرعي",
+                                    }
+                                });
+                            totalPrice();
+                        } else {
+                            notif({
+                                msg: data.message,
+                                type: 'error'
+                            });
+                        }
+                    },
+                    error() {
+                        notif({
+                            msg: 'حدث خطأ ما، يرجى المحاولة لاحقًا',
+                            type: 'error'
+                        });
+                    }
+                });
+            });
+
+            $('#search').on('keyup', function() {
+                $.ajax({
+                    url: '{{ route('sale_invoice.search') }}',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: {
+                        search: $('#search').val(),
+                        type: 3,
+                    },
+                    success: function(result) {
+                        let tbody = $('#body_search');
+                        tbody.empty();
+                        let rows = '';
+                        result.products.forEach((product, index) => {
+                            let isAdded = productIds.includes(product.id);
+                            rows += `
+                                    <tr>
+                                        <td>${product.name}</td>
+                                        <td>
+                                            <a href="#" class="btn btn-add-invoice ${isAdded ? 'btn-white disabled' : 'btn-primary'}" data-id="${product.id}">
+                                                <i class="fa fa-plus"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                `;
+                        });
+
+                        tbody.append(rows);
+                    }
+                })
+            });
+
+            $('#apply_tax').on('change', function() {
+                totalPrice();
+            });
+
+            $('#cash_amount_total').on('input', function() {
+                totalDeferend();
+            });
+
+            $('#bank_amount_total').on('input', function() {
+                totalDeferend();
             });
 
             function addValidationRules() {
@@ -742,10 +1605,8 @@
                 $('input.qty').each(function() {
                     $(this).rules("add", {
                         required: true,
-                        number: true,
                         messages: {
                             required: "يرجى إدخال الكمية.",
-                            number: "يجب أن تكون الكمية رقمًا."
                         }
                     });
                 });
@@ -753,10 +1614,8 @@
                 $('input.price').each(function() {
                     $(this).rules("add", {
                         required: true,
-                        number: true,
                         messages: {
                             required: "يرجى إدخال السعر.",
-                            number: "يجب أن تكون السعر رقمًا."
                         }
                     });
                 });
@@ -764,10 +1623,8 @@
                 $('input.row_sub_total').each(function() {
                     $(this).rules("add", {
                         required: true,
-                        number: true,
                         messages: {
                             required: "يرجى إدخال الاجمالي قبل الضريبة.",
-                            number: "يجب أن يكون الاجمالي قبل الضريبة رقمًا."
                         }
                     });
                 });
@@ -776,218 +1633,170 @@
             // تطبيق القواعد عند تحميل الصفحة
             addValidationRules();
 
-
-            // التحقق عند الإرسال
-            $("#invoiceForm").on("submit", function(e) {
-                if (!$("#invoiceForm").valid()) {
-                    e.preventDefault();
-                }
-            });
-
-            $('#confirm-payment').on('click', function(e) {
-                updateProductQty(deletedProducts);
-                const paymentMethod = $('#payment_method').val();
-                if (!paymentMethod) {
-                    $('#payment_method').rules(
-                        'add', {
-                            required: true,
-                            messages: {
-                                required: "يرجى إدخال وسيلة الدفع"
-                            }
-                        });
-                }
+            attachCommaFormatter('#cash_amount_total');
+            attachCommaFormatter(
+                '#bank_amount_total');
+            attachCommaFormatter('#deferend_amount');
+            attachCommaFormatter(
+                '#discount');
+            attachCommaFormatter('.qty');
+            attachCommaFormatter('.price');
 
 
-                $('#cash_name').rules(
-                    'add', {
-                        required: true,
-                        messages: {
-                            required: "يرجى ادخال اسم حساب الخزينة"
-                        }
-                    });
-
-                $('#bank_name').rules(
-                    'add', {
-                        required: true,
-                        messages: {
-                            required: "يرجى إدخال اسم حساب البنك"
-                        }
-                    });
-
-                $('#bank_id').rules(
-                    'add', {
-                        required: true,
-                        messages: {
-                            required: "يرجى إدخال اسم حساب البنك"
-                        }
-                    });
-
-                $('#bank_amount').rules(
-                    'add', {
-                        required: true,
-                        messages: {
-                            required: "يرجى إدخال اسم حساب الخزينة"
-                        }
-                    });
-
-                $('#cash_id').rules(
-                    'add', {
-                        required: true,
-                        messages: {
-                            required: "يرجى إدخال المبلغ بالكاش"
-                        }
-                    });
-
-                $('#cash_amount').rules(
-                    'add', {
-                        required: true,
-                        messages: {
-                            required: "يرجى إدخال المبلغ بالبنك"
-                        }
-                    });
-
-                $('#invoiceForm').submit();
-            });
-
-            $('#payment_method').on('change', function() {
-                let selectedMethod = $(this).val();
-                let selectMethod1 = selectedMethod;
-
-                $('#cash-list, #bank-list, #cash-input, #bank-input, #cash-id, #bank-id').addClass(
-                    'd-none');
-                $('#cash_amount, #bank_amount').val('');
-                $('#cash_name, #bank_name, #bank_id, #cash_id').val('').trigger('change');
-
-                if (selectedMethod == '1') {
-                    $('#cash-list').removeClass('d-none');
-                } else if (selectedMethod === '2') {
-                    $('#bank-list').removeClass('d-none');
-                } else if (selectedMethod === '3') {
-                    $('#cash-input, #bank-input, #cash-id, #bank-id').removeClass('d-none');
-                }
-            });
-            select2list("#cash_name", "{{ route('sale_invoice.select2') }}", 1, 'قم باختيار حساب الخزينة');
-            select2list("#bank_name", "{{ route('sale_invoice.select2') }}", 2, 'قم باختيار حساب الينك');
-            select2list("#cash_id", "{{ route('sale_invoice.select2') }}", 1, 'قم باختيار حساب الخزينة');
-            select2list("#bank_id", "{{ route('sale_invoice.select2') }}", 2, 'قم باختيار حساب البنك');
         });
+
+        function attachCommaFormatter(selector) {
+
+            document.querySelectorAll(selector).forEach(input => {
+
+                input.addEventListener('input', function() {
+
+                    /* ـــ حالة المؤشر قبل التعديل ـــ */
+                    const oldPos = this.selectionStart;
+                    const oldVal = this.value;
+
+                    /* 1) إزالة كل ما ليس رقمًا أو نقطة */
+                    let cleaned = oldVal.replace(/[^0-9.]/g, '');
+
+                    /* 2) الاحتفاظ بأول نقطة فقط ومسح البقية */
+                    const firstDot = cleaned.indexOf('.');
+                    if (firstDot !== -1) {
+                        cleaned = cleaned.slice(0, firstDot + 1) +
+                            cleaned.slice(firstDot + 1).replace(/\./g, '');
+                    }
+
+                    /* 3) تقسيم إلى جزء صحيح وعشرى */
+                    const [rawInt = '', rawDec = ''] = cleaned.split('.');
+
+                    /* 4) إضافة فواصل للجزء الصحيح */
+                    const intPart = rawInt.replace(/^0+(?!$)/, ''); // أصفار زائدة
+                    const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                    /* 5) إعادة التجميع */
+                    let formatted = intWithCommas;
+                    if (firstDot !== -1) {
+                        // لو المستخدم كتب نقطة ولم يكتب أرقام بعدها نحافظ على النقطة
+                        formatted += '.' + rawDec;
+                    }
+
+                    this.value = formatted;
+
+                    /* 6) إعادة المؤشر لموضعه الطبيعى */
+                    const diff = formatted.length - oldVal.length;
+                    this.setSelectionRange(oldPos + diff, oldPos + diff);
+                });
+
+            });
+        }
+
+        function cleanNumbersBeforeSubmit() {
+            // الحقول ذات الأسماء المتكررة كمصفوفات (price[], row_sub_total[], qty[] ... الخ)
+            // نفترض ان الفورم يحتوي على هذه الحقول، نمر عليها كلها
+            document.querySelectorAll('input[name^="price"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+            document.querySelectorAll('input[name^="row_sub_total"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+            document.querySelectorAll('input[name^="qty"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+
+            document.querySelectorAll('input[name^="bounce"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+
+            // نفس الشيء للحقول الفردية:
+            let singleFields = ['cash_amount_total', 'bank_amount_total', 'discount', 'sub_total',
+                'tax', 'total',
+                'deferend_amount'
+            ];
+            singleFields.forEach(id => {
+                let el = document.getElementById(id);
+                if (el && el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+        }
+
+        function toggleSidebarBasedOnScreen() {
+            if (window.innerWidth >= 768) {
+                document.body.classList.add('sidenav-toggled');
+            } else {
+                document.body.classList.remove('sidenav-toggled');
+            }
+        }
+
+        window.addEventListener('load', toggleSidebarBasedOnScreen);
+        window.addEventListener('resize',
+            toggleSidebarBasedOnScreen);
 
 
         function totalPrice() {
+            const unformat = str => parseFloat(String(str).replace(/,/g, '')) || 0;
+            const format = num => num.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
             let subTotal = 0;
             document.querySelectorAll('.row_sub_total').forEach(function(selector) {
-                let rowSubTotal = parseFloat(selector.value) || 0; // تحويل القيمة إلى رقم والتعامل مع القيم الفارغة
+                let rowSubTotal = unformat(selector.value) ||
+                    0; // تحويل القيمة إلى رقم والتعامل مع القيم الفارغة
                 subTotal += rowSubTotal; // جمع القيم
             });
 
             // تعيين القيمة النهائية مع التنسيق العشري
-            let sub_total = parseFloat(subTotal); // تأكد من تحويله إلى رقم
-            document.getElementById('sub_total').value = sub_total.toFixed(2);
+            let sub_total = unformat(subTotal); // تأكد من تحويله إلى رقم
+            document.getElementById('sub_total').value = format(sub_total);
 
-            let discount = parseFloat(document.getElementById('discount').value) || 0;
-            let tax = parseFloat(sub_total * 17 / 100) || 0;
-            document.getElementById('tax').value = tax.toFixed(2);
+            let discount = unformat(document.getElementById('discount').value) || 0;
+            let tax = $('#apply_tax').is(':checked') ? unformat(sub_total * 17 / 100) || 0 : 0;
+            document.getElementById('tax').value = format(tax);
 
-            let total = parseFloat(sub_total + tax - discount);
-            document.getElementById('total').value = total.toFixed(2);
+            let cash = unformat(document.getElementById('cash_amount_total').value) || 0;
+            let bank = unformat(document.getElementById('bank_amount_total').value) || 0;
+
+            let total = unformat(sub_total + tax - discount);
+            document.getElementById('total').value = format(total);
+            document.getElementById('deferend_amount').value = format(total - cash - bank);
 
             // 🔹 تأكد أن المقارنة مع رقم
             if (sub_total == 0) {
                 document.getElementById('total').value = '';
+                document.getElementById('deferend_amount').value = '0.00';
             }
         }
 
-        // ✅ دالة التحقق من الكمية بعد تغيير الوحدة أو الكمية
-        function checkQuantity(unitSelect, productId, qtyInput, oldPrice) {
-            $.ajax({
-                url: '{{ route('product.checkQty') }}',
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                data: {
-                    unit_id: unitSelect.val(),
-                    product_id: productId,
-                    qty: qtyInput.val(),
-                    stock_id: $('#stock_id').data('stock_id')
-                }
-            }).done(function(result) {
-                if (!result.success) {
-                    notif({
-                        msg: result.message,
-                        type: 'error',
-                    });
-                    resetSelect2(unitSelect, qtyInput, oldPrice);
-                }
-            }).fail(function() {
-                notif({
-                    msg: '⚠️ حدث خطأ أثناء الاتصال بالسيرفر.',
-                    type: 'error',
-                });
+        function totalDeferend() {
+            const unformat = str => parseFloat(String(str).replace(/,/g, '')) || 0;
+            const format = num => num.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             });
+            let total = unformat($('#total').val());
+            let cash = unformat($('#cash_amount_total').val());
+            let bank = unformat($('#bank_amount_total').val());
+
+            $('#deferend_amount').val(format(total - cash - bank))
         }
 
-        function resetSelect2(unitSelect, qtyInput, oldPrice) {
+
+        function resetSelect2(unitSelect, qtyInput, qtyBounce, oldPrice) {
             let firstOption = unitSelect.find('option:first').val();
             unitSelect.val(firstOption).trigger('change.select2'); // إعادة تعيين الـ select
             qtyInput.val(1); // إعادة تعيين الكمية إلى 1
+            qtyBounce.val(0);
             unitSelect.closest('tr').find('.price').val(parseFloat(oldPrice).toFixed(2));
             unitSelect.closest('tr').find('.row_sub_total').val((parseFloat(oldPrice) * 1).toFixed(2));
             totalPrice();
-        }
-
-        function updateProductQty(deletedProducts) {
-            if (deletedProducts.length > 0) {
-                $.ajax({
-                    url: '{{ route('sale_invoice.updateQty') }}',
-                    type: "POST",
-                    data: {
-                        deleted_products: deletedProducts,
-                        _token: '{{ csrf_token() }}',
-                        stock_id: $('#stock_id').data('stock_id')
-                    },
-                    success: function(response) {
-                        deletedProducts = []; // مسح المصفوفة بعد الحفظ
-                    },
-                });
-            }
-        }
-
-        function select2list(selector, url, selectMethod, placeholder) {
-            $(selector).select2({
-                language: {
-                    inputTooShort: function() {
-                        return 'ادخل حرف واحد على الاقل';
-                    }
-                },
-                dropdownParent: $('#paymentModal'),
-                ajax: {
-                    url: url,
-                    dataType: 'json',
-                    delay: 100,
-                    data: function(params) {
-                        return {
-                            q: params.term,
-                            page: params.page,
-                            selectMethod: selectMethod
-                        };
-                    },
-                    processResults: function(data, params) {
-                        console.log(data);
-                        params.page = params.page || 1;
-                        return {
-                            results: data,
-                            pagination: {
-                                more: ((data.total_count) > (params.page * 20))
-                            }
-                        };
-                    },
-                    cache: true
-                },
-                minimumInputLength: 1,
-                placeholder: placeholder
-            });
-
         }
     </script>
 @endsection

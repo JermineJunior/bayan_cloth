@@ -8,11 +8,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseInvoice extends Model
 {
-    protected $fillable = ['supplier_id', 'invoice_number', 'stock_id', 'invoice_date', 'sub_total_amount', 'discount_amount', 'tax_amount', 'total_amount', 'payment_status', 'status', 'payment_method', 'cash_id', 'bank_id', 'cash_amount', 'bank_amount'];
+    protected $fillable = ['supplier_id', 'representative_id', 'invoice_number', 'stock_id', 'date', 'sub_total_amount', 'discount_amount', 'tax_amount', 'tax_status', 'total_amount', 'status', 'cash_name', 'bank_name', 'cash_amount_total', 'bank_amount_total', 'process_no','deferend_amount','branch_id','invoice_status','user_id'];
 
-    public function supplier()
+    public function supplier(): BelongsTo
     {
         return $this->belongsTo(Tree4::class , 'supplier_id');
+    }
+
+    public function tree4(): BelongsTo
+    {
+        return $this->belongsTo(Tree4::class , 'supplier_id');
+    }
+
+    public function stock(): BelongsTo
+    {
+        return $this->belongsTo(Stock::class);
     }
     
     public function details(): HasMany
@@ -34,4 +44,5 @@ class PurchaseInvoice extends Model
     {
         return $this->hasOne(PurchaseInvoiceReturn::class);
     }
+
 }

@@ -7,15 +7,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Stock extends Model
 {
-    protected $fillable = ['name','status'];
-
-    public function scopeStatusActive($query)
-    {
-        return $query->whereStatus(1);
-    }
+    protected $fillable = ['name'];
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'product_stocks')->withPivot('quantity','unit_stock');
+        return $this->belongsToMany(Product::class, 'product_stocks')->withPivot('quantity', 'unit_stock');
     }
 }

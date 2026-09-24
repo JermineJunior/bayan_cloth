@@ -53,5 +53,77 @@ class Tree4TableSeeder extends Seeder
         $tree4->tree3_code = 4101;
         $tree4->user_id = 1;
         $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 310100001;
+        $tree4->tree4_name = 'راس المال';
+        $tree4->tree3_id = 11;
+        $tree4->tree3_code = 3101;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100001;
+        $tree4->tree4_name = 'تامين';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100002;
+        $tree4->tree4_name = 'رسوم جمركية';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100003;
+        $tree4->tree4_name = 'تخليص جمركي';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100004;
+        $tree4->tree4_name = 'تفريغ ومناولة';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100005;
+        $tree4->tree4_name = 'نقل داخلي';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100006;
+        $tree4->tree4_name = 'عمولات بنكية';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100007;
+        $tree4->tree4_name = 'فروقات عملة';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
+
+        $tree4  = new Tree4();
+        $tree4->tree4_code = 530100008;
+        $tree4->tree4_name = 'رسوم صيدلة';
+        $tree4->tree3_id = 15;
+        $tree4->tree3_code = 5301;
+        $tree4->user_id = 1;
+        $tree4->save();
     }
 }

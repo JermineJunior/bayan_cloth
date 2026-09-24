@@ -47,25 +47,33 @@
                         @csrf
                         <div class="row">
                             <!-- Barcode -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="barcode">باركود المنتج</label>
                                     <input type="text" name="barcode" id="barcode" class="form-control"
-                                        placeholder="ادخل باركود المنتج">
+                                        placeholder="ادخل باركود المنتج" autocomplete="off">
                                 </div>
                             </div>
                             <!-- Name -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="name">اسم المنتج <span class="tx-danger">*</span></label>
+                                    <span class="tx-danger">*</span><label for="name">اسم المنتج </label>
                                     <input type="text" name="name" id="name" class="form-control"
-                                        placeholder="ادخل اسم المنتج">
+                                        placeholder="ادخل اسم المنتج" autocomplete="off">
+                                </div>
+                            </div>
+                            <!-- Name EN -->
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="name_en">الاسم العلمي للمنتج </label>
+                                    <input type="text" name="name_en" id="name_en" class="form-control"
+                                        placeholder="ادخل الاسم العلمي للمنتج" autocomplete="off">
                                 </div>
                             </div>
                             <!-- Category -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="category_id">قسم المنتج <span class="tx-danger">*</span></label>
+                                    <span class="tx-danger">*</span><label for="category_id">شركة المنتج </label>
                                     <select class="form-control" name="category_id" id="category_id">
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -73,26 +81,10 @@
                                     </select>
                                 </div>
                             </div>
-                            <!-- Purchase Price -->
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="purchase_price">سعر الشراء <span class="tx-danger">*</span></label>
-                                    <div class="input-group">
-                                        <input type="number" name="purchase_price" id="purchase_price" class="form-control"
-                                            step="0.01" placeholder="أدخل السعر" style="flex: 2">
-                                        <select name="unit_purchase_price" id="unit_purchase_price" class="form-control"
-                                            style="flex: 1">
-                                            @foreach ($units as $unit)
-                                                <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
                             <!-- Reorder Level -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="reorder_level">إعادة الطلب <span class="tx-danger">*</span></label>
+                                    <label for="reorder_level">إعادة الطلب </label>
                                     <div class="input-group">
                                         <input type="number" name="reorder_level" id="reorder_level" class="form-control"
                                             style="flex: 2" placeholder="ادخل اعادة حد الطلب">
@@ -106,9 +98,9 @@
                                 </div>
                             </div>
                             <!-- Expire Date -->
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="expire_date">تاريخ انتهاء الصلاحية <span class="tx-danger">*</span></label>
+                                    <label for="expire_date">تاريخ انتهاء الصلاحية </label>
                                     <input type="date" name="expire_date" id="expire_date" class="form-control">
                                 </div>
                             </div>
@@ -119,7 +111,7 @@
                                 <br>
                                 <div class="unit-row mb-3">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label for="unit_id" class="form-label">الوحدة</label>
                                             <select name="units[0][unit_id]" id="unit_id" class="form-control">
                                                 @foreach ($units as $unit)
@@ -127,14 +119,19 @@
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label for="price" class="form-label">السعر</label>
-                                            <input type="number" name="units[0][price]" id="price"
-                                                class="form-control" step="0.01" placeholder="ادخل سعر الوحدة">
+                                        <div class="col-md-3">
+                                            <label for="price" class="form-label">سعر البيع</label>
+                                            <input type="text" name="units[0][price]" id="price"
+                                                class="form-control product_price" placeholder="ادخل سعر بيع الوحدة">
                                         </div>
                                         <div class="col-md-3">
-                                            <label for="conversion_factor" class="form-label">الكمية</label>
-                                            <input type="number" name="units[0][conversion_factor]"
+                                            <label for="price_purchase" class="form-label">سعر الشراء</label>
+                                            <input type="text" name="units[0][price_purchase]" id="price_purchase"
+                                                class="form-control product_price_purchase"
+                                                placeholder="ادخل سعر الشراء الوحدة">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="hidden" name="units[0][conversion_factor]"
                                                 id="conversion_factor" class="form-control product_conversion_factor"
                                                 placeholder="ادخل كمية الوحدة" value="1" readonly>
                                         </div>
@@ -147,7 +144,7 @@
                                     وحدة</button>
 
                                 {{-- <button type="button" id="add-stock-row" class="btn btn-info mb-3 mr-3">إضافة
-                                    مخزون</button> --}}
+                                    مخزن</button> --}}
                             </div>
                             <!-- Submit Button -->
                             <div class="col-12 text-center">
@@ -177,31 +174,36 @@
             // إضافة صف جديد للوحدات
             $('#add-unit-row').click(function() {
                 let unitRow = `<div class="unit-row mb-3">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label for="unit_id_${unitIndex}" class="form-label">الوحدة</label>
-                            <select name="units[${unitIndex}][unit_id]" id="unit_id_${unitIndex}" class="form-control product_unit" required>
-                                @foreach ($units as $unit)
-                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="price_${unitIndex}" class="form-label">السعر</label>
-                            <input type="number" name="units[${unitIndex}][price]" id="price_${unitIndex}" class="form-control product_price" step="0.01" required placeholder="ادخل سعر الوحدة">
-                        </div>
-                        <div class="col-md-3">
-                            <label for="conversion_factor_${unitIndex}" class="form-label">الكمية</label>
-                            <input type="number" name="units[${unitIndex}][conversion_factor]" id="conversion_factor_${unitIndex}" class="form-control product_conversion_factor" required placeholder="ادخل كمية عامل التحويل">
-                        </div>
-                        <div class="col-md-1 d-flex align-items-end">
-                            <button type="button" class="btn btn-danger remove-unit-row">حذف</button>
-                        </div>
-                    </div>
-                </div>`;
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <label for="unit_id_${unitIndex}" class="form-label">الوحدة</label>
+                                            <select name="units[${unitIndex}][unit_id]" id="unit_id_${unitIndex}" class="form-control product_unit" required>
+                                                @foreach ($units as $unit)
+                                                    <option value="{{ $unit->id }}">{{ $unit->name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="price_${unitIndex}" class="form-label">سعر البيع</label>
+                                            <input type="text" name="units[${unitIndex}][price]" id="price_${unitIndex}" class="form-control product_price" required placeholder="ادخل سعر بيع الوحدة">
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label for="price_purchase_${unitIndex}" class="form-label">سعر الشراء</label>
+                                            <input type="text" name="units[${unitIndex}][price_purchase]" id="price_purchase_${unitIndex}" class="form-control product_price_purchase" required placeholder="ادخل سعر شراء الوحدة">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="conversion_factor_${unitIndex}" class="form-label">معامل الوحدة</label>
+                                            <input type="text" name="units[${unitIndex}][conversion_factor]" id="conversion_factor_${unitIndex}" class="form-control product_conversion_factor" required placeholder="كم تساوي من اصغر وحدة">
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-end">
+                                            <button type="button" class="btn btn-danger remove-unit-row">حذف</button>
+                                        </div>
+                                    </div>
+                                </div>`;
 
                 $('#unit-rows').append(unitRow);
 
+                // تفعيل select2 على select الجديد
                 $(`#unit_id_${unitIndex}`).select2();
 
                 // إضافة قواعد التحقق للحقول الجديدة
@@ -216,10 +218,33 @@
                     required: true,
                     number: true,
                     messages: {
-                        required: "يرجى إدخال سعر الوحدة",
-                        number: "يجب أن يكون السعر عددًا"
+                        required: "يرجى إدخال سعر البيع الوحدة",
+                        number: "يجب أن يكون سعر البيع عددًا"
                     }
                 });
+
+                $(`#price_purchase_${unitIndex}`).rules('add', {
+                    required: true,
+                    number: true,
+                    messages: {
+                        required: "يرجى إدخال سعر الشراء الوحدة",
+                        number: "يجب أن يكون سعر الشراء عددًا"
+                    }
+                });
+
+                $(`#conversion_factor_${unitIndex}`).rules('add', {
+                    required: true,
+                    number: true,
+                    messages: {
+                        required: "يرجى إدخال عامل التحويل",
+                        number: "يجب أن يكون عامل التحويل عددًا"
+                    }
+                });
+
+                // **هنا: استدعاء دالة attachCommaFormatter على الحقول الجديدة فقط**
+                attachCommaFormatter(`#price_${unitIndex}`);
+                attachCommaFormatter(`#price_purchase_${unitIndex}`);
+                attachCommaFormatter(`#conversion_factor_${unitIndex}`);
 
                 unitIndex++;
             });
@@ -233,7 +258,7 @@
             $('#productForm').validate({
                 rules: {
                     barcode: {
-                        uniqueBarcode: true // قاعدة التحقق المخصصة للاسم
+                        uniqueBarcode: true // قاعدة التحقق المخصصة الباركود
                     },
                     name: {
                         required: true,
@@ -242,27 +267,16 @@
                     category_id: {
                         required: true
                     },
-                    purchase_price: {
-                        required: true,
-                        number: true
-                    },
-                    opening_balance: {
-                        required: true,
-                        number: true
-                    },
                     reorder_level: {
-                        required: true,
                         number: true
-                    },
-                    expire_date: {
-                        required: true,
-                        date: true,
-                        after_or_equal_today: true // قاعدة التحقق المخصصة لتاريخ اليوم أو بعده
                     },
                     'units[0][unit_id]': {
                         required: true,
                     },
                     'units[0][price]': {
+                        required: true,
+                    },
+                    'units[0][price_purchase]': {
                         required: true,
                     },
                     'units[0][conversion_factor]': {
@@ -281,34 +295,28 @@
                         uniqueName: "اسم المنتج موجود بالفعل في النظام"
                     },
                     category_id: {
-                        required: "يرجى اختيار قسم المنتج"
+                        required: "يرجى اختيار شركة المنتج"
                     },
                     'stock_id[]': {
-                        required: "يرجى اختيار مخزون المنتج"
+                        required: "يرجى اختيار مخزن المنتج"
                     },
                     purchase_price: {
-                        required: "يرجى إدخال سعر الشراء",
                         number: "يجب أن يكون سعر الشراء رقمًا"
                     },
-                    opening_balance: {
-                        required: "يرجى إدخال الرصيد الافتتاحي",
-                        number: "يجب أن يكون الرصيد الافتتاحي رقمًا"
-                    },
                     reorder_level: {
-                        required: "يرجى إدخال مستوى إعادة الطلب",
                         number: "يجب أن يكون مستوى إعادة الطلب رقمًا"
-                    },
-                    expire_date: {
-                        required: "يرجى إدخال تاريخ انتهاء الصلاحية"
                     },
                     'units[0][unit_id]': {
                         required: 'يرجى اختيار الوحدة'
                     },
                     'units[0][price]': {
-                        required: 'يرجى ادخال سعر الوحدة'
+                        required: 'يرجى ادخال سعر بيع الوحدة'
+                    },
+                    'units[0][price_purchase]': {
+                        required: 'يرجى ادخال سعر شراء الوحدة'
                     },
                     'stocks[0][quantity]': {
-                        required: 'يرجى ادخال الكمية للمخزون'
+                        required: 'يرجى ادخال الكمية للمخزن'
                     }
                 },
                 errorPlacement: function(error, element) {
@@ -331,36 +339,6 @@
                 }
             });
 
-            $('form').on('submit', function(e) {
-                $('input.product_price').each(function() {
-                    $(this).rules("add", {
-                        required: true,
-                        messages: {
-                            required: "يرجى إدخال سعر المنتج."
-                        }
-                    });
-                });
-
-                $('select.product_unit').each(function() {
-                    $(this).rules("add", {
-                        required: true,
-                        messages: {
-                            required: "يرجى اختيار وحدة المنتج."
-                        }
-                    });
-                });
-
-                $('input.product_conversion_factor').each(function() {
-                    $(this).rules("add", {
-                        required: true,
-                        messages: {
-                            required: "يرجى إدخال عامل التحويل."
-                        }
-                    });
-                });
-            });
-
-            // إضافة قاعدة التحقق الفريدة للباركود باستخدام AJAX
             $.validator.addMethod("uniqueBarcode", function(value, element) {
                 let isValid = false;
                 $.ajax({
@@ -405,6 +383,79 @@
                 return date >= today; // السماح بتاريخ اليوم أو الأيام القادمة فقط
             }, "يجب أن يكون تاريخ انتهاء الصلاحية اليوم أو بعده.");
 
+            document.getElementById('productForm').addEventListener('submit', function(e) {
+                cleanNumbersBeforeSubmit();
+            });
+
+            attachCommaFormatter('#price');
+            attachCommaFormatter('#price_purchase');
+            attachCommaFormatter('#conversion_factor');
+
+
         });
+
+
+        function attachCommaFormatter(selector) {
+            document.querySelectorAll(selector).forEach(input => {
+
+                input.addEventListener('input', function() {
+
+                    /* ـــ حالة المؤشر قبل التعديل ـــ */
+                    const oldPos = this.selectionStart;
+                    const oldVal = this.value;
+
+                    /* 1) إزالة كل ما ليس رقمًا أو نقطة */
+                    let cleaned = oldVal.replace(/[^0-9.]/g, '');
+
+                    /* 2) الاحتفاظ بأول نقطة فقط ومسح البقية */
+                    const firstDot = cleaned.indexOf('.');
+                    if (firstDot !== -1) {
+                        cleaned = cleaned.slice(0, firstDot + 1) +
+                            cleaned.slice(firstDot + 1).replace(/\./g, '');
+                    }
+
+                    /* 3) تقسيم إلى جزء صحيح وعشرى */
+                    const [rawInt = '', rawDec = ''] = cleaned.split('.');
+
+                    /* 4) إضافة فواصل للجزء الصحيح */
+                    const intPart = rawInt.replace(/^0+(?!$)/, ''); // أصفار زائدة
+                    const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                    /* 5) إعادة التجميع */
+                    let formatted = intWithCommas;
+                    if (firstDot !== -1) {
+                        // لو المستخدم كتب نقطة ولم يكتب أرقام بعدها نحافظ على النقطة
+                        formatted += '.' + rawDec;
+                    }
+
+                    this.value = formatted;
+
+                    /* 6) إعادة المؤشر لموضعه الطبيعى */
+                    const diff = formatted.length - oldVal.length;
+                    this.setSelectionRange(oldPos + diff, oldPos + diff);
+                });
+
+            });
+        }
+
+        function cleanNumbersBeforeSubmit() {
+            // الحقول ذات الأسماء المتكررة كمصفوفات (price[], row_sub_total[], qty[] ... الخ)
+            // نفترض ان الفورم يحتوي على هذه الحقول، نمر عليها كلها
+            document.querySelectorAll('.product_price').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+            document.querySelectorAll('.product_price_purchase').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+            document.querySelectorAll('.product_conversion_factor').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+        }
     </script>
 @endsection

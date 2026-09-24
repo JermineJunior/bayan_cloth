@@ -24,12 +24,13 @@
     <!-- row -->
     <div class="row row-sm">
         <div class="col-md-12 col-xl-12">
-            <div class=" main-content-body-invoice" id="print">
+            <div class=" main-content-body-invoice" id="print"> <!-- print begins here  -->
                 <div class="card card-invoice">
                     <div class="card-body">
                         <div class="invoice-header">
 
-                            <h1 class="invoice-title"> كشف حساب : {{ $Madin[0]->tree4_madin->tree4_name ?? $Dain[0]->tree4_dain->tree4_name }} <span></span>
+                            <h1 class="invoice-title"> كشف حساب :
+                                {{ $tree4 ? $tree4->tree4_name : 'عام' }} <span></span>
                                 <div class="col-md">
                                     <p><span> &nbsp;</span>&nbsp; <span>&nbsp;</span></p>
                                     <p><span> &nbsp;</span>&nbsp; <span>&nbsp;</span></p>
@@ -41,8 +42,10 @@
                                 </div>
                             </h1>
                             <div class="billed-from">
-                                <div class="col"> <img class="img-bill" style="width: 240px; height: 240px;"
-                                        src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" /> </div>
+                                @if (GeneralSiteSettings('logo'))
+                                    <div class="col"> <img class="img-bill" style="width: 240px; height: 240px;"
+                                            src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" /> </div>
+                                @endif
                                 <br />
                                 <h5>{{ GeneralSiteSettings('name') }}</h5>
                                 <p>
@@ -58,83 +61,61 @@
                                             <thead>
                                                 <tr>
                                                     <th style="font-size:14px">متسلسل</th>
-                                                    <th style="font-size:14px">نوع العملية</th>
                                                     <th style="font-size:14px">رقم العملية</th>
-                                                    <th style="font-size:14px">من حساب</th>
-                                                    <th style="font-size:14px">الى حساب </th>
-                                                    <th style="font-size:14px">المبلغ</th>
+                                                    <th style="font-size:14px">نوع العملية</th>
+                                                    <th style="font-size:14px">الجهة</th>
                                                     <th style="font-size:14px">التاريخ</th>
+                                                    <th style="font-size:14px">المبلغ المدين</th>
+                                                    <th style="font-size:14px">المبلغ الدائن</th>
                                                     <th style="font-size:14px">البيان</th>
+                                                    <th style="font-size:14px">الرصيد</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {{-- <span>{{$item->agent->tree4_code}}</span> --}}
 
-                                                {{-- @livewire('model' ,['item_id' => $item->agent->tree4_code]) --}}
-                                                @foreach ($Madin as $one)
+                                                @foreach ($operations as $operation)
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
-                                                        @if ($one->type == 1)
+                                                        <td>{{ $operation->constant_number }}</td>
+                                                        @if ($operation->type == 1)
                                                             <td> مبيعات</td>
-                                                        @elseif($one->type == 2)
+                                                        @elseif($operation->type == 2)
                                                             <td> مشتريات </td>
-                                                        @elseif($one->type == 3)
+                                                        @elseif($operation->type == 3)
                                                             <td> مردودات مبيعات </td>
-                                                        @elseif($one->type == 4)
+                                                        @elseif($operation->type == 4)
                                                             <td>مردودات مشتريات </td>
-                                                        @elseif($one->type == 5)
+                                                        @elseif($operation->type == 5)
                                                             <td>قيد عام </td>
-                                                        @elseif($one->type == 6)
+                                                        @elseif($operation->type == 6)
                                                             <td>قيد مركب </td>
-                                                        @else
-                                                            <td> رصيد افتتاحي  </td>
+                                                        @elseif($operation->type == 7)
+                                                            <td> رصيد افتتاحي </td>
+                                                        @elseif($operation->type == 8)
+                                                            <td> ايرادات </td>
+                                                        @elseif($operation->type == 9)
+                                                            <td>مصروفات</td>
+                                                        @elseif($operation->type == 10)
+                                                            <td>منصرفات مشتريات خارجية</td>
                                                         @endif
-                                                        <td>{{ $one->constant_number }}</td>
-                                                        <td>
-                                                            @isset($one->tree4_dain->tree4_name)
-                                                                {{ $one->tree4_dain->tree4_name }}
-                                                            @endisset
+                                                        <td>{{ $operation->tree4->tree4_name }}
                                                         </td>
-
-                                                        <td>{{ $one->tree4_madin->tree4_name }}</td>
-                                                        <td>{{ number_format($one->price, 2) }}</td>
-                                                        <td>{{ $one->created_at->format('Y/m/d') }}</td>
-                                                        <td>{{ $one->node }}</td>
-                                                    </tr>
-                                                @endforeach
-                                                @foreach ($Dain as $one)
-                                                    <tr>
-                                                        <th scope="row">{{ $loop->iteration }}</th>
-                                                        @if ($one->type == 1)
-                                                            <td> مبيعات</td>
-                                                        @elseif($one->type == 2)
-                                                            <td> مشتريات </td>
-                                                        @elseif($one->type == 3)
-                                                            <td> مردودات مبيعات </td>
-                                                        @elseif($one->type == 4)
-                                                            <td>مردودات مشتريات </td>
-                                                        @elseif($one->type == 5)
-                                                            <td>قيد عام </td>
-                                                        @elseif($one->type == 6)
-                                                            <td>قيد مركب </td>
-                                                        @else
-                                                            <td> رصيد افتتاحي  </td>
-                                                        @endif
-                                                        <td>{{ $one->constant_number }}</td>
+                                                        <td>{{ $operation->date }}</td>
                                                         <td>
-                                                            @isset($one->tree4_dain->tree4_name)
-                                                                {{ $one->tree4_dain->tree4_name }}
-                                                            @endisset
+                                                            @if ($operation->dain == 0)
+                                                                {{ number_format($operation->madin / $curencey->amount, 2) }}
+                                                               
+                                                            @endif
                                                         </td>
                                                         <td>
-                                                            @isset($one->tree4_madin->tree4_name)
-                                                                {{ $one->tree4_madin->tree4_name }}
-                                                            @endisset
+                                                            @if ($operation->madin == 0)
+                                                                {{ number_format($operation->dain / $curencey->amount, 2) }}
+                                                                {{ $curencey->symbol }}
+                                                            @endif
                                                         </td>
-
-                                                        <td>{{ number_format($one->price, 2) }}</td>
-                                                        <td>{{ $one->created_at }}</td>
-                                                        <td>{{ $one->node }}</td>
+                                                        <td>{{ $operation->node }}</td>
+                                                        <td>{{ number_format($operation->balance / $curencey->amount, 2) }}
+                                                            {{ $curencey->symbol }}</td>
                                                     </tr>
                                                 @endforeach
 
@@ -166,21 +147,26 @@
                                                     $paid_up = 0;
                                                     ?>
 
-                                                    @foreach ($Madin as $one)
-                                                        {{ $Total_debtor = $one->price + $Total_debtor }}
+                                                    @foreach ($operations as $madin)
+                                                        {{ $Total_debtor = $madin->madin + $Total_debtor }}
                                                     @endforeach
 
-                                                    @foreach ($Dain as $two)
-                                                        {{ $Total_Creditor = $two->price + $Total_Creditor }}
-                                                        {{ $paid_up = $two->price + $paid_up }}
+                                                    @foreach ($operations as $dain)
+                                                        {{ $Total_Creditor = $dain->dain + $Total_Creditor }}
+                                                        {{ $paid_up = $dain->dain + $paid_up }}
                                                     @endforeach
 
 
                                                 </div>
                                                 <tr>
-                                                    <td>{{ number_format($Total_debtor, 2) }} </td>
-                                                    <td style="color:green">{{ number_format($paid_up, 2) }} </td>
-                                                    <td>{{ number_format($Total_debtor - $Total_Creditor, 2) }} </td>
+                                                    <td class="text-danger">
+                                                        {{ number_format($Total_debtor / $curencey->amount, 2) }}
+                                                        {{ $curencey->symbol }}</td>
+                                                    <td class="text-success">
+                                                        {{ number_format($paid_up / $curencey->amount, 2) }}
+                                                        {{ $curencey->symbol }} </td>
+                                                    <td>{{ number_format(($Total_debtor - $Total_Creditor) / $curencey->amount, 2) }}
+                                                        {{ $curencey->symbol }} </td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -198,20 +184,7 @@
                             </div>
                         </div> --}}
                         {{-- //footer the page invoices --}}
-                        <div class="row">
-                            <div class="col">
-                                <h6 style="text-align: center">
-                                    <span> {{ GeneralSiteSettings('location') }}
-                                        - البريد الإلكتروني : {{ GeneralSiteSettings('email') }}
-                                        - هاتف : {{ GeneralSiteSettings('phone') }}
-                                    </span>
 
-                                    </br>
-                                </h6>
-                            </div>
-                        </div>
-                        {{-- //footer the page invoices --}}
-                        <hr class="mg-b-40">
                         {{-- <a class="btn btn-purple float-left mt-3 mr-2" href="">
                         <i class="mdi mdi-currency-usd ml-1"></i>Pay Now
                     </a> --}}
@@ -245,3 +218,4 @@
         }
     </script>
 @endsection
+

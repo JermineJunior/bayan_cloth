@@ -82,17 +82,21 @@
                             <form id="openingForm" action="{{ route('opening.store') }}" method="POST">
                                 @csrf
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col-xl-4">
                                         <span class="tx-danger">*</span><label for="inputName" class="control-label">
                                             رقم القيد</label>
                                         <input type="text" readonly value="{{ $constant_number }}"
                                             name="constant_number" class="form-control" required>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-xl-4">
                                         <span class="tx-danger">*</span><label> الحساب</label>
-                                        <select name="account" class="form-control select2"></select>
+                                        <select name="account" class="form-control select2">
+                                            @foreach ($trees as $tree)
+                                                <option value="{{ $tree->id }}">{{ $tree->tree4_name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col">
+                                    <div class="col-xl-4">
                                         <span class="tx-danger">*</span><label for="inputName" class="control-label">
                                             نوع الرصيد</label>
                                         <select name="accountType" class="form-control nice-select">
@@ -105,14 +109,14 @@
 
                                 </br>
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label for="price" class="control-label">
                                             المبلغ</label>
-                                        <input type="number" id="price" name="price" class="form-control"
+                                        <input type="text" id="price" name="price" class="form-control price"
                                             placeholder="يرجى ادخال المبلغ">
                                     </div>
                                     </br>
-                                    <div class="col">
+                                    <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label for="date" class="control-label">
                                             التاريخ </label>
                                         <input type="date" name="date" id="date" value="<?php echo date('Y-m-d'); ?>"
@@ -122,14 +126,17 @@
                                 </br>
 
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col-xl-12">
                                         <label>البيان</label>
                                         <textarea rows="5" name="note" class="form-control">رصيد افتتاحي</textarea>
                                     </div>
                                 </div>
                                 </br>
                                 <div class="d-flex justify-content-center">
-                                    <button type="submit" class="btn btn-primary"> إضــافة البيانات</button>
+                                    <button type="submit" class="btn btn-primary ml-2"> إضــافة البيانات</button>
+                                    <a href="javascript:history.back()" class="btn btn-warning">
+                                        <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                                    </a>
                                 </div>
                             </form>
                         </div>
@@ -180,7 +187,10 @@
     <script src="{{ URL::asset('assets/plugins/form_validation/messages_ar.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-
+            $('.select2').select2({
+                width:'100%'
+            });
+            
             $('#openingForm').validate({
                 rules: {
                     account: {
@@ -241,26 +251,64 @@
                     $(element).closest('.form-group').removeClass('has-error');
                 }
             });
-            // تهيئة الحقل "من حساب"
-            $('.select2').select2({
-                ajax: {
-                    url: "{{ route('select2.tree4') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term // نص البحث
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true,
-                },
-                placeholder: 'يرجى اختيار الحساب ',
+
+            document.getElementById('openingForm').addEventListener('submit', function(e) {
+                cleanNumbersBeforeSubmit();
             });
+
+            attachCommaFormatter('.price');
         });
+
+        function attachCommaFormatter(selector) {
+
+            document.querySelectorAll(selector).forEach(input => {
+
+                input.addEventListener('input', function() {
+
+                    /* ـــ حالة المؤشر قبل التعديل ـــ */
+                    const oldPos = this.selectionStart;
+                    const oldVal = this.value;
+
+                    /* 1) إزالة كل ما ليس رقمًا أو نقطة */
+                    let cleaned = oldVal.replace(/[^0-9.]/g, '');
+
+                    /* 2) الاحتفاظ بأول نقطة فقط ومسح البقية */
+                    const firstDot = cleaned.indexOf('.');
+                    if (firstDot !== -1) {
+                        cleaned = cleaned.slice(0, firstDot + 1) +
+                            cleaned.slice(firstDot + 1).replace(/\./g, '');
+                    }
+
+                    /* 3) تقسيم إلى جزء صحيح وعشرى */
+                    const [rawInt = '', rawDec = ''] = cleaned.split('.');
+
+                    /* 4) إضافة فواصل للجزء الصحيح */
+                    const intPart = rawInt.replace(/^0+(?!$)/, ''); // أصفار زائدة
+                    const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                    /* 5) إعادة التجميع */
+                    let formatted = intWithCommas;
+                    if (firstDot !== -1) {
+                        // لو المستخدم كتب نقطة ولم يكتب أرقام بعدها نحافظ على النقطة
+                        formatted += '.' + rawDec;
+                    }
+
+                    this.value = formatted;
+
+                    /* 6) إعادة المؤشر لموضعه الطبيعى */
+                    const diff = formatted.length - oldVal.length;
+                    this.setSelectionRange(oldPos + diff, oldPos + diff);
+                });
+
+            });
+        }
+
+        function cleanNumbersBeforeSubmit() {
+            document.querySelectorAll('input[name^="price"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+        }
     </script>
 @endsection

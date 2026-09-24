@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bank;
 use App\Models\Stock;
 use App\Models\Tree4;
 use App\Models\Product;
-use App\Models\Operation;
 use Illuminate\View\View;
 use App\Models\Restriction;
+use App\Models\StockDetail;
 use Illuminate\Http\Request;
 use App\Models\PurchaseInvoice;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
@@ -21,45 +21,49 @@ class PurchaseInvoiceController extends Controller
 {
     public function index(): View
     {
-        $purchase_invoices = PurchaseInvoice::get();
+        $purchase_invoices = PurchaseInvoice::where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
         return view('purchase.index', compact('purchase_invoices'));
     }
 
     public function create(): View
     {
-        $check = PurchaseInvoice::orderBy('id', 'desc')->first();
-        if ($check) {
-            $last_invoice_number = $check->invoice_number;
-            $invoice_number = $last_invoice_number + 1;
-        } else {
-            $invoice_number = random_int(999, 9999);
-        }
-        $suppliers = Tree4::whereTree3_code(2301)->whereStatus(1)->get();
-        $stocks = Stock::statusActive()->get();
-        return view('purchase.create', compact('suppliers', 'invoice_number', 'stocks'));
+        $invoice_number = PurchaseInvoice::where('branch_id', session('branch_id'))->max('invoice_number') + 1;
+        $suppliers = Tree4::whereTree3_code(1205)->orWhere('tree3_code','2301')->get();
+        $representatives = Tree4::where('tree3_code', '1206')->orderByDesc('id')->get();
+        $stocks = Stock::get();
+        $safes = Tree4::where('tree3_code', '1202')->get();
+        $banks = Tree4::where('tree3_code', '1203')->get();
+        $products = Product::with('stocks', 'units')->take(7)->inRandomOrder()->get();
+        return view('purchase.create', compact('suppliers', 'representatives', 'invoice_number', 'stocks', 'safes', 'banks', 'products'));
     }
 
     public function store(StorePurchaseRequest $request): RedirectResponse
     {
         try {
             DB::beginTransaction();
+            $invoice_status = $request->deferend_amount != '' ? 0 : 1;
             $purchase_invoice = PurchaseInvoice::create(
                 attributes: [
                     'supplier_id' => $request->get('supplier_id'),
+                    'representative_id' => $request->get('representative_id'),
                     'invoice_number' => $request->get('invoice_number'),
-                    'invoice_date' => $request->get('invoice_date'),
+                    'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
                     'sub_total_amount' => $request->get('sub_total'),
                     'discount_amount' => $request->get('discount'),
                     'tax_amount' => $request->get('tax'),
+                    'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
-                    'payment_status' => $request->get('payment_status'),
                     'status' => 1,
-                    'payment_method' => $request->get('payment_method'),
-                    'cash_id' => $request->get('cash_id'),
-                    'bank_id' => $request->get('bank_id'),
-                    'cash_amount' => $request->get('cash_amount'),
-                    'bank_amount' => $request->get('bank_amount'),
+                    'cash_name' => $request->get('cash_name'),
+                    'bank_name' => $request->get('bank_name'),
+                    'cash_amount_total' => $request->get('cash_amount_total'),
+                    'bank_amount_total' => $request->get('bank_amount_total'),
+                    'process_no' => $request->get('process_no'),
+                    'deferend_amount' => $request->get('deferend_amount'),
+                    'invoice_status' => $invoice_status,
+                    'branch_id' => session('branch_id'),
+                    'user_id' => Auth::id(),
                 ],
             );
 
@@ -68,6 +72,8 @@ class PurchaseInvoiceController extends Controller
                     attributes: [
                         'product_id' => $product_id,
                         'qty' => $request->qty[$index],
+                        'bounce' => $request->bounce[$index] ?? 0,
+                        'expire_date' => $request->expire_date[$index],
                         'price' => $request->price[$index],
                         'unit_id' => $request->unit_id[$index],
                         'row_sub_total' => $request->row_sub_total[$index],
@@ -76,9 +82,20 @@ class PurchaseInvoiceController extends Controller
 
                 $product = Product::whereId($product_id)->first();
                 $product_unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
-                $qty = $request->qty[$index] * $product_unit->pivot->conversion_factor;
+                $qty = ((float) str_replace(',', '', $request->qty[$index]) + (float) str_replace(',', '', $request->bounce[$index])) * $product_unit->pivot->conversion_factor;
 
                 $productStock = $product->stocks()->where('stock_id', $request->stock_id)->first();
+
+                StockDetail::create([
+                    'product_id' => $product_id,
+                    'unit_id' => $request->unit_id[$index],
+                    'stock_id' => $request->stock_id,
+                    'wared' => $qty,
+                    'user_id' => Auth::id(),
+                    'type' => 2,
+                    'branch_id' => session('branch_id'),
+                    'purchase_invoice_id' => $purchase_invoice->id,
+                ]);
 
                 if ($productStock) {
                     $newQuantity = $productStock->pivot->quantity + $qty;
@@ -88,69 +105,53 @@ class PurchaseInvoiceController extends Controller
                 }
             }
 
-            $last_constant_number = Operation::max('constant_number');
+            $last_constant_number = Restriction::where('branch_id', session('branch_id'))->max('constant_number');
+
             $constant_number = $last_constant_number ? $last_constant_number + 1 : 1;
 
-            if ($request->payment_status == 0 && $request->supplier_id == null) {
-                $id = $request->cash_id != null ? $request->cash_id : ($request->bank_id != null ? $request->bank_id : '');
-                if ($request->payment_method == 1 || $request->payment_method == 2) {
-                    $tree4 = Tree4::find($id);
+            if (empty($request->supplier_id)) {
+                if (!empty($request->cash_amount_total)) {
+                    $cash = Tree4::find($request->cash_name);
 
-                    $operation = $this->operation(4, $tree4->id, 520100001, $tree4->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
+                    $this->restriction(4, 520100001, $request->cash_amount_total, 0, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش', $purchase_invoice->date);
 
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $this->restriction($tree4->id, $tree4->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                } elseif ($request->payment_method == 3) {
-                    $tree4_cash = Tree4::find($request->cash_id);
-                    $tree4_bank = Tree4::find($request->bank_id);
-
-                    $operation_cash = $this->operation(4, $tree4_cash->id, 520100001, $tree4_cash->tree4_code, $request->cash_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $operation_bank = $this->operation(4, $tree4_bank->id, 520100001, $tree4_bank->tree4_code, $request->bank_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation_bank, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $this->restriction($tree4_cash->id, $tree4_cash->tree4_code, 0, $request->cash_amount, $constant_number, $purchase_invoice, $operation_cash, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $this->restriction($tree4_bank->id, $tree4_bank->tree4_code, 0, $request->bank_amount, $constant_number, $purchase_invoice, $operation_bank, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
+                    $this->restriction($cash->id, $cash->tree4_code, 0, $request->cash_amount_total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش', $purchase_invoice->date);
                 }
-            } elseif ($request->payment_status == 0 && $request->supplier_id != null) {
-                $tree4_supplier = Tree4::find($request->supplier_id);
-                $id = $request->cash_id != null ? $request->cash_id : ($request->bank_id != null ? $request->bank_id : '');
-                if ($request->payment_method == 1 || $request->payment_method == 2) {
-                    $tree4 = Tree4::find($id);
 
-                    $operation1 = $this->operation(4, $tree4_supplier->id, 520100001, $tree4_supplier->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $operation2 = $this->operation($tree4_supplier->id, $tree4->id, $tree4_supplier->tree4_code, $tree4->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
+                if (!empty($request->bank_amount_total)) {
+                    $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4->id, $tree4->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, $request->total, 0, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                } elseif ($request->payment_method == 3) {
-                    $tree4_cash = Tree4::find($request->cash_id);
-                    $tree4_bank = Tree4::find($request->bank_id);
+                    $this->restriction(4, 520100001, $request->bank_amount_total, 0, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق البنك', $purchase_invoice->date);
 
-                    $operation1 = $this->operation(4, $tree4_supplier->id, 520100001, $tree4_supplier->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $operation2 = $this->operation($tree4_supplier->id, $tree4_cash->id, $tree4_supplier->tree4_code, $tree4_cash->tree4_code, $request->cash_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $operation3 = $this->operation($tree4_supplier->id, $tree4_bank->id, $tree4_supplier->tree4_code, $tree4_bank->tree4_code, $request->bank_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_cash->id, $tree4_cash->tree4_code, 0, $request->cash_amount, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, $request->cash_amount, 0, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_bank->id, $tree4_bank->tree4_code, 0, $request->bank_amount, $constant_number, $purchase_invoice, $operation3, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, $request->bank_amount, 0, $constant_number, $purchase_invoice, $operation3, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق البنك', $purchase_invoice->date);
                 }
-            } elseif ($request->payment_status == 1 && $request->supplier_id != null) {
-                $tree4_supplier = Tree4::find($request->supplier_id);
+            } else {
+                $supplier = Tree4::find($request->supplier_id);
 
-                $operation = $this->operation(4, $tree4_supplier->id, 520100001, $tree4_supplier->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات عن طريق الاجل ');
+                $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, 'فاتورة مشتريات', $purchase_invoice->date);
 
-                $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات عن طريق الاجل ');
-                $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات عن طريق الاجل ');
+                $this->restriction($supplier->id, $supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات', $purchase_invoice->date);
+
+                if (!empty($request->cash_amount_total)) {
+                    $cash = Tree4::find($request->cash_name);
+
+                    $this->restriction($cash->id, $cash->tree4_code, 0, $request->cash_amount_total, $constant_number, $purchase_invoice, 'سداد كاش للمورد', $purchase_invoice->date);
+
+                    $this->restriction($supplier->id, $supplier->tree4_code, $request->cash_amount_total, 0, $constant_number, $purchase_invoice, 'سداد كاش للمورد', $purchase_invoice->date);
+                }
+
+                if (!empty($request->bank_amount_total)) {
+                    $bank = Tree4::find($request->bank_name);
+
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $purchase_invoice, 'سداد بنك للمورد', $purchase_invoice->date);
+
+                    $this->restriction($supplier->id, $supplier->tree4_code, $request->bank_amount_total, 0, $constant_number, $purchase_invoice, 'سداد بنك للمورد', $purchase_invoice->date);
+                }
             }
 
             DB::commit();
 
-            return back()->with('success_created', 'Product created successfully.');
+            return redirect()->route('purchase_invoice.show', $purchase_invoice->id);
         } catch (\Exception $exception) {
             DB::rollback();
             return redirect()
@@ -160,57 +161,94 @@ class PurchaseInvoiceController extends Controller
         }
     }
 
+    public function show(PurchaseInvoice $purchase_invoice)
+    {
+        $purchase_invoice = $purchase_invoice->load('tree4', 'details', 'details.product', 'details.unit');
+        if ($purchase_invoice->supplier_id) {
+            $restriction = Restriction::where('purchase_invoice_id', $purchase_invoice->id)->latest()->first();
+            $madinTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->where('constant_number', '<', $restriction->constant_number)->sum('madin');
+            $dainTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->where('constant_number', '<', $restriction->constant_number)->sum('dain');
+            $allMadinTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->sum('madin');
+
+            $allDainTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->sum('dain');
+        }
+
+        $bank = Tree4::where('tree3_code', 1203)->select('no_bank')->first();
+        return view('purchase.print', compact('purchase_invoice', 'allDainTotal', 'allMadinTotal', 'dainTotal', 'madinTotal', 'bank'));
+    }
+
     public function edit(PurchaseInvoice $purchase_invoice): View
     {
-        $suppliers = Tree4::whereTree3_code(2301)->whereStatus(1)->get();
-        $stocks = Stock::statusActive()->get();
-        return view('purchase.edit', compact('purchase_invoice', 'suppliers', 'stocks'));
+        $suppliers = Tree4::whereTree3_code(1205)->orWhere('tree3_code','2301')->get();
+        $representatives = Tree4::where('tree3_code', '1206')->get();
+        $stocks = Stock::get();
+        $safes = Tree4::where('tree3_code', '1202')->get();
+        $banks = Tree4::where('tree3_code', '1203')->get();
+        $products = Product::with('stocks', 'units')->take(7)->inRandomOrder()->get();
+        $productIds = $purchase_invoice->details()->pluck('product_id')->toArray();
+        return view('purchase.edit', compact('purchase_invoice', 'suppliers', 'representatives', 'stocks', 'safes', 'banks', 'products', 'productIds'));
     }
 
     public function update(UpdatePurchaseRequest $request, PurchaseInvoice $purchase_invoice): RedirectResponse
     {
         try {
             DB::beginTransaction();
-            $purchase = $purchase_invoice->details;
+            $invoice_status = $request->deferend_amount != '' ? 0 : 1;
+
+            $oldDetails = $purchase_invoice->details;
+
+            foreach ($oldDetails as $item) {
+                $product = Product::with(['stocks', 'units'])->find($item->product_id);
+                if (!$product) {
+                    continue;
+                }
+
+                $unit = $product->units()->where('unit_id', $item->unit_id)->first();
+                $stock = $product->stocks()->where('stock_id', $purchase_invoice->stock_id)->first();
+
+                if (!$unit || !$stock) {
+                    continue;
+                }
+
+                $qtyBack = ($item->qty + ($item->bounce ?? 0)) * $unit->pivot->conversion_factor;
+                $product->stocks()->updateExistingPivot($purchase_invoice->stock_id, ['quantity' => $stock->pivot->quantity - $qtyBack]);
+            }
+
             $purchase_invoice->delete();
+
             $purchase_invoice = PurchaseInvoice::create(
                 attributes: [
                     'supplier_id' => $request->get('supplier_id'),
+                    'representative_id' => $request->get('representative_id'),
                     'invoice_number' => $request->get('invoice_number'),
-                    'invoice_date' => $request->get('invoice_date'),
+                    'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
                     'sub_total_amount' => $request->get('sub_total'),
                     'discount_amount' => $request->get('discount'),
                     'tax_amount' => $request->get('tax'),
+                    'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
                     'payment_status' => $request->get('payment_status'),
                     'status' => 1,
-                    'payment_method' => $request->get('payment_method'),
-                    'cash_id' => $request->get('cash_id'),
-                    'bank_id' => $request->get('bank_id'),
-                    'cash_amount' => $request->get('cash_amount'),
-                    'bank_amount' => $request->get('bank_amount'),
+                    'cash_name' => $request->get('cash_name'),
+                    'bank_name' => $request->get('bank_name'),
+                    'cash_amount_total' => $request->get('cash_amount_total'),
+                    'bank_amount_total' => $request->get('bank_amount_total'),
+                    'process_no' => $request->get('process_no'),
+                    'deferend_amount' => $request->get('deferend_amount'),
+                    'invoice_status' => $invoice_status,
+                    'branch_id' => session('branch_id'),
+                    'user_id' => Auth::id(),
                 ],
             );
 
             foreach ($request->product_id as $index => $product_id) {
-                foreach ($purchase as $item) {
-                    if ($item->product_id == $product_id) {
-                        $product = Product::with('stocks', 'units')->find($item->product_id);
-                        $product_unit = $product->units()->where('unit_id', $item->unit_id)->first();
-                        $producStock = $product->stocks()->where('stock_id', $purchase_invoice->stock_id)->first();
-                        $qty = $item->qty * $product_unit->pivot->conversion_factor;
-                        $newQuantity = $producStock->pivot->quantity - $qty;
-                        $product->stocks()->syncWithoutDetaching([
-                            $purchase_invoice->stock_id => ['quantity' => $newQuantity],
-                        ]);
-                    }
-                }
-
                 $purchase_invoice->details()->create(
                     attributes: [
                         'product_id' => $product_id,
                         'qty' => $request->qty[$index],
+                        'bounce' => $request->bounce[$index] ?? 0,
+                        'expire_date' => $request->expire_date[$index],
                         'price' => $request->price[$index],
                         'unit_id' => $request->unit_id[$index],
                         'row_sub_total' => $request->row_sub_total[$index],
@@ -218,77 +256,67 @@ class PurchaseInvoiceController extends Controller
                 );
 
                 $product = Product::whereId($product_id)->first();
-                $product_unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
-                $qty = $request->qty[$index] * $product_unit->pivot->conversion_factor;
+                $unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
+                $stock = $product->stocks()->where('stock_id', $request->stock_id)->first();
 
-                $productStock = $product->stocks()->where('stock_id', $request->stock_id)->first();
+                $qty = ($request->qty[$index] + $request->bounce[$index]) * $unit->pivot->conversion_factor;
 
-                if ($productStock) {
-                    $newQuantity = $productStock->pivot->quantity + $qty;
-                    $product->stocks()->syncWithoutDetaching([
-                        $request->stock_id => ['quantity' => $newQuantity],
-                    ]);
-                }
+                $product->stocks()->updateExistingPivot($request->stock_id, ['quantity' => $stock->pivot->quantity + $qty]);
+
+                StockDetail::create([
+                    'product_id' => $product_id,
+                    'unit_id' => $request->unit_id[$index],
+                    'stock_id' => $request->stock_id,
+                    'wared' => $qty,
+                    'user_id' => Auth::id(),
+                    'branch_id' => session('branch_id'),
+                    'type' => 2,
+                    'purchase_invoice_id' => $purchase_invoice->id,
+                ]);
             }
 
-            $last_constant_number = Operation::max('constant_number');
+            $last_constant_number = Restriction::where('branch_id', session('branch_id'))->max('constant_number');
+
             $constant_number = $last_constant_number ? $last_constant_number + 1 : 1;
 
-            if ($request->payment_status == 0 && $request->supplier_id == null) {
-                $id = $request->cash_id != null ? $request->cash_id : ($request->bank_id != null ? $request->bank_id : '');
-                if ($request->payment_method == 1 || $request->payment_method == 2) {
-                    $tree4 = Tree4::find($id);
+            if (empty($request->supplier_id)) {
+                if (!empty($request->cash_amount_total)) {
+                    $cash = Tree4::find($request->cash_name);
 
-                    $operation = $this->operation(4, $tree4->id, 520100001, $tree4->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
+                    $this->restriction(4, 520100001, $request->cash_amount_total, 0, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش', $purchase_invoice->date);
 
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $this->restriction($tree4->id, $tree4->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                } elseif ($request->payment_method == 3) {
-                    $tree4_cash = Tree4::find($request->cash_id);
-                    $tree4_bank = Tree4::find($request->bank_id);
-
-                    $operation_cash = $this->operation(4, $tree4_cash->id, 520100001, $tree4_cash->tree4_code, $request->cash_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $operation_bank = $this->operation(4, $tree4_bank->id, 520100001, $tree4_bank->tree4_code, $request->bank_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation_bank, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $this->restriction($tree4_cash->id, $tree4_cash->tree4_code, 0, $request->cash_amount, $constant_number, $purchase_invoice, $operation_cash, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
-                    $this->restriction($tree4_bank->id, $tree4_bank->tree4_code, 0, $request->bank_amount, $constant_number, $purchase_invoice, $operation_bank, 'فاتورة مشتريات تم الدفع عن طريق الكاش');
+                    $this->restriction($cash->id, $cash->tree4_code, 0, $request->cash_amount_total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق الكاش', $purchase_invoice->date);
                 }
-            } elseif ($request->payment_status == 0 && $request->supplier_id != null) {
-                $tree4_supplier = Tree4::find($request->supplier_id);
-                $id = $request->cash_id != null ? $request->cash_id : ($request->bank_id != null ? $request->bank_id : '');
-                if ($request->payment_method == 1 || $request->payment_method == 2) {
-                    $tree4 = Tree4::find($id);
 
-                    $operation1 = $this->operation(4, $tree4_supplier->id, 520100001, $tree4_supplier->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $operation2 = $this->operation($tree4_supplier->id, $tree4->id, $tree4_supplier->tree4_code, $tree4->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
+                if (!empty($request->bank_amount_total)) {
+                    $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4->id, $tree4->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, $request->total, 0, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                } elseif ($request->payment_method == 3) {
-                    $tree4_cash = Tree4::find($request->cash_id);
-                    $tree4_bank = Tree4::find($request->bank_id);
+                    $this->restriction(4, 520100001, $request->bank_amount_total, 0, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق البنك', $purchase_invoice->date);
 
-                    $operation1 = $this->operation(4, $tree4_supplier->id, 520100001, $tree4_supplier->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $operation2 = $this->operation($tree4_supplier->id, $tree4_cash->id, $tree4_supplier->tree4_code, $tree4_cash->tree4_code, $request->cash_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $operation3 = $this->operation($tree4_supplier->id, $tree4_bank->id, $tree4_supplier->tree4_code, $tree4_bank->tree4_code, $request->bank_amount, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation1, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_cash->id, $tree4_cash->tree4_code, 0, $request->cash_amount, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, $request->cash_amount, 0, $constant_number, $purchase_invoice, $operation2, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_bank->id, $tree4_bank->tree4_code, 0, $request->bank_amount, $constant_number, $purchase_invoice, $operation3, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
-                    $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, $request->bank_amount, 0, $constant_number, $purchase_invoice, $operation3, 'فاتورة مشتريات تم الدفع بالكاش عن طريق عميل');
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $purchase_invoice, 'فاتورة مشتريات تم الدفع عن طريق البنك', $purchase_invoice->date);
                 }
-            } elseif ($request->payment_status == 1 && $request->supplier_id != null) {
-                $tree4_supplier = Tree4::find($request->supplier_id);
+            } else {
+                $supplier = Tree4::find($request->supplier_id);
 
-                $operation = $this->operation(4, $tree4_supplier->id, 520100001, $tree4_supplier->tree4_code, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات عن طريق الاجل ');
+                $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, 'فاتورة مشتريات', $purchase_invoice->date);
 
-                $this->restriction($tree4_supplier->id, $tree4_supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات عن طريق الاجل ');
-                $this->restriction(4, 520100001, $request->total, 0, $constant_number, $purchase_invoice, $operation, 'فاتورة مشتريات عن طريق الاجل ');
+                $this->restriction($supplier->id, $supplier->tree4_code, 0, $request->total, $constant_number, $purchase_invoice, 'فاتورة مشتريات', $purchase_invoice->date);
+
+                if (!empty($request->cash_amount_total)) {
+                    $cash = Tree4::find($request->cash_name);
+
+                    $this->restriction($cash->id, $cash->tree4_code, 0, $request->cash_amount_total, $constant_number, $purchase_invoice, 'سداد كاش للمورد', $purchase_invoice->date);
+
+                    $this->restriction($supplier->id, $supplier->tree4_code, $request->cash_amount_total, 0, $constant_number, $purchase_invoice, 'سداد كاش للمورد', $purchase_invoice->date);
+                }
+
+                if (!empty($request->bank_amount_total)) {
+                    $bank = Tree4::find($request->bank_name);
+
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $purchase_invoice, 'سداد بنك للمورد', $purchase_invoice->date);
+
+                    $this->restriction($supplier->id, $supplier->tree4_code, $request->bank_amount_total, 0, $constant_number, $purchase_invoice, 'سداد بنك للمورد', $purchase_invoice->date);
+                }
             }
 
             DB::commit();
@@ -308,7 +336,7 @@ class PurchaseInvoiceController extends Controller
             $product = Product::with('stocks', 'units')->find($item->product_id);
             $product_unit = $product->units()->where('unit_id', $item->unit_id)->first();
             $producStock = $product->stocks()->where('stock_id', $purchase_invoice->stock_id)->first();
-            $qty = $item->qty * $product_unit->pivot->conversion_factor;
+            $qty = ($item->qty + $item->bounce) * $product_unit->pivot->conversion_factor;
             $newQuantity = $producStock->pivot->quantity - $qty;
             $product->stocks()->syncWithoutDetaching([
                 $purchase_invoice->stock_id => ['quantity' => $newQuantity],
@@ -319,54 +347,7 @@ class PurchaseInvoiceController extends Controller
         return back()->with('success_deleted', 'تم الحذف بنجاح ');
     }
 
-    public function toggleStatus(PurchaseInvoice $purchase_invoice): JsonResponse
-    {
-        $purchase_invoice->update(['status' => !$purchase_invoice->status]);
-        return response()->json(['status' => $purchase_invoice->status]);
-    }
-
-    public function updateQtyProduct(Request $request): JsonResponse
-    {
-        $request->validate([
-            'deleted_products' => 'required|array',
-            'deleted_products.*.id' => 'exists:products,id',
-            'deleted_products.*.unitId' => 'exists:units,id',
-            'deleted_products.*.qty' => 'required|integer|min:1',
-        ]);
-
-        foreach ($request->deleted_products as $product) {
-            $productqty = Product::with('units', 'stocks')->firstWhere('id', $product['id']);
-            $conversion_factor = $productqty->units()->firstWhere('unit_id', $product['unitId'])->pivot->conversion_factor;
-            $qty = $product['qty'] * $conversion_factor;
-            $productStock = $productqty->stocks->where('id', $request->stock_id)->first();
-            $newQuantity = $productStock->pivot->quantity - $qty;
-            $productqty->stocks()->syncWithoutDetaching([
-                $request->stock_id => ['quantity' => $newQuantity],
-            ]);
-        }
-
-        return response()->json(['success' => true, 'message' => 'تم تحديث الكمية بنجاح']);
-    }
-
-    private function operation($madin_id, $dain_id, $madin, $dain, $total, $constant_number, $purchase_invoice, $node): Operation
-    {
-        return Operation::create(
-            attributes: [
-                'madin_id' => $madin_id,
-                'dain_id' => $dain_id,
-                'madin' => $madin,
-                'dain' => $dain,
-                'price' => $total,
-                'constant_number' => $constant_number,
-                'node' => $node,
-                'purchase_invoice_id' => $purchase_invoice->id,
-                'type' => 2,
-                'user_id' => Auth::id(),
-            ],
-        );
-    }
-
-    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $purchase_invoice, $operation, $node): Restriction
+    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $purchase_invoice, $node, $date): Restriction
     {
         return Restriction::create(
             attributes: [
@@ -374,14 +355,74 @@ class PurchaseInvoiceController extends Controller
                 'tree4_code' => $tree4_code,
                 'madin' => $madin,
                 'dain' => $dain,
-                'date' => today(),
+                'date' => $date,
                 'node' => $node,
                 'constant_number' => $constant_number,
                 'type' => 2,
                 'purchase_invoice_id' => $purchase_invoice->id,
                 'user_id' => Auth::id(),
-                'operation_id' => $operation->id,
+                'branch_id' => session('branch_id'),
             ],
         );
+    }
+
+    public function externalPurchase_create(PurchaseInvoice $purchase_invoice)
+    {
+        $operations = Restriction::where('purchase_invoice_id', $purchase_invoice->id)->where('branch_id', session('branch_id'))->where('type', 10)->whereYear('created_at', $purchase_invoice->created_at->year)->get();
+        // dd($operations);
+        $madin_trees = Tree4::where('tree3_code', 5301)->get();
+        $dain_trees = Tree4::where('tree3_code', 1203)->orWhere('tree3_code', 1202)->get();
+        return view('purchase.external', compact('purchase_invoice', 'dain_trees', 'madin_trees', 'operations'));
+    }
+
+    public function externalPurchase_store(Request $request, PurchaseInvoice $purchase_invoice): RedirectResponse
+    {
+        try {
+            DB::beginTransaction();
+            Restriction::where(['purchase_invoice_id' => $purchase_invoice->id, 'branch_id' => session('branch_id'), 'type' => 10])
+                ->whereYear('created_at', $purchase_invoice->created_at->year)
+                ->delete();
+            $constant_number = Restriction::where('branch_id', session('branch_id'))->max('constant_number') + 1;
+            foreach ($request->madin as $index => $madin) {
+                $madin = Tree4::find($madin);
+
+                Restriction::create([
+                    'tree4_id' => $madin->id,
+                    'tree4_code' => $madin->tree4_code,
+                    'madin' => $request->price_madin[$index],
+                    'dain' => 0,
+                    'date' => now(),
+                    'node' => 'عبارة عن منصرفات مشتريات خارجية',
+                    'constant_number' => $constant_number,
+                    'type' => 10,
+                    'branch_id' => session('branch_id'),
+                    'user_id' => Auth::id(),
+                    'purchase_invoice_id' => $purchase_invoice->id,
+                ]);
+            }
+
+            foreach ($request->dain as $index => $dain) {
+                $dain = Tree4::find($dain);
+
+                Restriction::create([
+                    'tree4_id' => $dain->id,
+                    'tree4_code' => $dain->tree4_code,
+                    'madin' => 0,
+                    'dain' => $request->price_dain[$index],
+                    'date' => now(),
+                    'node' => 'مصرفات مشتريات خارجية',
+                    'constant_number' => $constant_number,
+                    'type' => 10,
+                    'branch_id' => session('branch_id'),
+                    'user_id' => Auth::id(),
+                    'purchase_invoice_id' => $purchase_invoice->id,
+                ]);
+            }
+            DB::commit();
+            return redirect()->route('daily.show', $constant_number)->with('success_created', 'successfully created');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('purchase_invoice.index')->withErrors($e->getMessage());
+        }
     }
 }

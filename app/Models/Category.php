@@ -7,16 +7,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    protected $fillable = ['name','status'];
+    protected $fillable = ['name', 'branch_id','order'];
 
     public function products(): HasMany
     {
         return $this->hasMany(related: Product::class);
     }
-
-    public function scopeStatusActive($query)
-    {
-        return $query->whereStatus(1);
-    }
-    
 }

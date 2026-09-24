@@ -24,16 +24,14 @@ class StorePurchaseReturnRequest extends FormRequest
         return [
             'supplier_id' => 'nullable|exists:tree4s,id',
             'invoice_number' => 'required|numeric',
-            'invoice_date' => 'required|date',
+            'date' => 'required|date',
             'sub_total' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
             'total' => 'required|numeric|min:0',
-            'payment_status' => 'required',
-            'payment_method' => 'nullable',
-            'cash_id' => 'nullable|exists:tree4s,id',
-            'bank_id' => 'nullable|exists:tree4s,id',
-            'cash_amount' => 'nullable|numeric',
-            'bank_amount' => 'nullable|numeric',
+            'cash_name' => 'nullable|exists:tree4s,id',
+            'bank_name' => 'nullable|exists:tree4s,id',
+            'cash_amount_total' => 'nullable|numeric',
+            'bank_amount_total' => 'nullable|numeric',
 
             'product_id' => 'required|array',
             'product_id.*' => 'required|exists:products,id',
@@ -60,8 +58,8 @@ class StorePurchaseReturnRequest extends FormRequest
             'invoice_number.required' => 'يجب إدخال رقم الفاتورة.',
             'invoice_number.numeric' => 'يجب أن يكون رقم الفاتورة عددًا صحيحًا.',
 
-            'invoice_date.required' => 'يجب إدخال تاريخ الفاتورة.',
-            'invoice_date.date' => 'تاريخ الفاتورة غير صالح.',
+            'date.required' => 'يجب إدخال تاريخ الفاتورة.',
+            'date.date' => 'تاريخ الفاتورة غير صالح.',
 
             'sub_total.required' => 'يجب إدخال المبلغ الإجمالي مع الضريبة.',
             'sub_total.numeric' => 'يجب أن يكون المبلغ الإجمالي مع الضريبة رقمًا صحيحًا أو عشريًا.',
@@ -71,12 +69,10 @@ class StorePurchaseReturnRequest extends FormRequest
             'total.required' => 'يجب إدخال المبلغ الإجمالي.',
             'total.numeric' => 'يجب أن يكون المبلغ الإجمالي رقمًا صحيحًا أو عشريًا.',
 
-            'payment_status.required' => 'يجب تحديد حالة الدفع.',
-
-            'cash_id.exists' => 'الخزنة المحددة غير موجودة.',
-            'bank_id.exists' => 'البنك المحدد غير موجود.',
-            'cash_amount.numeric' => 'يجب ان يكون المبلغ تقدا رقما صحيحا او عشريا.',
-            'bank_amount.numeric' => 'يجب ان يكون المبلغ عبر البنك رقما صحيحا او عشريا.',
+            'cash_name.exists' => 'الخزنة المحددة غير موجودة.',
+            'bank_name.exists' => 'البنك المحدد غير موجود.',
+            'cash_amount_total.numeric' => 'يجب ان يكون المبلغ تقدا رقما صحيحا او عشريا.',
+            'bank_amount_total.numeric' => 'يجب ان يكون المبلغ عبر البنك رقما صحيحا او عشريا.',
 
             'product_id.required' => 'يجب إدخال المنتجات.',
             'product_id.array' => 'المنتجات يجب أن تكون في شكل قائمة.',

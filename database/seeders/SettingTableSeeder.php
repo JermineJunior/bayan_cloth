@@ -14,11 +14,10 @@ class SettingTableSeeder extends Seeder
     public function run(): void
     {
         Setting::create(attributes: [
-            'name' => 'pos bayan',
-            'location' => 'khartoum',
-            'phone' => '0121000000',
-            'email' => 'bayan@gmail.com',
-            'logo' => '17307014763895.png',
+            'name' => 'شركة بيان للبرمجيات',
+            'location' => ' الخرطوم',
+            'logo' => 'bayan.jpg',
+            'phone' => implode(',',['0123113936','0123196595'])
         ]);
     }
 }

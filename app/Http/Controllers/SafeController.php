@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Safe;
 use App\Models\Tree4;
 use Illuminate\View\View;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +16,7 @@ class SafeController extends Controller
 {
     public function index(): View
     {
-        $safes = Safe::get();
+        $safes = Tree4::where('tree3_code', 1202)->get();
         return view('safe.index', compact('safes'));
     }
 
@@ -24,19 +24,12 @@ class SafeController extends Controller
     {
         try {
             DB::beginTransaction();
-
-            $safe = Safe::create(
-                attributes: [
-                    'name' => $request->name,
-                ],
-            );
-
             $tree4 = Tree4::whereTree3_code(1202)->orderBy('id', 'DESC')->first();
             $tree4_code = $tree4 ? $tree4->tree4_code + 1 : '120200001';
 
-            Tree4::create(
+            $x = Tree4::create(
                 attributes: [
-                    'tree4_name' => $safe->name,
+                    'tree4_name' => $request->name,
                     'tree4_code' => $tree4_code,
                     'tree3_id' => 2,
                     'tree3_code' => 1202,
@@ -44,7 +37,8 @@ class SafeController extends Controller
                 ],
             );
 
-            Db::commit();
+
+            DB::commit();
             return back()->with('success_created', 'تمت اضافة البيانات بنجاح');
         } catch (\Exception $exception) {
             DB::rollback();
@@ -54,20 +48,16 @@ class SafeController extends Controller
         }
     }
 
-    public function update(UpdateSafeRequest $request, Safe $safe): RedirectResponse
+    public function update(UpdateSafeRequest $request, Tree4 $safe): RedirectResponse
     {
         try {
-            Db::beginTransaction();
+            DB::beginTransaction();
 
-            $tree4 = Tree4::whereTree4_name($safe->name);
-            $tree4->update([
+            $safe->update([
                 'tree4_name' => $request->name,
             ]);
 
-            $safe->update([
-                'name' => $request->name,
-            ]);
-            Db::commit();
+            DB::commit();
             return back()->with('success_updated', 'تم تحديث البيانات بنجاج');
         } catch (\Exception $exception) {
             DB::rollback();
@@ -77,11 +67,14 @@ class SafeController extends Controller
         }
     }
 
-    public function destroy(Safe $safe): RedirectResponse
+    public function destroy(Tree4 $safe): RedirectResponse
     {
         try {
             DB::beginTransaction();
-            Tree4::whereTree4_name($safe->name)->delete();
+            if ($safe->restrictions()->count() > 0) {
+                DB::rollBack();
+                return back()->withErrors('لا يمكن حذف هذه الخزنة لانها مرتبطة ببعض الحسابات');
+            }
             $safe->delete();
             DB::commit();
             return back()->with('success_deleted', 'تم الحذف بنجاح ');
@@ -93,12 +86,10 @@ class SafeController extends Controller
         }
     }
 
-    public function toggleStatus(Safe $safe): JsonResponse
+    public function checkName(Request $request): JsonResponse
     {
-        Tree4::whereTree4_name($safe->name)->update([
-            'status' => !$safe->status,
-        ]);
-        $safe->update(['status' => !$safe->status]);
-        return response()->json(['status' => $safe->status]);
+        $id = $request->input('id');
+        $exists = Tree4::where('tree4_name', $request->name)->where('id', '!=', $id)->exists(); // تحقق من وجود الباركود في قاعدة البيانات
+        return response()->json(['isUnique' => !$exists]);
     }
 }

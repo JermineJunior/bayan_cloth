@@ -72,70 +72,93 @@
                         </script>
                     @endif
 
-                    <div class="d-flex">
+                    <div class="d-flex justify-content-between gap-2">
                         <h5 class="content-title mb-0 my-auto"> إضاف قيد جديد :</h5>
+
+                        <a href="javascript:history.back()" class="btn btn-warning">
+                            <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                        </a>
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <div class="card-body">
                             <form id="compoundForm" action="{{ route('compound.store') }}" method="POST">
                                 @csrf
                                 <div class="row">
-                                    <div class="col">
+                                    <div class="col-xl-4">
                                         <label for="constant_number" class="control-label"> رقم القيد</label>
                                         <input type="text" id="constant_number" value="{{ $constant_number }}" readonly
                                             name="constant_number" class="form-control">
                                     </div>
-                                    <div class="col">
+                                    <div class="col-xl-4">
                                         <span class="tx-danger">*</span><label for="date" class="control-label"> تاريخ
                                             القيد</label>
                                         <input type="date" id="date" name="date" value="<?php echo date('Y-m-d'); ?>"
                                             class="form-control" placeholder="يرجى ادخال التاريخ">
                                     </div>
-                                    <div class="col">
-                                        <span class="tx-danger">*</span><label for="note" class="control-label"> بيان
+                                    <div class="col-xl-4">
+                                        <label for="note" class="control-label"> بيان
                                             القيد</label>
                                         <input type="text" id="note" name="note" class="form-control"
                                             placeholder="يرجى ادخال بيان القيد">
                                     </div>
                                 </div>
                                 <br>
-                                <div class="row">
-                                    <div class="col-6">
+                                <div class="row" id="row-dain">
+                                    <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label for="dain">الحساب الدائن</label>
-                                        <select name="dain" id="dain" class="form-control select2-from"></select>
+                                        <select name="dain[]" id="dain" class="form-control select2-from">
+                                            <option value="">-- من فضلك قم باختيار حساب --</option>
+                                            @foreach ($trees as $tree)
+                                                <option value="{{ $tree->id }}">{{ $tree->tree4_name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-6 mb-3">
+                                    <div class="col-xl-5 mb-2">
                                         <span class="tx-danger">*</span><label for="price_dain" class="control-label">
                                             المبلغ</label>
-                                        <input id="price_dain" type="number" name="price_dain" class="form-control"
-                                            onkeyup="checkPrice()" placeholder="يرجى ادخال المبلغ">
+                                        <input id="price_dain" type="text" name="price_dain[]"
+                                            class="form-control price_dain" onkeyup="checkPrice()"
+                                            placeholder="يرجى ادخال المبلغ">
+                                    </div>
+
+                                    <div class="col-xl-1 col-md-1">
+                                        <label for="">حذف</label>
+                                        <button type="button" class="btn btn-danger remove-madin"><i
+                                                class="fa fa-trash"></i></button>
                                     </div>
                                 </div>
+                                <div id="dain-container"></div>
 
                                 <div class="row" id="row-madin">
-                                    <div class="col-6">
+                                    <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label>الحساب المدين</label>
-                                        <select name="madin[1]" class="form-control select2-to"></select>
+                                        <select name="madin[]" class="form-control select2-to">
+                                            <option value="">-- من فضلك قم باختيار حساب --</option>
+                                            @foreach ($trees as $tree)
+                                                <option value="{{ $tree->id }}">{{ $tree->tree4_name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
-                                    <div class="col-6 mb-3">
+                                    <div class="col-xl-5 mb-2">
                                         <span class="tx-danger">*</span><label class="control-label">
                                             المبلغ</label>
-                                        <input type="number" name="price_madin[1]" class="form-control price_madin"
+                                        <input type="text" name="price_madin[]" class="form-control price_madin"
                                             onkeyup="checkPrice()" placeholder="يرحى ادخال المبلغ">
                                     </div>
 
-                                    <div class="col-6 mb-3">
-                                        <select name="madin[2]" class="form-control select2-to"></select>
+                                    <div class="col-xl-1 col-md-1">
+                                        <label for="">حذف</label>
+                                        <button type="button" class="btn btn-danger remove-madin"><i
+                                                class="fa fa-trash"></i></button>
                                     </div>
-                                    <div class="col-6">
-                                        <input type="number" name="price_madin[2]" class="form-control price_madin"
-                                            onkeyup="checkPrice()" placeholder="يرجي ادخال  المبلغ">
-                                    </div>
+                                </div>
+                                <div id="madin-container"></div>
 
-                                    <div class="col-12 mt-3">
-                                        <button type="button" id="add-madin-row" class="btn btn-secondary mb-3">إضافة
-                                            حساب دائن</button>
-                                    </div>
+                                <div class="col-12 mt-3">
+                                    <button type="button" id="add-dain-row" class="btn btn-secondary mb-3">إضافة
+                                        حساب دائن</button>
+                                    <button type="button" id="add-madin-row" class="btn btn-info mb-3">إضافة
+                                        حساب مدين</button>
                                 </div>
                                 <div class="d-flex justify-content-center">
                                     <button type="submit" id="saveButton" class="btn btn-primary"> إضــافة
@@ -164,89 +187,119 @@
     <script src="{{ URL::asset('assets/plugins/form_validation/additional-methods.min.js') }}"></script>
     <script src="{{ URL::asset('assets/plugins/form_validation/messages_ar.js') }}"></script>
     <script>
+        $('.select2-from').select2();
+        $('.select2-to').select2();
         document.getElementById('add-madin-row').addEventListener('click', function() {
-            const bodyAccount = document.getElementById('row-madin');
-            let indexOf = bodyAccount.querySelectorAll('.select2-to').length + 1;
+            const rowMadinContainer = document.getElementById('madin-container');
+            let indexOf = rowMadinContainer.querySelectorAll('.select2-to').length + 1;
+
             const row = `
-                        <div class="row">
-                            <div class="col-6">
-                                <select name="madin[${indexOf}]" id="madin_${indexOf}" class="form-control select2-to"></select>
-                            </div>
-                            <div class="col-6">
-                                <input type="number" name="price_madin[${indexOf}]" id="price_madin_${indexOf}" class="form-control price_madin"
-                                    onkeyup="checkPrice()"  placeholder="يرجي ادخال  المبلغ">
-                            </div>
-                        </div>
-                        <br />`;
+        <div class="row madin-row">
+            <div class="col-xl-6 col-md-12" style="margin-top:15px">
+                <select name="madin[${indexOf}]" class="form-control select2-to">
+                    <option> -- من فضلك قم باختيار حساب --</option>
+                    @foreach ($trees as $tree)
+                        <option value="{{ $tree->id }}"> {{ $tree->tree4_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-xl-5 col-md-11 my-3">
+                <input type="text" name="price_madin[${indexOf}]" class="form-control price_madin"
+                    onkeyup="checkPrice()" placeholder="يرجى ادخال المبلغ">
+            </div>
+            <div class="col-xl-1 col-md-1 mt-3">
+                <button type="button" class="btn btn-danger remove-madin"><i class="fa fa-trash"></i></button>
+            </div>
+        </div>`;
 
-            document.getElementById('add-madin-row').insertAdjacentHTML('beforebegin', row);
-            $(`#madin_${indexOf}`).rules(
-                'add', {
-                    required: true,
-                    messages: {
-                        required: "يرجى اختيار الحساب المدين"
-                    }
-                });
+            rowMadinContainer.insertAdjacentHTML('beforeend', row);
+            $('.select2-to').select2();
 
-            $(`#price_madin_${indexOf}`).rules(
-                'add', {
-                    required: true,
-                    messages: {
-                        required: 'يرجى ادخال مبلغ الحساب المدين'
-                    }
-                });
-            $('.select2-to').select2({
-                ajax: {
-                    url: "{{ route('select2.tree4') }}",
-                    dataType: 'json',
-                    delay: 250,
-                    data: function(params) {
-                        return {
-                            q: params.term, // نص البحث
-                            exclude: getExcludedAccounts() // استبعاد الحسابات المختارة
-                        };
-                    },
-                    processResults: function(data) {
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true,
-                },
-                placeholder: 'يرجى اختيار الحساب إلى',
-            });
+            attachCommaFormatter('.price_madin');
 
-
+            // تطبيق تنسيق الفاصلة على حقل المبلغ
+            attachCommaFormatter($('.price_madin').last().attr('id'));
         });
+
+        document.getElementById('add-dain-row').addEventListener('click', function() {
+            const rowDainContainer = document.getElementById('dain-container');
+            let indexOf = rowDainContainer.querySelectorAll('.select2-from').length + 1;
+
+            const row = `
+                            <div class="row dain-row">
+                                <div class="col-xl-6 col-md-12" style="margin-top:15px">
+                                    <select name="dain[${indexOf}]" class="form-control select2-from">
+                                        <option> -- من فضلك قم باختيار حساب --</option>
+                                        @foreach ($trees as $tree)
+                                            <option value="{{ $tree->id }}"> {{ $tree->tree4_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-xl-5 col-md-11 my-3">
+                                    <input type="text" name="price_dain[${indexOf}]" class="form-control price_dain"
+                                        onkeyup="checkPrice()" placeholder="يرجى ادخال المبلغ">
+                                </div>
+                                <div class="col-xl-1 col-md-1 mt-3">
+                                    <button type="button" class="btn btn-danger remove-madin"><i class="fa fa-trash"></i></button>
+                                </div>
+                            </div>`;
+
+
+            rowDainContainer.insertAdjacentHTML('beforeend', row);
+
+            $('.select2-from').select2();
+
+            attachCommaFormatter('.price_dain');
+
+
+            // تطبيق تنسيق الفاصلة على حقل المبلغ
+            attachCommaFormatter($('.price_dain').last().attr('id'));
+        });
+
+        // الاستماع للنقر على زر الحذف لأي صف مدين (باستخدام التفويض delegation)
+        document.getElementById('madin-container').addEventListener('click', function(e) {
+            if (e.target.closest('.remove-madin')) {
+                const row = e.target.closest('.madin-row');
+                if (row) {
+                    row.remove();
+                }
+            }
+        });
+
+        // الاستماع للنقر على زر الحذف لأي صف مدين (باستخدام التفويض delegation)
+        document.getElementById('dain-container').addEventListener('click', function(e) {
+            if (e.target.closest('.remove-dain')) {
+                const row = e.target.closest('.dain-row');
+                if (row) {
+                    row.remove();
+                }
+            }
+        });
+
+
+
         $('#compoundForm').validate({
             rules: {
                 dain: {
                     required: true,
                 },
-                "madin[1]": {
+                "madin[]": {
                     required: true,
                 },
-                "madin[2]": {
+                "dain[]": {
                     required: true,
                 },
-                price_dain: {
-                    required: true,
-                    number: true
-                },
-                "price_madin[1]": {
+                "price_dain[]": {
                     required: true,
                     number: true
                 },
-                "price_madin[2]": {
+                "price_madin[]": {
                     required: true,
                     number: true
                 },
                 date: {
                     required: true,
                     date: true,
-                },
-                note: {
-                    required: true
                 },
                 constant_number: {
                     number: true,
@@ -256,22 +309,18 @@
                 dain: {
                     required: "يرجى إدخال الحساب الدائن.",
                 },
-                "madin[1]": {
+                "madin[]": {
                     required: "يرجى إدخال الحساب المدين.",
                 },
-                "madin[2]": {
-                    required: "يرجى إدخال الحساب المدين.",
+                "dain[]": {
+                    required: "يرجى إدخال الحساب الدائن.",
                 },
-                price_dain: {
+                "price_madin[]": {
+                    required: "يرجى إدخال مبلغ الحساب المدين.",
+                    number: "يجب أن يكون المبلغ عدداً."
+                },
+                "price_dain[]": {
                     required: "يرجى إدخال مبلغ الحساب الدائن.",
-                    number: "يجب أن يكون المبلغ عدداً."
-                },
-                "price_madin[1]": {
-                    required: "يرجى إدخال مبلغ الحساب المدين.",
-                    number: "يجب أن يكون المبلغ عدداً."
-                },
-                "price_madin[2]": {
-                    required: "يرجى إدخال مبلغ الحساب المدين.",
                     number: "يجب أن يكون المبلغ عدداً."
                 },
                 date: {
@@ -279,16 +328,8 @@
                     date: "يرجى إدخال تاريخ صحيح."
 
                 },
-                note: {
-                    required: "يرجى إدخال بيان القيد.",
-                },
                 constant_number: {
                     required: "يجب ادخال رقم القيد.",
-                },
-                total: {
-                    required: "يرجى إدخال الاجمالي للفاتورة.",
-                    number: "يجب أن يكون الاجمالي للفاتورة عدداً.",
-                    min: "يجب أن يكون الاجمالي اكبر من الصفر."
                 }
             },
             errorPlacement: function(error, element) {
@@ -311,47 +352,7 @@
             }
         });
 
-        $('.select2-from').select2({
-            ajax: {
-                url: "{{ route('select2.tree4') }}", // رابط البحث
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term // نص البحث
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                },
-                cache: true,
-            },
-            placeholder: 'يرجى اختيار الحساب من',
-        });
 
-        // تهيئة الحقول "إلى حساب" (المدين)
-        $('.select2-to').select2({
-            ajax: {
-                url: "{{ route('select2.tree4') }}",
-                dataType: 'json',
-                delay: 250,
-                data: function(params) {
-                    return {
-                        q: params.term, // نص البحث
-                        exclude: getExcludedAccounts() // استبعاد الحسابات المختارة
-                    };
-                },
-                processResults: function(data) {
-                    return {
-                        results: data
-                    };
-                },
-                cache: true,
-            },
-            placeholder: 'يرجى اختيار الحساب إلى',
-        });
 
         // تحديث الحقول "إلى حساب" عند تغيير الحقل "من حساب"
         $('.select2-from').on('change', function() {
@@ -374,6 +375,13 @@
                 });
             }
         });
+
+        document.getElementById('compoundForm').addEventListener('submit', function(e) {
+            cleanNumbersBeforeSubmit();
+        });
+
+        attachCommaFormatter('.price_madin');
+        attachCommaFormatter('.price_dain');
 
         // دالة لجلب الحسابات المستبعدة
         function getExcludedAccounts() {
@@ -418,20 +426,82 @@
         }
 
         function checkPrice() {
-            let price_dain_value = document.getElementById('price_dain').value || 0;
             let price_madin = document.querySelectorAll('.price_madin');
-            let sum = 0;
+            let price_dain = document.querySelectorAll('.price_dain');
+            let sum_madin = 0;
+            let sum_dain = 0;
             price_madin.forEach(function(madin) {
-                let price_madin_value = madin.value || 0;
-                sum += parseFloat(price_madin_value);
-
-                console.log(price_madin_value, price_dain_value, sum);
-
+                let price_madin_value = madin.value.replace(/,/g, '') || 0;
+                sum_madin += parseFloat(price_madin_value);
 
             });
 
-            document.getElementById('saveButton').disabled = (parseFloat(price_dain_value) !== parseFloat(sum));
+            price_dain.forEach(function(dain) {
+                let price_dain_value = dain.value.replace(/,/g, '') || 0;
+                sum_dain += parseFloat(price_dain_value);
 
+            });
+
+            document.getElementById('saveButton').disabled = (parseFloat(sum_madin) !== parseFloat(sum_dain));
+
+        }
+
+        function attachCommaFormatter(selector) {
+
+            document.querySelectorAll(selector).forEach(input => {
+
+                input.addEventListener('input', function() {
+
+                    /* ـــ حالة المؤشر قبل التعديل ـــ */
+                    const oldPos = this.selectionStart;
+                    const oldVal = this.value;
+
+                    /* 1) إزالة كل ما ليس رقمًا أو نقطة */
+                    let cleaned = oldVal.replace(/[^0-9.]/g, '');
+
+                    /* 2) الاحتفاظ بأول نقطة فقط ومسح البقية */
+                    const firstDot = cleaned.indexOf('.');
+                    if (firstDot !== -1) {
+                        cleaned = cleaned.slice(0, firstDot + 1) +
+                            cleaned.slice(firstDot + 1).replace(/\./g, '');
+                    }
+
+                    /* 3) تقسيم إلى جزء صحيح وعشرى */
+                    const [rawInt = '', rawDec = ''] = cleaned.split('.');
+
+                    /* 4) إضافة فواصل للجزء الصحيح */
+                    const intPart = rawInt.replace(/^0+(?!$)/, ''); // أصفار زائدة
+                    const intWithCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+                    /* 5) إعادة التجميع */
+                    let formatted = intWithCommas;
+                    if (firstDot !== -1) {
+                        // لو المستخدم كتب نقطة ولم يكتب أرقام بعدها نحافظ على النقطة
+                        formatted += '.' + rawDec;
+                    }
+
+                    this.value = formatted;
+
+                    /* 6) إعادة المؤشر لموضعه الطبيعى */
+                    const diff = formatted.length - oldVal.length;
+                    this.setSelectionRange(oldPos + diff, oldPos + diff);
+                });
+
+            });
+        }
+
+        function cleanNumbersBeforeSubmit() {
+            document.querySelectorAll('input[name^="price_madin"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+
+            document.querySelectorAll('input[name^="price_dain"]').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
         }
     </script>
 @endsection

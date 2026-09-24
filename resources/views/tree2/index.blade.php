@@ -59,12 +59,18 @@
                             }
                         </script>
                     @endif
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة نشاط')
-                            <a class="modal-effect btn btn-primary btn-block" data-effect="effect-super-scaled"
-                                data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة نشاط')
+                                <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled" data-toggle="modal"
+                                    href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -224,7 +230,7 @@
             var tree2_name = button.data('tree2_name')
 
             var modal = $(this)
-            $('#edit_tree2').attr('action', '{{ route( 'tree2.update', ':id') }}'.replace(':id', id));
+            $('#edit_tree2').attr('action', '{{ route('tree2.update', ':id') }}'.replace(':id', id));
             modal.find('.modal-body #id').val(id);
             modal.find('.modal-body #tree1_name_ed').val(tree1_name);
             modal.find('.modal-body #tree2_code_ed').val(tree2_code);

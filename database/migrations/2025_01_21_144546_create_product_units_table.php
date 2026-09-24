@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade'); // الصنف
             $table->foreignId('unit_id')->constrained('units')->onDelete('cascade'); // الوحدة
             $table->decimal('price', 10, 2); // السعر
+            $table->decimal('price_purchase', 10, 2); // السعر
             $table->integer('conversion_factor');
             $table->timestamps();
         });

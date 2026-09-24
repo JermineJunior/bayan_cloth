@@ -180,7 +180,7 @@ return [
         'available'             => 'مُتاح',
         'size'                  => 'الحجم',
         'permission'            => 'الصلاحيات',
-        'category_id'           => 'القسم',
+        'category_id'           => 'الشركة',
         'purches_price'         => 'سعر الشراء',
         'sale_price'            => 'سعر البيع',
         'stock'                 => 'الكمية',

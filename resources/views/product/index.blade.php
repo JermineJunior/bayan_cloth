@@ -8,6 +8,7 @@
     <link href="{{ URL::asset('assets/plugins/datatable/css/responsive.dataTables.min.css') }}" rel="stylesheet">
     <!--Internal   Notify -->
     <link href="{{ URL::asset('assets/plugins/notify/css/notifIt.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
 @endsection
 
 @section('page-header')
@@ -69,12 +70,30 @@
                         </script>
                     @endif
 
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة منتج')
-                            <a class="btn btn-primary btn-block" href="{{ route('product.create') }}"><i class="fa fa-plus">
-                                </i>&nbsp;&nbsp;إضافة منتج
-                                </i></a>
-                        @endcan
+                    <div class="col-12 mg-t-20">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+
+                            <!-- مجموعة الإضافة + الحذف -->
+                            <div class="d-flex flex-column flex-md-row gap-2">
+
+                                @can('اضافة منتج')
+                                    <a class="btn btn-primary" href="{{ route('product.create') }}"><i class="fa fa-plus">
+                                        </i>&nbsp;&nbsp;إضافة منتج
+                                        </i></a>
+                                @endcan
+                                <a class="btn btn-success" href="{{ route('product.excel.create') }}">
+                                    الاضافة بواسطة الاكسل</a>
+                                <a href="#" class="modal-effect btn btn-info" data-target="#percentModal"
+                                    data-toggle="modal"> تغيير
+                                    الاسعار بالنسبة</a>
+                            </div>
+
+                            <!-- زر الرجوع -->
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;رجوع
+                            </a>
+
+                        </div>
                     </div>
                     {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                 </div>
@@ -85,10 +104,12 @@
                                 <tr>
                                     <th class="wd-5p border-bottom-0">#</th>
                                     <th class="wd-10p border-bottom-0">الاسم</th>
+                                    <th class="wd-10p border-bottom-0">الاسم العلمي</th>
                                     <th class="wd-25p border-bottom-0">الكمية</th>
-                                    <th class="wd-20p border-bottom-0">القسم</th>
+                                    <th class="wd-15p border-bottom-0">الشركة</th>
                                     <th class="wd-20p border-bottom-0">تاريخ الصلاحية</th>
-                                    <th class="wd-5p">الحالة</th>
+                                    <th class="wd-5p">سعر البيع</th>
+                                    <th class="wd-5p">سعر الشراء</th>
                                     <th class="wd-15p border-bottom-0">العمليات </th>
 
                                 </tr>
@@ -99,20 +120,17 @@
                                     <tr data-id="{{ $product->id }}">
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $product->name }}</td>
-                                        <td>{{ $product->convertQuantity($product->stocks->sum('pivot.quantity'))  }}</td>
+                                        <td>{{ $product->name_en }}</td>
+                                        <td>{{ $product->convertQuantity($product->stocks->sum('pivot.quantity')) ?? null }}
+                                        </td>
                                         <td>{{ $product->category->name }}</td>
                                         <td>{{ $product->expire_date }}</td>
-                                        <!-- عرض عدد الحجاج في هذه الحملة -->
-                                        <td>
-                                            <button
-                                                class="btn btn-sm btn-{{ $product->status ? 'success' : 'danger' }} toggle-status-btn"
-                                                data-id="{{ $product->id }}">
-                                                {{ $product->status == 1 ? 'نشط' : 'غير نشط' }}
-                                            </button>
-                                        </td>
+                                        <td>{{ number_format($product->units[0]->pivot->price ?? 0) }}</td>
+                                        <td>{{ number_format($product->units[0]->pivot->price_purchase ?? 0) }}</td>
                                         <td>
                                             @can('تعديل منتج')
-                                                <a class="btn btn-outline-success btn-sm" href="{{ route('product.edit',$product->id) }}" title="تعديل">
+                                                <a class="btn btn-outline-success btn-sm"
+                                                    href="{{ route('product.edit', $product->id) }}" title="تعديل">
                                                     <i class="fa fa-edit">
                                                     </i></a>
                                             @endcan
@@ -123,13 +141,13 @@
                                                     <i class="fa fa-trash">
                                                     </i></a>
                                             @endcan
-                                            @can('الارصدة الافتتاحية للمنتجات')
+                                            {{-- @can('الارصدة الافتتاحية للمنتجات')
                                                 <a class="btn btn-outline-info btn-sm"
                                                      href="{{ route('product.opening',$product->id) }}" data-id="{{ $product->id }}"
                                                     title="الارصدة الافتتاحية للمنتجات">
                                                     <i class="fa fa-box">
                                                     </i></a>
-                                            @endcan
+                                            @endcan --}}
                                         </td>
                                     </tr>
                                 @endforeach
@@ -140,7 +158,81 @@
             </div>
         </div>
     </div>
-    {{-- // modal delete alert    --}}
+    </div>
+    </div>
+    <div class="modal" id="percentModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content tx-size-sm">
+
+                <div class="modal-body pd-y-20 pd-x-20">
+
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+
+                    <div class="tx-center mg-b-20">
+                        <h5 class="mg-b-5">تغيير أسعار المنتجات</h5>
+                        <p class="tx-13 tx-gray-600 mg-b-0">
+                            يمكنك تعديل أسعار المنتجات حسب القسم ونسبة التغيير
+                        </p>
+                    </div>
+
+                    <form action="{{ route('product.percent') }}" method="post">
+                        @csrf
+
+                        {{-- القسم --}}
+                        <div class="form-group">
+                            <label for="category_id">
+                                الأقسام
+                            </label>
+
+                            <select name="category_id[]" id="category_id" class="form-control" multiple>
+                                @foreach ($categories as $category)
+                                    <option value="{{ $category->id }}">
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <small class="text-muted">
+                                 يمكنك اختيار اكثر من قسم كما يمكنك عدم اختيار اي قسم  </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="percent">
+                                نسبة التغيير
+                            </label>
+
+                            <div class="input-group">
+                                <input type="number" name="percent" id="percent" class="form-control"
+                                    placeholder="مثال: 10" min="0" step="0.01" required>
+
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+
+                            <small class="text-muted">
+                                أدخل نسبة الزيادة أو التغيير على أسعار المنتجات
+                            </small>
+                        </div>
+
+                        <div class="tx-center mg-t-20">
+                            <button class="btn ripple btn-primary pd-x-25" type="submit">
+                                تغيير الأسعار
+                            </button>
+
+                            <button class="btn ripple btn-secondary pd-x-25" data-dismiss="modal" type="button">
+                                إلغاء
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="deleteModal">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content tx-size-sm">
@@ -188,11 +280,15 @@
     <!--Internal  Notify js -->
     <script src="{{ URL::asset('assets/plugins/notify/js/notifIt.js') }}"></script>
     <script src="{{ URL::asset('assets/plugins/notify/js/notifit-custom.js') }}"></script>
+    <script src="{{ URL::asset('assets/plugins/select2/js/select2.min.js') }}"></script>
 
     {{-- delete script  --}}
     <script>
         $(document).ready(function() {
-
+            $('select').select2({
+                placeholder:'الاقسام',
+                width:'100%'
+            });
             $('#deleteModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
@@ -201,33 +297,6 @@
                     ':id', id));
             });
 
-            // Handling status toggle button click
-            $('.toggle-status-btn').click(function() {
-                var productId = $(this).data('id');
-                var button = $(this);
-
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route('product.toggleStatus', '') }}/' + productId,
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        button.toggleClass('btn-success btn-danger');
-                        button.text(response.status == 1 ? 'نشط' : 'غير نشط');
-                        notif({
-                            msg: 'تم تغيير حالة الحملة بنجاح',
-                            type: 'success'
-                        });
-                    },
-                    error: function() {
-                        notif({
-                            msg: 'حدث خطأ أثناء تغيير الحالة',
-                            type: 'error'
-                        });
-                    }
-                });
-            });
         });
     </script>
 @endsection

@@ -22,35 +22,49 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header pb-0">
-                    <div class="d-flex">
+                    <div class="d-flex justify-content-between gap-2">
                         <h5 class="content-title mb-0 my-auto"> تقرير كشف حساب :</h5>
+
+                        <a href="javascript:history.back()" class="btn btn-warning">
+                            <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                        </a>
                     </div>
                     <div class="col-lg-12 col-md-12">
                         <div class="card-body">
-                            <form method="POST" action="{{ route('account.statement.show') }}" id="demo-form2" class="form-horizontal form-label-left">
+                            <div class="col-12 text-center">
+                                <button class="btn btn-outline-info filter-btn" data-type="customers">عملاء</button>
+                                <button class="btn btn-outline-success filter-btn" data-type="suppliers">موردين</button>
+                                <button class="btn btn-outline-warning filter-btn" data-type="cash">نقدية</button>
+                                <button class="btn btn-outline-primary filter-btn" data-type="others">اخرى</button>
+
+                            </div>
+                            <form method="POST" action="{{ route('account.statement.show') }}" id="demo-form2"
+                                class="form-horizontal form-label-left">
                                 @csrf
+
                                 <div class="row">
-                                    <div class="col">
-                                        <div class="alert alert-primary" role="alert">
-                                            اَختر الحساب مع تحديد الفترة من تاريخ البداية الي تاريخ النهاية لكي يتم عرض
-                                            تفاصيل الحساب خلال الفترة المحددة .
-                                            <span class="alert-inner--icon"><i class="ti-bell"></i></span>
-                                        </div>
+                                    <div class="col-md-6 mb-2">
+                                        <span class="tx-danger">*</span><label> الحساب
+                                        </label>
+                                        <select name="tree4" class="form-control select2">
+                                        </select>
                                     </div>
-                                </div>
-                                <div class="col">
-                                    <span class="tx-danger">*</span><label> الحساب
-                                    </label>
-                                    <select required name="tree4" class="form-control select2"></select>
-                                </div>
-                                <br>
-                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>العملة</label>
+                                        <select name="curencey_id" id="curencey_id" class="form-control" required>
+                                            <option value="">قم باختيار العملة</option>
+                                            @foreach ($curenceies as $curencey)
+                                                <option value="{{ $curencey->id }}">{{ $curencey->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <br>
                                     <div class="col">
                                         <span class="tx-danger">*</span><label for="inputName" class="control-label"> تاريخ
                                             البداية
                                         </label>
                                         <input type="date" name="start" value="<?php echo date('Y-m-d'); ?>"
-                                            class="form-control" required>
+                                            class="form-control">
                                     </div>
                                     </br>
                                     <div class="col">
@@ -58,7 +72,7 @@
                                             النهاية
                                         </label>
                                         <input type="date" name="end" value="<?php echo date('Y-m-d'); ?>"
-                                            class="form-control" required>
+                                            class="form-control">
                                     </div>
                                 </div>
                                 </br>
@@ -89,27 +103,60 @@
     <!-- Internal form-elements js -->
     <script src="{{ URL::asset('assets/js/form-elements.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // تهيئة الحقل "من حساب"
+        // دالة لإعادة تحميل select2 مع الفلترة
+        function loadAccounts(type = 'all') {
+            $('.select2').empty(); // نظف الخيارات
             $('.select2').select2({
+                placeholder: "-- من فضلك اختر حساب --",
                 ajax: {
-                    url: "{{ route('select2.tree4') }}", // رابط البحث
+                    url: "{{ route('tree4.filter') }}",
                     dataType: 'json',
                     delay: 250,
                     data: function(params) {
                         return {
-                            q: params.term // نص البحث
+                            q: params.term, // البحث
+                            type: type // نوع الفلترة
                         };
                     },
                     processResults: function(data) {
+                        // أضف أول عنصر ثابت
+                        let results = [{
+                            id: 'عام',
+                            text: 'كشف حساب عام'
+                        }];
+
+                        // أضف بقية العناصر من السيرفر
+                        results = results.concat(
+                            data.map(function(item) {
+                                return {
+                                    id: item.id,
+                                    text: item.tree4_name
+                                };
+                            })
+                        );
+
                         return {
-                            results: data
+                            results: results
                         };
                     },
-                    cache: true,
+                    cache: true
                 },
-                placeholder: 'يرجى اختيار الحساب ',
+                minimumInputLength: 0
             });
-        });
+        }
+
+
+        $(document).ready(function() {
+
+            // أول ما الصفحة تفتح → يجيب الكل
+            loadAccounts();
+
+            // عند الضغط على الأزرار
+            $('.filter-btn').on('click', function() {
+                let type = $(this).data('type');
+                loadAccounts(type);
+            });
+
+        })
     </script>
 @endsection

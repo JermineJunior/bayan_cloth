@@ -1,4 +1,4 @@
-<!-- resources/views/reports/expired_products.blade.php -->
+<!-- resources/views/report/expired_products.blade.php -->
 @extends('layouts.app')
 
 @section('content')

@@ -176,6 +176,12 @@
                             }
                         </script>
                     @endif
+
+                    <div class="float-left">
+                        <a href="javascript:history.back()" class="btn btn-warning">
+                            <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                        </a>
+                    </div>
                 </div>
 
                 {{--  card table   --}}
@@ -196,20 +202,25 @@
                                 @foreach ($operations as $operation)
                                     <tr>
                                         <td>{{ $operation->type == 5 ? 'قيد يومية ' : 'قيد مركب' }}</td>
-                                        <td>{{ $operation->user->name }}</td>
+                                        <td>{{ $operation->user }}</td>
                                         <td>{{ $operation->constant_number }}</td>
-                                        <td>{{ $operation->created_at->format('Y/m/d') }}</td>
+                                        <td>{{ $operation->date }}</td>
                                         <td>{{ $operation->node }}</td>
                                         <td>
+                                            <a href="{{ route('compound.edit', $operation->id) }}"
+                                                class="btn btn-outline-success btn-sm"><i
+                                                    class="fa fa-edit"></i>&nbsp;&nbsp;تعديل</a>
                                             <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
-                                                data-toggle="modal" href="#" data-id="{{ $operation->id }}" data-type="{{ $operation->type }}"
-                                                title="تعديل"> <i class="fa fa-trash"></i>&nbsp;&nbsp;حذف</a>
+                                                data-toggle="modal" href="#" data-id="{{ $operation->id }}"
+                                                data-type="{{ $operation->type }}" title="حذف"> <i
+                                                    class="fa fa-trash"></i>&nbsp;&nbsp;حذف</a>
                                             <a class="modal-effect btn btn-outline-info btn-sm" data-target="#showModal"
                                                 data-toggle="modal" href="#"
-                                                data-madin="{{ $operation->tree4_madin->tree4_name }}"
-                                                data-dain="{{ $operation->tree4_dain->tree4_name }}"
-                                                data-price="{{ $operation->price }}" title="عرض التفاصيل"> <i
-                                                    class="fa fa-eye"></i>&nbsp;&nbsp;عرض التفاصيل</a>
+                                                data-madin="{{ $operation->madin_name }}"
+                                                data-dain="{{ $operation->dain_name }}"
+                                                data-price="{{ number_format($operation->price, 2) }}"
+                                                title="عرض التفاصيل">
+                                                <i class="fa fa-eye"></i>&nbsp;&nbsp;عرض التفاصيل</a>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -256,8 +267,8 @@
             </div>
             <div class="modal-body">
                 <div class="container">
-                    <div class="header">من حساب (مدين)</div>
-                    <div class="header">إلى حساب (دائن)</div>
+                    <div class="header">حساب مدين</div>
+                    <div class="header">حساب دائن</div>
                     <div class="header">المبلغ</div>
 
                     <div id="maidn" class="cell">الحساب A</div>

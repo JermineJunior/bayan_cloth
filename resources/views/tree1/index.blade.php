@@ -15,7 +15,8 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h5 class="content-title mb-0 my-auto">انشطة الحسابات</h5><span class="text-muted mt-1 tx-13 mr-2 mb-0">/المستوى الاول</span>
+                <h5 class="content-title mb-0 my-auto">انشطة الحسابات</h5><span
+                    class="text-muted mt-1 tx-13 mr-2 mb-0">/المستوى الاول</span>
             </div>
         </div>
     </div>
@@ -28,7 +29,7 @@
             <div class="card">
                 <div class="card-header pb-0">
                     @if ($errors->any())
-                        <div class="alert alert-outline-warning" role="alert">
+                        <div class="alert alert-outline-danger" role="alert">
                             <button aria-label="Close" class="close" data-dismiss="alert" type="button">
                                 <span aria-hidden="true">&times;</span></button>
                             @foreach ($errors->all() as $error)
@@ -57,19 +58,25 @@
                             }
                         </script>
                     @endif
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة نشاط')
-                            <a class="modal-effect btn btn-primary btn-block" data-effect="effect-super-scaled"
-                                data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة نشاط')
+                                <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled" data-toggle="modal"
+                                    href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                     {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table text-md-nowrap" id="example1">
-                           <thead>
+                            <thead>
                                 <tr>
                                     <th class="wd-5p border-bottom-0">متسلسل</th>
                                     <th class="wd-10p border-bottom-0">كود الحساب </th>
@@ -204,7 +211,7 @@
                 var id = button.data('id');
                 var name = button.data('tree1_name');
                 var modal = $(this);
-                $('#edit_tree1').attr('action', '{{ route('tree1.update', ':id') }}'.replace(':id',id));
+                $('#edit_tree1').attr('action', '{{ route('tree1.update', ':id') }}'.replace(':id', id));
                 modal.find('.modal-body #tree1_name_ed').val(name);
             });
 

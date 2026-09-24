@@ -2820,7 +2820,7 @@ if ( !jQuery.support.style ) {
 	};
 }
 
-// Safari mis-reports the default selected property of an option
+// Safari mis-report the default selected property of an option
 // Accessing the parent's selectedIndex property fixes it
 if ( !jQuery.support.optSelected ) {
 	jQuery.propHooks.selected = jQuery.extend( jQuery.propHooks.selected, {
@@ -9350,7 +9350,7 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 				// Either scroll[Width/Height] or offset[Width/Height], whichever is greater
 				doc = elem.documentElement;
 
-				// when a window > document, IE6 reports a offset[Width/Height] > client[Width/Height]
+				// when a window > document, IE6 report a offset[Width/Height] > client[Width/Height]
 				// so we can't use max, as it'll choose the incorrect offset[Width/Height]
 				// instead we use the correct client[Width/Height]
 				// support:IE6

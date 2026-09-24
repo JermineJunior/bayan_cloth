@@ -1059,7 +1059,7 @@ $.fn.clearFields = $.fn.clearInputs = function(includeHidden) {
 $.fn.resetForm = function() {
     return this.each(function() {
         // guard against an input with the name of 'reset'
-        // note that IE reports the reset function as an 'object'
+        // note that IE report the reset function as an 'object'
         if (typeof this.reset == 'function' || (typeof this.reset == 'object' && !this.reset.nodeType)) {
             this.reset();
         }

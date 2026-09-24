@@ -59,12 +59,18 @@
                             }
                         </script>
                     @endif
-                    <div class="col-sm-6 col-md-4 col-xl-3 mg-t-20">
-                        @can('اضافة نشاط')
-                            <a class="modal-effect btn btn-primary btn-block" data-effect="effect-super-scaled"
-                                data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
-                                </i></a>
-                        @endcan
+                    <div class="col-sm-6 col-md-4 col-xl-12 mg-t-20">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة نشاط')
+                                <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled"
+                                    data-toggle="modal" href="#addModal"><i class="fa fa-plus"> </i>&nbsp;&nbsp;إضافة حساب
+                                    </i></a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -158,7 +164,8 @@
                             </div>
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label>اسم الحساب</label>
-                                <input id="tree3_name_ed" required type="text" name="tree3_name" class="form-control">
+                                <input id="tree3_name_ed" required type="text" name="tree3_name"
+                                    class="form-control">
                             </div>
                             <div class="modal-footer">
                                 <button class="btn ripple btn-primary" type="submit">تحديث البيانات </button>

@@ -71,10 +71,16 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header pb-0">
-                    <div class="col-sm-1 col-md-2">
-                        @can('اضافة مستخدم')
-                            <a class="btn btn-primary" href="{{ route('user.create') }}">&nbsp;&nbsp;إضافة مستخدم</a>
-                        @endcan
+                    <div class="col-sm-1 col-md-12">
+                        <div class="d-flex justify-content-between gap-2">
+                            @can('اضافة مستخدم')
+                                <a class="btn btn-primary" href="{{ route('user.create') }}">&nbsp;&nbsp;إضافة مستخدم</a>
+                            @endcan
+
+                            <a href="javascript:history.back()" class="btn btn-warning">
+                                <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -83,9 +89,8 @@
                             <thead>
                                 <tr>
                                     <th class="wd-10p border-bottom-0">م</th>
-                                    <th class="wd-15p border-bottom-0">اسم المستخدم</th>
-                                    <th class="wd-20p border-bottom-0">البريد الالكتروني</th>
-                                    <th class="wd-15p border-bottom-0">حالة المستخدم</th>
+                                    <th class="wd-15p border-bottom-0">الاسم </th>
+                                    <th class="wd-20p border-bottom-0">اسم المستخدم</th>
                                     <th class="wd-10p border-bottom-0">العمليات</th>
                                 </tr>
                             </thead>
@@ -94,14 +99,7 @@
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $user->name }}</td>
-                                        <td>{{ $user->email }}</td>
-                                        <td>
-                                            <button
-                                                class="btn btn-sm btn-{{ $user->status ? 'success' : 'danger' }} toggle-status-btn"
-                                                data-id="{{ $user->id }}">
-                                                {{ $user->status == 1 ? 'نشط' : 'غير نشط' }}
-                                            </button>
-                                        </td>
+                                        <td>{{ $user->username }}</td>
                                         <td>
                                             @can('تعديل مستخدم')
                                                 <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-success"
@@ -184,7 +182,7 @@
         $('#deleteModal').on('show.bs.modal', function(event) {
             var button = $(event.relatedTarget);
             var id = button.data('id');
-            
+
             var modal = $(this);
             $('#deleteForm').attr('action', '{{ route('user.destroy', ':id') }}'.replace(':id', id));
         });

@@ -1,9 +1,5 @@
 @extends('layouts.login')
 
-@section('title')
-    تسجيل الدخول - {{ GeneralSiteSettings('logo') }}
-@stop
-
 
 @section('css')
     <!-- Sidemenu-respoansive-tabs css -->
@@ -37,7 +33,7 @@
                                 <div class="card-sigin">
                                     <div class="mb-5 d-flex">
                                         <h1 class="main-logo1 ml-1 mr-0 my-auto tx-28">
-                                            <h1>B2B - Travel Sudan</h1>
+                                            <h1>{{ GeneralSiteSettings('name') }}</h1>
                                         </h1>
                                     </div>
                                     <div class="card-sigin">
@@ -48,11 +44,11 @@
                                                 @csrf
                                                 <div class="form-group">
                                                     <label>البريد الالكتروني او رقم التلفون</label>
-                                                    <input id="email" type="test"
-                                                        class="form-control @error('email') is-invalid @enderror"
-                                                        name="email" value="{{ old('email') }}" required
-                                                        autocomplete="email" autofocus>
-                                                    @error('email')
+                                                    <input id="username" type="test"
+                                                        class="form-control @error('username') is-invalid @enderror"
+                                                        name="username" value="{{ old('username') }}" required
+                                                        autocomplete="off" autofocus placeholder="رقم الهاتف او البريد الالكتروني">
+                                                    @error('username')
                                                         <span class="invalid-feedback" role="alert">
                                                             <strong>{{ $message }}</strong>
                                                         </span>
@@ -64,7 +60,7 @@
 
                                                     <input id="password" type="password"
                                                         class="form-control @error('password') is-invalid @enderror"
-                                                        name="password" required autocomplete="current-password">
+                                                        name="password" required autocomplete="current-password" placeholder="من فضلك ادخل كلمة المرور">
 
                                                     @error('password')
                                                         <span class="invalid-feedback" role="alert">
@@ -105,7 +101,7 @@
             <div class="col-md-6 col-lg-6 col-xl-7 d-none d-md-flex bg-primary-transparent">
                 <div class="row wd-100p mx-auto text-center">
                     <div class="col-md-12 col-lg-12 col-xl-12 my-auto mx-auto wd-100p">
-                        <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}"
+                        <img src="{{ asset('image/login/bayan.jpg') }}"
                             class="my-auto ht-xl-80p wd-md-100p wd-xl-80p mx-auto" alt="logo">
                     </div>
                 </div>

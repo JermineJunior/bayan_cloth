@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->foreignId('unit_id')->constrained()->cascadeOnDelete();
             $table->integer('qty');
+            $table->integer('bounce')->default(0);
             $table->decimal('price',15,2);
             $table->decimal('row_sub_total',15,2);
             $table->timestamps();

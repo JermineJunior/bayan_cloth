@@ -1201,10 +1201,10 @@ setDocument = Sizzle.setDocument = function( node ) {
 
 	// QSA and matchesSelector support
 
-	// matchesSelector(:active) reports false when true (IE9/Opera 11.5)
+	// matchesSelector(:active) report false when true (IE9/Opera 11.5)
 	rbuggyMatches = [];
 
-	// qSa(:focus) reports false when true (Chrome 21)
+	// qSa(:focus) report false when true (Chrome 21)
 	// We allow this because of a bug in IE8/9 that throws an error
 	// whenever `document.activeElement` is accessed on an iframe
 	// So, we allow :focus to pass through QSA all the time to avoid the IE error
@@ -8749,7 +8749,7 @@ if ( !support.hrefNormalized ) {
 }
 
 // Support: Safari, IE9+
-// mis-reports the default selected property of an option
+// mis-report the default selected property of an option
 // Accessing the parent's selectedIndex property fixes it
 if ( !support.optSelected ) {
 	jQuery.propHooks.selected = {
@@ -9993,7 +9993,7 @@ function filterHidden( elem ) {
 jQuery.expr.filters.hidden = function( elem ) {
 
 	// Support: Opera <= 12.12
-	// Opera reports offsetWidths and offsetHeights less than zero on some elements
+	// Opera report offsetWidths and offsetHeights less than zero on some elements
 	return support.reliableHiddenOffsets() ?
 		( elem.offsetWidth <= 0 && elem.offsetHeight <= 0 &&
 			!elem.getClientRects().length ) :

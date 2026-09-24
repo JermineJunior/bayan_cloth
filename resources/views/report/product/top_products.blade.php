@@ -1,4 +1,4 @@
-<!-- resources/views/reports/daily_sales.blade.php -->
+<!-- resources/views/report/daily_sales.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -19,7 +19,7 @@
                     <tr>
                         <th class="py-3">#</th>
                         <th class="py-3">اسم المنتج</th>
-                        <th class="py-3">عدد الطلبات</th>
+                        <th class="py-3">الكمية المباعة</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,7 +30,7 @@
                                 <span class="fw-semibold text-primary fs-5">{{ $item->product->name }}</span>
                             </td>
                             <td>
-                                <span class="badge bg-success fs-5 px-3 py-2 shadow-sm text-white">{{ $item->total_orders }}</span>
+                                <span class="badge bg-success fs-5 px-3 py-2 shadow-sm text-white">{{ $item->total_qty }}</span>
                             </td>
                         </tr>
                     @endforeach

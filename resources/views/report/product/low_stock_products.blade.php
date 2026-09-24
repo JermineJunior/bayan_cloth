@@ -1,4 +1,4 @@
-<!-- resources/views/reports/low_stock_products.blade.php -->
+<!-- resources/views/report/low_stock_products.blade.php -->
 @extends('layouts.app')
 
 @section('content')
@@ -17,8 +17,8 @@
                             <thead class="bg-warning text-dark">
                                 <tr>
                                     <th class="py-3">اسم المنتج</th>
-                                    <th class="py-3">المخزون الحالي</th>
-                                    <th class="py-3">الحد الأدنى للمخزون</th>
+                                    <th class="py-3">المخزن الحالي</th>
+                                    <th class="py-3">الحد الأدنى للمخزن</th>
                                     <th class="py-3">النقص في المخزون</th>
                                 </tr>
                             </thead>

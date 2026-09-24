@@ -22,7 +22,7 @@ class StoreSafeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|unique:safes,name'
+            'name' => 'required|unique:tree4s,tree4_name'
         ];
     }
 }

@@ -24,11 +24,13 @@ class StoreCompoundRequest extends FormRequest
         return [
             'constant_number' => 'required|numeric',
             'date' => 'required|date',
-            'note' => 'required|string|max:225',
+            'note' => 'nullable|string|max:225',
             'madin' => 'array',
             'madin.*' => 'required|numeric|exists:tree4s,id',
-            'dain' => 'required|numeric|exists:tree4s,id',
-            'price_dain' => 'required|numeric',
+            'dain' => 'array',
+            'dain.*' => 'required|numeric|exists:tree4s,id',
+            'price_dain' => 'array',
+            'price_dain.*' => 'required|numeric',
             'price_madin' => 'array',
             'price_madin.*' => 'required|numeric',
         ];
