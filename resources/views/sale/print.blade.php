@@ -249,6 +249,13 @@
                                                             {{ number_format($sale_invoice->bank_amount_total, 2) }}
                                                         </td>
                                                     </tr>
+                                                    @if ($sale_invoice->transaction_no)
+                                                        <tr>
+                                                            <td colspan="6"></td>
+                                                            <td>رقم عملية البنك</td>
+                                                            <td>{{ $sale_invoice->transaction_no }}</td>
+                                                        </tr>
+                                                    @endif
                                                     <tr>
                                                         <td colspan="6"></td>
                                                         <td> اجل</td>

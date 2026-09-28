@@ -339,6 +339,8 @@
                                         </select>
                                         <input type="text" name="bank_amount_total" id="bank_amount_total"
                                             class="form-control" placeholder="المبلغ بالبنك">
+                                        <input type="text" name="transaction_no" id="transaction_no"
+                                            class="form-control" placeholder="رقم العملية" style="display:none;">
                                     </div>
                                 </div>
                             </div>
@@ -727,6 +729,9 @@
                     bank_amount_total: {
                         requiredBankNameIfAmount: true
                     },
+                    transaction_no: {
+                        requiredTransactionNoIfBankAmount: true
+                    },
 
                 },
                 messages: {
@@ -793,6 +798,15 @@
 
                 return true;
             }, "يرجى إدخال اسم البنك إذا قمت بإدخال المبلغ بالبنك.");
+
+            $.validator.addMethod("requiredTransactionNoIfBankAmount", function(value, element) {
+                const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+                const bank = unformat($('#bank_amount_total').val());
+                if (bank > 0) {
+                    return value != null && String(value).trim() !== '';
+                }
+                return true;
+            }, "يرجى إدخال رقم عملية البنك");
 
             $.validator.addMethod(
                 "amountMismatch",
@@ -1129,6 +1143,14 @@
 
             $('#bank_amount_total').on('input', function() {
                 totalDeferend();
+                const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+                const $tx = $('#transaction_no');
+                if (unformat($(this).val()) > 0) {
+                    $tx.show();
+                } else {
+                    $tx.hide();
+                    $tx.val('');
+                }
             });
 
             attachCommaFormatter('#cash_amount_total');

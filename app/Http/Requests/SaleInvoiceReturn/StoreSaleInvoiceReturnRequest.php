@@ -3,6 +3,7 @@
 namespace App\Http\Requests\SaleInvoiceReturn;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreSaleInvoiceReturnRequest extends FormRequest
 {
@@ -32,6 +33,7 @@ class StoreSaleInvoiceReturnRequest extends FormRequest
             'bank_name' => 'nullable|exists:tree4s,id',
             'cash_amount_total' => 'nullable|numeric',
             'bank_amount_total' => 'nullable|numeric',
+            'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn () => (float) str_replace(',', '', $this->bank_amount_total ?? '') > 0)],
 
             'product_id' => 'required|array',
             'product_id.*' => 'required|exists:products,id',
@@ -74,6 +76,7 @@ class StoreSaleInvoiceReturnRequest extends FormRequest
             'bank_name.exists' => 'البنك المحدد غير موجود.',
             'cash_amount_total.numeric' => 'يجب ان يكون المبلغ تقدا رقما صحيحا او عشريا.',
             'bank_amount_total.numeric' => 'يجب ان يكون المبلغ عبر البنك رقما صحيحا او عشريا.',
+            'transaction_no.required' => 'يرجى إدخال رقم عملية البنك.',
 
             'product_id.required' => 'يجب إدخال المنتجات.',
             'product_id.array' => 'المنتجات يجب أن تكون في شكل قائمة.',

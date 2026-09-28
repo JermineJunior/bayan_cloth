@@ -132,6 +132,7 @@
                                                     data-dain-id="{{ $revenue->dain_id }}" data-note="{{ $revenue->note }}"
                                                     data-cach-price="{{ number_format($revenue->cach_name, 2) }}"
                                                     data-bank-price="{{ number_format($revenue->bank_name, 2) }}"
+                                                    data-transaction-no="{{ $revenue->transaction_no }}"
                                                     data-dain-name="{{ $revenue->dain->tree4_name }}" title="تعديل">
                                                     <i class="fa fa-edit">
                                                     </i></a>
@@ -201,7 +202,16 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <input type="text" name="madin_name[1]"
-                                            class="form-control bank_price madin_name" placeholder="المبلغ بالبنك">
+                                            class="form-control bank_price madin_name" placeholder="المبلغ بالبنك"
+                                            id="bank_price_add">
+                                    </div>
+                                </div>
+
+                                {{-- رقم العملية --}}
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <input type="text" name="transaction_no" id="transaction_no_add"
+                                            class="form-control" placeholder="رقم العملية" style="display:none;">
                                     </div>
                                 </div>
 
@@ -285,6 +295,14 @@
                                     <div class="form-group">
                                         <input type="text" name="madin_name[1]" id="bank_price"
                                             class="form-control bank_price madin_name" placeholder="المبلغ بالبنك">
+                                    </div>
+                                </div>
+
+                                {{-- رقم العملية --}}
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <input type="text" name="transaction_no" id="transaction_no"
+                                            class="form-control" placeholder="رقم العملية" style="display:none;">
                                     </div>
                                 </div>
 
@@ -420,6 +438,16 @@
                                 return $('select[name="madin_id[1]"]').val() !== '';
                             }
                         }
+                    },
+
+                    'transaction_no': {
+                        required: {
+                            depends: function() {
+                                const $f = $(this.form);
+                                const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+                                return unformat($f.find('input[name="madin_name[1]"]').val()) > 0;
+                            }
+                        }
                     }
                 },
 
@@ -438,6 +466,9 @@
                     },
                     'madin_name[1]': {
                         required: 'يرجى إدخال المبلغ بالبنك'
+                    },
+                    'transaction_no': {
+                        required: 'يرجى إدخال رقم عملية البنك'
                     }
                 },
 
@@ -528,6 +559,16 @@
                         }
                     },
 
+                    'transaction_no': {
+                        required: {
+                            depends: function() {
+                                const $f = $(this.form);
+                                const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+                                return unformat($f.find('input[name="madin_name[1]"]').val()) > 0;
+                            }
+                        }
+                    }
+
                 },
 
                 messages: {
@@ -548,6 +589,9 @@
                     },
                     'madin_name[1]': {
                         required: 'يرجى إدخال المبلغ بالبنك'
+                    },
+                    'transaction_no': {
+                        required: 'يرجى إدخال رقم عملية البنك'
                     }
                 },
 
@@ -586,6 +630,7 @@
                 var dainId = button.data('dain-id');
                 var dainName = button.data('dain-name');
                 var note = button.data('note');
+                var transactionNo = button.data('transaction-no');
                 var modal = $(this);
                 $('#edit_revenue').attr('action', '{{ route('revenue.update', ':id') }}'.replace(':id',
                     id));
@@ -625,6 +670,12 @@
                     maximumFractionDigits: 2
                 });
                 modal.find('.modal-body #note').val(note);
+                modal.find('.modal-body #transaction_no').val(transactionNo || '');
+                if (parseFloat(String(bankPrice).replace(/,/g, '')) > 0) {
+                    modal.find('.modal-body #transaction_no').show();
+                } else {
+                    modal.find('.modal-body #transaction_no').hide().val('');
+                }
 
             });
 
@@ -641,6 +692,24 @@
             });
 
             attachCommaFormatter('.madin_name');
+
+            $('#bank_price_add').on('input', function() {
+                const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+                if (unformat($(this).val()) > 0) {
+                    $('#transaction_no_add').show();
+                } else {
+                    $('#transaction_no_add').hide().val('');
+                }
+            });
+
+            $('#bank_price').on('input', function() {
+                const unformat = v => parseFloat(String(v).replace(/,/g, '')) || 0;
+                if (unformat($(this).val()) > 0) {
+                    $('#transaction_no').show();
+                } else {
+                    $('#transaction_no').hide().val('');
+                }
+            });
 
 
         });

@@ -60,6 +60,12 @@
                                     <td>{{ $expense->bankName->tree4_name }}</td>
                                 </tr>
                             @endif
+                            @if ($expense->transaction_no)
+                                <tr>
+                                    <td><strong>رقم عملية البنك:</strong></td>
+                                    <td>{{ $expense->transaction_no }}</td>
+                                </tr>
+                            @endif
 
                             <tr>
                                 <td><strong>المبلغ:</strong></td>

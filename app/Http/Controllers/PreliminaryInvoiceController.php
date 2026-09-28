@@ -100,6 +100,7 @@ class PreliminaryInvoiceController extends Controller
             $preliminaryInvoice->delete();
 
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
+            $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
             $sale_invoice = SaleInvoice::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
@@ -116,6 +117,7 @@ class PreliminaryInvoiceController extends Controller
                     'bank_name' => $request->get('bank_name'),
                     'cash_amount_total' => $request->get('cash_amount_total'),
                     'bank_amount_total' => $request->get('bank_amount_total'),
+                    'transaction_no' => $transaction_no,
                     'deferend_amount' => $request->get('deferend_amount'),
                     'process_no' => $request->get('process_no'),
                     'invoice_status' => $invoice_status,
@@ -183,9 +185,9 @@ class PreliminaryInvoiceController extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date);
+                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date, $transaction_no);
 
-                    $this->restriction(3, 420100001, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date);
+                    $this->restriction(3, 420100001, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date, $transaction_no);
                 }
             } else {
                 $customer = Tree4::find($request->customer_id);
@@ -205,9 +207,9 @@ class PreliminaryInvoiceController extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date);
+                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date, $transaction_no);
 
-                    $this->restriction($customer->id, $customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date);
+                    $this->restriction($customer->id, $customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date, $transaction_no);
                 }
             }
 
@@ -230,7 +232,7 @@ class PreliminaryInvoiceController extends Controller
         return back()->with('success_deleted', 'Product deleted successfully.');
     }
 
-    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $sale_invoice, $node, $date): Restriction
+    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $sale_invoice, $node, $date, $transactionNo = null): Restriction
     {
         return Restriction::create(
             attributes: [
@@ -241,6 +243,7 @@ class PreliminaryInvoiceController extends Controller
                 'date' => $date,
                 'node' => $node,
                 'constant_number' => $constant_number,
+                'transaction_no' => $transactionNo,
                 'type' => 1,
                 'sale_invoice_id' => $sale_invoice->id,
                 'user_id' => Auth::id(),

@@ -28,12 +28,14 @@ class RevenueController extends Controller
         try {
             DB::beginTransaction();
             $sum = 0;
+            $transaction_no = (float) str_replace(',', '', $request->madin_name[1] ?? '') > 0 ? $request->transaction_no : null;
             $revenue = Revenue::create([
                 'dain_id' => $request->dain,
                 'bank_id' => $request->madin_id[1] ?? null,
                 'cach_id' => $request->madin_id[0] ?? null,
                 'cach_name' => $request->madin_name[0] ?? null,
                 'bank_name' => $request->madin_name[1] ?? null,
+                'transaction_no' => $transaction_no,
                 'branch_id' => session('branch_id'),
                 'note' => $request->note,
             ]);
@@ -46,11 +48,11 @@ class RevenueController extends Controller
                     continue;
                 }
                 $madin = Tree4::findOrFail($madinId);
-                $this->restriction($madin->id, $madin->tree4_code, $request->madin_name[$index], 0, $constant_number, $revenue, $request->note);
+                $this->restriction($madin->id, $madin->tree4_code, $request->madin_name[$index], 0, $constant_number, $revenue, $request->note, $index == 1 ? $transaction_no : null);
                 $sum += $request->madin_name[$index];
             }
             $dain = Tree4::findOrFail($request->dain);
-            $this->restriction($dain->id, $dain->tree4_code, 0, $sum, $constant_number, $revenue, $request->note);
+            $this->restriction($dain->id, $dain->tree4_code, 0, $sum, $constant_number, $revenue, $request->note, $transaction_no);
             DB::commit();
             // return view('revenue.print', ['revenue' => $operation]);
             return redirect()->route('revenue.show', $revenue->id);
@@ -71,12 +73,14 @@ class RevenueController extends Controller
             DB::beginTransaction();
             $revenue->delete();
             $sum = 0;
+            $transaction_no = (float) str_replace(',', '', $request->madin_name[1] ?? '') > 0 ? $request->transaction_no : null;
             $revenue = Revenue::create([
                 'dain_id' => $request->dain,
                 'bank_id' => $request->madin_id[1] ?? null,
                 'cach_id' => $request->madin_id[0] ?? null,
                 'cach_name' => $request->madin_name[0] ?? null,
                 'bank_name' => $request->madin_name[1] ?? null,
+                'transaction_no' => $transaction_no,
                 'branch_id' => session('branch_id'),
                 'note' => $request->note,
             ]);
@@ -89,11 +93,11 @@ class RevenueController extends Controller
                     continue;
                 }
                 $madin = Tree4::findOrFail($madinId);
-                $this->restriction($madin->id, $madin->tree4_code, $request->madin_name[$index], 0, $constant_number, $revenue, $request->note);
+                $this->restriction($madin->id, $madin->tree4_code, $request->madin_name[$index], 0, $constant_number, $revenue, $request->note, $index == 1 ? $transaction_no : null);
                 $sum += $request->madin_name[$index];
             }
             $dain = Tree4::findOrFail($request->dain);
-            $this->restriction($dain->id, $dain->tree4_code, 0, $sum, $constant_number, $revenue, $request->note);
+            $this->restriction($dain->id, $dain->tree4_code, 0, $sum, $constant_number, $revenue, $request->note, $transaction_no);
             DB::commit();
             return redirect()->route('revenue.show', $revenue->id);
         } catch (\Exception $exception) {
@@ -115,7 +119,7 @@ class RevenueController extends Controller
         }
     }
 
-    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $revenue, $node): Restriction
+    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $revenue, $node, $transactionNo = null): Restriction
     {
         return Restriction::create(
             attributes: [
@@ -126,6 +130,7 @@ class RevenueController extends Controller
                 'date' => today(),
                 'node' => $node,
                 'constant_number' => $constant_number,
+                'transaction_no' => $transactionNo,
                 'revenue_id' => $revenue->id,
                 'type' => 8,
                 'branch_id' => session('branch_id'),

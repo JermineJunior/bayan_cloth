@@ -82,7 +82,7 @@
                                                     <td>{{ number_format($operation->price,2) }}</td>
                                                     <td>{{ $operation->user }}</td>
                                                     <td>{{ $operation->node }}</td>
-                                                    <td>{{ $operation->constant_number }}</td>
+                                                    <td>{{ $operation->transaction_no ?? $operation->constant_number }}</td>
                                                     <td>{{ $operation->date }}</td>
                                                 </tr>
                                                 {{-- @endforeach --}}

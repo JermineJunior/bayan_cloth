@@ -245,6 +245,13 @@
                                                             {{ number_format($purchase_invoice->bank_amount_total, 2) }}
                                                         </td>
                                                     </tr>
+                                                    @if ($purchase_invoice->transaction_no)
+                                                        <tr>
+                                                            <td colspan="5"></td>
+                                                            <td>رقم عملية البنك</td>
+                                                            <td>{{ $purchase_invoice->transaction_no }}</td>
+                                                        </tr>
+                                                    @endif
                                                     <tr>
                                                         <td colspan="5"></td>
                                                         <td> اجل</td>

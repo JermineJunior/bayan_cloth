@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Expense;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreExpenseRequest extends FormRequest
 {
@@ -23,6 +24,14 @@ class StoreExpenseRequest extends FormRequest
     {
         return [
             'madin' =>'required|exists:tree4s,id',
+            'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn () => (float) str_replace(',', '', $this->dain_name[1] ?? '') > 0)],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'transaction_no.required' => 'يرجى إدخال رقم عملية البنك.',
         ];
     }
 }

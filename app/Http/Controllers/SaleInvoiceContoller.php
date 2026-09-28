@@ -16,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 use App\Http\Requests\SaleInvoice\StoreSaleInvoiceRequest;
 use App\Http\Requests\SaleInvoice\UpdateSaleInvoiceRequest;
 
@@ -46,6 +47,7 @@ class SaleInvoiceContoller extends Controller
         try {
             DB::beginTransaction();
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
+            $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
             $sale_invoice = SaleInvoice::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
@@ -62,6 +64,7 @@ class SaleInvoiceContoller extends Controller
                     'bank_name' => $request->get('bank_name'),
                     'cash_amount_total' => $request->get('cash_amount_total'),
                     'bank_amount_total' => $request->get('bank_amount_total'),
+                    'transaction_no' => $transaction_no,
                     'deferend_amount' => $request->get('deferend_amount'),
                     'process_no' => $request->get('process_no'),
                     'invoice_status' => $invoice_status,
@@ -129,9 +132,9 @@ class SaleInvoiceContoller extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date);
+                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date, $transaction_no);
 
-                    $this->restriction(3, 420100001, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date);
+                    $this->restriction(3, 420100001, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date, $transaction_no);
                 }
             } else {
                 $customer = Tree4::find($request->customer_id);
@@ -151,9 +154,9 @@ class SaleInvoiceContoller extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date);
+                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date, $transaction_no);
 
-                    $this->restriction($customer->id, $customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date);
+                    $this->restriction($customer->id, $customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date, $transaction_no);
                 }
             }
 
@@ -206,9 +209,9 @@ class SaleInvoiceContoller extends Controller
             DB::beginTransaction();
 
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
+            $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
 
             $oldDetails = $sale_invoice->details;
-
             foreach ($oldDetails as $item) {
                 $product = Product::with(['stocks', 'units'])->find($item->product_id);
                 if (!$product) {
@@ -244,6 +247,7 @@ class SaleInvoiceContoller extends Controller
                 'bank_name' => $request->bank_name,
                 'cash_amount_total' => $request->cash_amount_total,
                 'bank_amount_total' => $request->bank_amount_total,
+                'transaction_no' => $transaction_no,
                 'deferend_amount' => $request->deferend_amount,
                 'process_no' => $request->process_no,
                 'invoice_status' => $invoice_status,
@@ -306,9 +310,9 @@ class SaleInvoiceContoller extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date);
+                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date, $transaction_no);
 
-                    $this->restriction(3, 420100001, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date);
+                    $this->restriction(3, 420100001, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات بنك', $sale_invoice->date, $transaction_no);
                 }
             } else {
                 $customer = Tree4::find($request->customer_id);
@@ -328,9 +332,9 @@ class SaleInvoiceContoller extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date);
+                    $this->restriction($bank->id, $bank->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date, $transaction_no);
 
-                    $this->restriction($customer->id, $customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date);
+                    $this->restriction($customer->id, $customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'سداد بنك', $sale_invoice->date, $transaction_no);
                 }
             }
 
@@ -401,7 +405,7 @@ class SaleInvoiceContoller extends Controller
         ]);
     }
 
-    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $sale_invoice, $node, $date): Restriction
+    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $sale_invoice, $node, $date, $transactionNo = null): Restriction
     {
         return Restriction::create(
             attributes: [
@@ -412,6 +416,7 @@ class SaleInvoiceContoller extends Controller
                 'date' => $date,
                 'node' => $node,
                 'constant_number' => $constant_number,
+                'transaction_no' => $transactionNo,
                 'type' => 1,
                 'sale_invoice_id' => $sale_invoice->id,
                 'user_id' => Auth::id(),
@@ -493,10 +498,21 @@ class SaleInvoiceContoller extends Controller
             return back()->withErrors('يجب ادخال المبالغ في الكاش او في البنك ');
         }
 
+        $request->validate([
+            'cash_amount_total' => 'nullable|numeric',
+            'bank_amount_total' => 'nullable|numeric',
+            'cash_name' => 'nullable|exists:tree4s,id',
+            'bank_name' => 'nullable|exists:tree4s,id',
+            'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn () => (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0)],
+        ], [
+            'transaction_no.required' => 'يرجى إدخال رقم عملية البنك.',
+        ]);
+
         if ($request->cash_amount_total + $request->bank_amount_total > $sale_invoice->total_amount) {
             return back()->withErrors('يجب ان يكون مجموع المدفوع بالبنك او الكاش اصغر او يساوي اجمالي الفاتورة ');
         }
 
+        $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
         $total = $request->cash_amount_total + $request->bank_amount_total;
         $last_constant_number = Restriction::where('branch_id', session('branch_id'))->max('constant_number');
         $constant_number = $last_constant_number ? $last_constant_number + 1 : 1;
@@ -511,8 +527,8 @@ class SaleInvoiceContoller extends Controller
         if ($request->bank_amount_total != '') {
             $tree4 = Tree4::find($request->bank_name);
 
-            $this->restriction($tree4->id, $tree4->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات تم الدفع بالبنك عن طريق عميل', $sale_invoice->date);
-            $this->restriction($tree4_customer->id, $tree4_customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات تم الدفع بالبنك عن طريق عميل', $sale_invoice->date);
+            $this->restriction($tree4->id, $tree4->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice, 'فاتورة مبيعات تم الدفع بالبنك عن طريق عميل', $sale_invoice->date, $transaction_no);
+            $this->restriction($tree4_customer->id, $tree4_customer->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice, 'فاتورة مبيعات تم الدفع بالبنك عن طريق عميل', $sale_invoice->date, $transaction_no);
         }
 
         $sale_invoice->update(['deferend_amount' => $sale_invoice->deferend_amount - $total]);

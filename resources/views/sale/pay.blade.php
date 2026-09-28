@@ -233,6 +233,12 @@
                                             class="form-control" placeholder="المبلغ بالبنك">
                                     </div>
                                 </div>
+                                <div class="row" id="transaction_no_row" style="display:none;">
+                                    <div class="col-md-12">
+                                        <input type="text" name="transaction_no" id="transaction_no"
+                                            class="form-control" placeholder="رقم العملية">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -318,8 +324,25 @@
             attachCommaFormatter('#cash_amount_total');
             attachCommaFormatter('#bank_amount_total');
 
+            $('#bank_amount_total').on('input', function() {
+                const bank = parseFloat(String($(this).val()).replace(/,/g, '')) || 0;
+                if (bank > 0) {
+                    $('#transaction_no_row').show();
+                } else {
+                    $('#transaction_no_row').hide();
+                    $('#transaction_no').val('');
+                }
+            });
+
             document.getElementById('payForm').addEventListener('submit', function(e) {
                 cleanNumbersBeforeSubmit();
+                const bank = parseFloat(String((document.getElementById('bank_amount_total') || {}).value || '').replace(/,/g, '')) || 0;
+                const tx = (document.getElementById('transaction_no') || {}).value || '';
+                if (bank > 0 && String(tx).trim() === '') {
+                    e.preventDefault();
+                    alert('يرجى إدخال رقم عملية البنك');
+                    return;
+                }
             });
 
             function cleanNumbersBeforeSubmit() {

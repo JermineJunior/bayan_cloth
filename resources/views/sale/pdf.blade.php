@@ -171,6 +171,13 @@
                     <td><strong>مدفوع بالبنك</strong></td>
                     <td>{{ number_format($sale_invoice->bank_amount_total, 2) }}</td>
                 </tr>
+                @if ($sale_invoice->transaction_no)
+                    <tr>
+                        <td colspan="6"></td>
+                        <td><strong>رقم عملية البنك</strong></td>
+                        <td>{{ $sale_invoice->transaction_no }}</td>
+                    </tr>
+                @endif
                 <tr>
                     <td colspan="6"></td>
                     <td><strong>أجل</strong></td>

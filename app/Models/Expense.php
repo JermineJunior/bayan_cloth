@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Expense extends Model
 {
-    protected $fillable = ['madin_id', 'cach_id', 'bank_id', 'cach_name', 'bank_name', 'note','branch_id'];
+    protected $fillable = ['madin_id', 'cach_id', 'bank_id', 'cach_name', 'bank_name', 'transaction_no', 'note','branch_id'];
 
     public function cach(): BelongsTo
     {

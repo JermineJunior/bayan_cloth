@@ -3,6 +3,7 @@
 namespace App\Http\Requests\PurchaseReturn;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePurchaseReturnRequest extends FormRequest
 {
@@ -22,7 +23,7 @@ class UpdatePurchaseReturnRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn () => (float) str_replace(',', '', $this->bank_amount_total ?? '') > 0)],
         ];
     }
 }

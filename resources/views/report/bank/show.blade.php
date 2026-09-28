@@ -86,7 +86,7 @@
                                                 @foreach ($operations as $operation)
                                                     <tr>
                                                         <th scope="row">{{ $loop->iteration }}</th>
-                                                        <td>{{ $operation->constant_number }}</td>
+                                                        <td>{{ $operation->transaction_no ?? $operation->constant_number }}</td>
                                                         @if ($operation->type == 1)
                                                             <td> مبيعات</td>
                                                         @elseif($operation->type == 2)

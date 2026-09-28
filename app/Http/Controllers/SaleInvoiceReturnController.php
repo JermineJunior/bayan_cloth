@@ -40,6 +40,7 @@ class SaleInvoiceReturnController extends Controller
         try {
             DB::beginTransaction();
             $invoice_status = $request->deferend_amount != '' ? 0 : 1;
+            $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
             $sale_invoice_return = SaleInvoiceReturn::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
@@ -57,6 +58,7 @@ class SaleInvoiceReturnController extends Controller
                     'bank_name' => $request->get('bank_name'),
                     'cash_amount_total' => $request->get('cash_amount_total'),
                     'bank_amount_total' => $request->get('bank_amount_total'),
+                    'transaction_no' => $transaction_no,
                     'process_no' => $request->get('process_no'),
                     'deferend_amount' => $request->get('deferend_amount'),
                     'invoice_status' => $invoice_status,
@@ -119,9 +121,9 @@ class SaleInvoiceReturnController extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction(4, 520100001, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date);
+                    $this->restriction(4, 520100001, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date, $transaction_no);
 
-                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date);
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date, $transaction_no);
                 }
             } else {
                 $supplier = Tree4::find($request->supplier_id);
@@ -141,9 +143,9 @@ class SaleInvoiceReturnController extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date);
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date, $transaction_no);
 
-                    $this->restriction($supplier->id, $supplier->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date);
+                    $this->restriction($supplier->id, $supplier->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date, $transaction_no);
                 }
             }
 
@@ -182,6 +184,7 @@ class SaleInvoiceReturnController extends Controller
         try {
             DB::beginTransaction();
             $invoice_status = $request->deferend_amount != '' ? 0 : 1;
+            $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
 
             $oldDetails = $sale_invoice_return->details;
 
@@ -225,6 +228,7 @@ class SaleInvoiceReturnController extends Controller
                     'bank_name' => $request->get('bank_name'),
                     'cash_amount_total' => $request->get('cash_amount_total'),
                     'bank_amount_total' => $request->get('bank_amount_total'),
+                    'transaction_no' => $transaction_no,
                     'process_no' => $request->get('process_no'),
                     'deferend_amount' => $request->get('deferend_amount'),
                     'invoice_status' => $invoice_status,
@@ -282,9 +286,9 @@ class SaleInvoiceReturnController extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction(4, 520100001, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date);
+                    $this->restriction(4, 520100001, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date, $transaction_no);
 
-                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date);
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'فاتورة مشتريات تم الدفع عن طريق البنك', $sale_invoice_return->date, $transaction_no);
                 }
             } else {
                 $supplier = Tree4::find($request->supplier_id);
@@ -304,9 +308,9 @@ class SaleInvoiceReturnController extends Controller
                 if (!empty($request->bank_amount_total)) {
                     $bank = Tree4::find($request->bank_name);
 
-                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date);
+                    $this->restriction($bank->id, $bank->tree4_code, 0, $request->bank_amount_total, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date, $transaction_no);
 
-                    $this->restriction($supplier->id, $supplier->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date);
+                    $this->restriction($supplier->id, $supplier->tree4_code, $request->bank_amount_total, 0, $constant_number, $sale_invoice_return, 'سداد بنك للمورد', $sale_invoice_return->date, $transaction_no);
                 }
             }
 
@@ -338,7 +342,7 @@ class SaleInvoiceReturnController extends Controller
         return back()->with('success_deleted', 'تم الحذف بنجاح ');
     }
 
-    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $sale_invoice_return, $node, $date): Restriction
+    private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $sale_invoice_return, $node, $date, $transactionNo = null): Restriction
     {
         return Restriction::create(
             attributes: [
@@ -349,6 +353,7 @@ class SaleInvoiceReturnController extends Controller
                 'date' => $date,
                 'node' => $node,
                 'constant_number' => $constant_number,
+                'transaction_no' => $transactionNo,
                 'type' => 3,
                 'sale_invoice_return_id' => $sale_invoice_return->id,
                 'branch_id' => session('branch_id'),
