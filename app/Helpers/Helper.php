@@ -17,6 +17,41 @@ if (!function_exists('GeneralSiteSettings')) {
     }
 }
 
+if (!function_exists('groupPermissions')) {
+    // دالة لتجميع الأذونات حسب المجموعات المعرفة في config/permission_groups.php
+    function groupPermissions($permissions): array
+    {
+        $permissions = collect($permissions);
+        $byName = $permissions->keyBy('name');
+
+        $grouped = [];
+        $groupedNames = [];
+
+        foreach (config('permission_groups', []) as $groupName => $names) {
+            $items = [];
+
+            foreach ($names as $name) {
+                if ($byName->has($name)) {
+                    $items[] = $byName->get($name);
+                    $groupedNames[$name] = true;
+                }
+            }
+
+            if (count($items)) {
+                $grouped[] = ['name' => $groupName, 'permissions' => $items];
+            }
+        }
+
+        $others = $permissions->reject(fn ($permission) => isset($groupedNames[$permission->name]))->values();
+
+        if ($others->isNotEmpty()) {
+            $grouped[] = ['name' => 'أخرى', 'permissions' => $others];
+        }
+
+        return $grouped;
+    }
+}
+
 
     // دالة لتحديد الحساب بناءً على tree3_code
     // public static function no_account($item)

@@ -98,6 +98,25 @@
                                     @enderror
                                 </div>
                             </div>
+                            <div class="col-md-12">
+                                <label class="form-label mb-1">شعار المؤسسة</label>
+                                <div class="d-flex align-items-center gap-3 flex-wrap">
+                                    <img id="preview" style="max-height: 90px; max-width: 150px; background: #fff; padding: 6px;"
+                                        class="border rounded"
+                                        src="{{ $info->logo ? asset('image/logo/' . $info->logo) : Avatar::create('شعار') }}"
+                                        alt="شعار المؤسسة">
+                                    <div class="flex-grow-1">
+                                        <input type="file" id="logo" name="logo" class="form-control"
+                                            accept=".jpg,.jpeg,.png,.webp" onchange="previewImage(this)">
+                                        <small class="text-muted d-block mt-1">
+                                            الصيغ المسموحة: JPG, PNG, WEBP &mdash; الحد الأقصى للحجم 2 ميجابايت
+                                        </small>
+                                        @error('logo')
+                                            <span class="text-danger"><strong>{{ $message }}</strong></span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary px-4">
                                     <i class="fas fa-save"></i> حفظ البيانات
@@ -119,6 +138,9 @@
     <script src="{{ URL::asset('assets/plugins/notify/js/notifit-custom.js') }}"></script>
     <script>
         function previewImage(event) {
+            if (!event.target.files || !event.target.files[0]) {
+                return;
+            }
             var reader = new FileReader();
             reader.onload = function() {
                 var output = document.getElementById('preview');

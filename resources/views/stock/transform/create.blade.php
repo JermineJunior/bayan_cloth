@@ -116,7 +116,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="body_search">
-                                            @foreach ($stocks_from[0]->products as $product)
+                                            @foreach ($stocks_from->first()?->products ?? [] as $product) // dont produce error if no stock product exist
                                                 <tr>
                                                     @if ($product->pivot->quantity == 0)
                                                         @continue

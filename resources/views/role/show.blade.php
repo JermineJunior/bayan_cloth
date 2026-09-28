@@ -6,13 +6,33 @@
 
     <style>
         .permission-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 15px;
             background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
             border: 1px solid #dee2e6;
+        }
+
+        .permission-group {
+            margin-bottom: 20px;
+        }
+
+        .permission-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .permission-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .permission-group-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #dee2e6;
         }
 
         .permission-label {
@@ -94,11 +114,18 @@
                     <div class="mt-4">
                         <h5 class="mb-3">الأذونات المرتبطة</h5>
                         <div class="permission-container">
-                            @foreach ($role->permissions as $permission)
-                                <label class="permission-label">
-                                    <span class="permission-icon"><i class="fas fa-shield-alt"></i></span>
-                                    {{ $permission->name }}
-                                </label>
+                            @foreach (groupPermissions($role->permissions) as $group)
+                                <div class="permission-group">
+                                    <h6 class="permission-group-title">{{ $group['name'] }}</h6>
+                                    <div class="permission-items">
+                                        @foreach ($group['permissions'] as $permission)
+                                            <label class="permission-label">
+                                                <span class="permission-icon"><i class="fas fa-shield-alt"></i></span>
+                                                {{ $permission->name }}
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
                             @endforeach
                         </div>
                     </div>

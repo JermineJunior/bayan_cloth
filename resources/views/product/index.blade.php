@@ -204,7 +204,7 @@
 
                             <div class="input-group">
                                 <input type="number" name="percent" id="percent" class="form-control"
-                                    placeholder="مثال: 10" min="0" step="0.01" required>
+                                    placeholder="مثال: 10"  step="0.01" required>
 
                                 <div class="input-group-append">
                                     <span class="input-group-text">%</span>

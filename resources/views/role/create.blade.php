@@ -5,12 +5,24 @@
     <!--Internal  treeview -->
     <style>
         .permission-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
             background: #f8f9fa;
             padding: 10px;
             border-radius: 5px;
+        }
+
+        .permission-group {
+            margin-bottom: 20px;
+            margin-top: 12px;
+        }
+
+        .permission-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .permission-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
         }
 
         .permission-label {
@@ -22,6 +34,35 @@
             background: #fff;
             border-radius: 5px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .permission-group-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .permission-group-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0;
+        }
+
+        .permission-group-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            font-size: 13px;
+            font-weight: normal;
+            color: #6c757d;
+            white-space: nowrap;
+            cursor: pointer;
         }
 
         .custom-checkbox {
@@ -88,12 +129,25 @@
                         <div id="permission-error" class="text-danger"></div>
 
                         <div class="permission-container">
-                            @foreach ($permissions as $permission)
-                                <label class="permission-label">
-                                    <input type="checkbox" class="custom-checkbox permission-checkbox" name="permission[]"
-                                        value="{{ $permission->name }}">
-                                    {{ $permission->name }}
-                                </label>
+                            @foreach (groupPermissions($permissions) as $group)
+                                <div class="permission-group">
+                                    <div class="permission-group-header">
+                                        <h6 class="permission-group-title">{{ $group['name'] }}</h6>
+                                        <label class="permission-group-toggle">
+                                            <input type="checkbox" class="custom-checkbox permission-group-checkbox">
+                                            تحديد الكل
+                                        </label>
+                                    </div>
+                                    <div class="permission-items">
+                                        @foreach ($group['permissions'] as $permission)
+                                            <label class="permission-label">
+                                                <input type="checkbox" class="custom-checkbox permission-checkbox"
+                                                    name="permission[]" value="{{ $permission->name }}">
+                                                {{ $permission->name }}
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
                             @endforeach
                         </div>
                         <div class="col-md-12 text-center mt-3">
@@ -114,7 +168,29 @@
     <script src="{{ URL::asset('assets/plugins/form_validation/additional-methods.min.js') }}"></script>
     <script src="{{ URL::asset('assets/plugins/form_validation/messages_ar.js') }}"></script>
     <script>
+        function syncPermissionGroups() {
+            $(".permission-group").each(function() {
+                let items = $(this).find(".permission-checkbox");
+                let groupCheckbox = $(this).find(".permission-group-checkbox");
+                let checkedCount = items.filter(":checked").length;
+                let allChecked = items.length > 0 && checkedCount === items.length;
+
+                groupCheckbox.prop("checked", allChecked);
+                groupCheckbox.prop("indeterminate", checkedCount > 0 && !allChecked);
+            });
+        }
+
+        $(document).on("change", ".permission-group-checkbox", function() {
+            $(this).closest(".permission-group").find(".permission-checkbox").prop("checked", this.checked);
+        });
+
+        $(document).on("change", ".permission-checkbox", function() {
+            syncPermissionGroups();
+        });
+
         $(document).ready(function() {
+            syncPermissionGroups();
+
             $("#toggle-permissions").click(function() {
                 let checkboxes = $(".permission-checkbox");
                 let allChecked = checkboxes.length === checkboxes.filter(":checked").length;
@@ -125,6 +201,7 @@
                     checkboxes.prop("checked", true);
                     $(this).text("إلغاء التحديد").removeClass("btn-primary").addClass("btn-danger");
                 }
+                syncPermissionGroups();
             });
 
             $('#roleForm').validate({

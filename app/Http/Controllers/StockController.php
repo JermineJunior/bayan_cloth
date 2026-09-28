@@ -70,15 +70,24 @@ class StockController extends Controller
     public function transform_create(): View
     {
         $stocks_from = Stock::get();
-        $products = Product::with('stocks', 'units')
-            ->whereHas('stocks', function ($q) use ($stocks_from) {
-                $q->where('stock_id', $stocks_from[0]);
-            })
-            ->inRandomOrder()
-            ->take(7)
-            ->get();
-        $stocks_to = Stock::where('id', '!=', $stocks_from->first()->id)
-            ->get();
+
+        $products = collect();
+        $stocks_to = collect();
+
+        if ($stocks_from->isNotEmpty()) {
+            $sourceStock = $stocks_from->first();
+
+            $products = Product::with('stocks', 'units')
+                ->whereHas('stocks', function ($q) use ($sourceStock) {
+                    $q->where('stock_id', $sourceStock->id);
+                })
+                ->inRandomOrder()
+                ->take(7)
+                ->get();
+
+            $stocks_to = Stock::where('id', '!=', $sourceStock->id)
+                ->get();
+        }
         return view('stock.transform.create', compact('products', 'stocks_from', 'stocks_to'));
     }
 
