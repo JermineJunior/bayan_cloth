@@ -86,6 +86,10 @@
                                 <a href="#" class="modal-effect btn btn-info" data-target="#percentModal"
                                     data-toggle="modal"> تغيير
                                     الاسعار بالنسبة</a>
+                                <div class="custom-control custom-checkbox align-self-center">
+                                    <input type="checkbox" class="custom-control-input" id="no_price_filter">
+                                    <label class="custom-control-label" for="no_price_filter">بدون سعر فقط</label>
+                                </div>
                             </div>
 
                             <!-- زر الرجوع -->
@@ -125,8 +129,18 @@
                                         </td>
                                         <td>{{ $product->category->name }}</td>
                                         <td>{{ $product->expire_date }}</td>
-                                        <td>{{ number_format($product->units[0]->pivot->price ?? 0) }}</td>
-                                        <td>{{ number_format($product->units[0]->pivot->price_purchase ?? 0) }}</td>
+                                        <td data-zero-price="{{ (($product->units[0]->pivot->price ?? 0) == 0) ? '1' : '0' }}">
+                                            {{ number_format($product->units[0]->pivot->price ?? 0) }}
+                                            @if (($product->units[0]->pivot->price ?? 0) == 0)
+                                                <span class="badge badge-warning">غير محدد</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            {{ number_format($product->units[0]->pivot->price_purchase ?? 0) }}
+                                            @if (($product->units[0]->pivot->price_purchase ?? 0) == 0)
+                                                <span class="badge badge-warning">غير محدد</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             @can('تعديل منتج')
                                                 <a class="btn btn-outline-success btn-sm"
@@ -289,6 +303,20 @@
                 placeholder:'الاقسام',
                 width:'100%'
             });
+            let productsTable = $('#example1').DataTable();
+
+            $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                if (!$('#no_price_filter').is(':checked')) {
+                    return true;
+                }
+                const cells = settings.aoData[dataIndex].nTr.getElementsByTagName('td');
+                return cells[6] && cells[6].getAttribute('data-zero-price') === '1';
+            });
+
+            $('#no_price_filter').on('change', function() {
+                productsTable.draw();
+            });
+
             $('#deleteModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
                 var id = button.data('id');

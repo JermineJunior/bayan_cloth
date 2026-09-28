@@ -57,9 +57,9 @@ class ProductController extends Controller
             $units = collect($request->units)->mapWithKeys(function ($unit) {
                 return [
                     $unit['unit_id'] => [
-                        'price' => $unit['price'],
+                        'price' => $unit['price'] ?? 0,
                         'conversion_factor' => $unit['conversion_factor'],
-                        'price_purchase' => $unit['price_purchase'],
+                        'price_purchase' => $unit['price_purchase'] ?? 0,
                     ],
                 ];
             });
@@ -158,9 +158,9 @@ class ProductController extends Controller
                 ->mapWithKeys(function ($unit) {
                     return [
                         $unit['unit_id'] => [
-                            'price' => $unit['price'],
+                            'price' => $unit['price'] ?? 0,
                             'conversion_factor' => $unit['conversion_factor'],
-                            'price_purchase' => $unit['price_purchase'],
+                            'price_purchase' => $unit['price_purchase'] ?? 0,
                         ],
                     ];
                 })

@@ -16,6 +16,33 @@ class UpdateProductRequest extends FormRequest
     }
 
     /**
+     * Convert blank prices to 0 before validation, so an existing unit can be
+     * saved with a 0 price instead of failing on the NOT NULL price columns.
+     */
+    protected function prepareForValidation(): void
+    {
+        if (! is_array($this->units)) {
+            return;
+        }
+
+        $this->merge([
+            'units' => collect($this->units)->map(function ($unit) {
+                if (! is_array($unit)) {
+                    return $unit;
+                }
+
+                foreach (['price', 'price_purchase'] as $field) {
+                    if (! array_key_exists($field, $unit) || $unit[$field] === null || $unit[$field] === '') {
+                        $unit[$field] = 0;
+                    }
+                }
+
+                return $unit;
+            })->all(),
+        ]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
@@ -29,6 +56,8 @@ class UpdateProductRequest extends FormRequest
             'stock_id.*' => 'required|exists:stocks,id',
             'reorder_level' => 'nullable|integer|min:0',
             'units.*.unit_id' => 'required|exists:units,id',
+            'units.*.price' => 'nullable|numeric|min:0',
+            'units.*.price_purchase' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -47,6 +76,10 @@ class UpdateProductRequest extends FormRequest
             'expire_date.after_or_equal' => 'تاريخ الصلاحية يجب أن يكون اليوم أو بعده.',
             'units.*.unit_id.required' => 'يرجى اختيار الوحدة.',
             'units.*.unit_id.exists' => 'الوحدة المحددة غير موجودة.',
+            'units.*.price.numeric' => 'سعر البيع يجب أن يكون رقمًا.',
+            'units.*.price.min' => 'سعر البيع يجب أن يكون أكبر من أو يساوي صفر.',
+            'units.*.price_purchase.numeric' => 'سعر الشراء يجب أن يكون رقمًا.',
+            'units.*.price_purchase.min' => 'سعر الشراء يجب أن يكون أكبر من أو يساوي صفر.',
         ];
     }
 }

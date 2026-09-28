@@ -122,13 +122,15 @@
                                         <div class="col-md-3">
                                             <label for="price" class="form-label">سعر البيع</label>
                                             <input type="text" name="units[0][price]" id="price"
-                                                class="form-control product_price" placeholder="ادخل سعر بيع الوحدة">
+                                                class="form-control product_price" placeholder="ادخل سعر بيع الوحدة"
+                                                value="{{ old('units.0.price', 0) }}">
                                         </div>
                                         <div class="col-md-3">
                                             <label for="price_purchase" class="form-label">سعر الشراء</label>
                                             <input type="text" name="units[0][price_purchase]" id="price_purchase"
                                                 class="form-control product_price_purchase"
-                                                placeholder="ادخل سعر الشراء الوحدة">
+                                                placeholder="ادخل سعر الشراء الوحدة"
+                                                value="{{ old('units.0.price_purchase', 0) }}">
                                         </div>
                                         <div class="col-md-3">
                                             <input type="hidden" name="units[0][conversion_factor]"
@@ -185,11 +187,11 @@
                                         </div>
                                         <div class="col-md-3">
                                             <label for="price_${unitIndex}" class="form-label">سعر البيع</label>
-                                            <input type="text" name="units[${unitIndex}][price]" id="price_${unitIndex}" class="form-control product_price" required placeholder="ادخل سعر بيع الوحدة">
+                                            <input type="text" name="units[${unitIndex}][price]" id="price_${unitIndex}" class="form-control product_price" placeholder="ادخل سعر بيع الوحدة" value="0">
                                         </div>
                                         <div class="col-md-3">
                                             <label for="price_purchase_${unitIndex}" class="form-label">سعر الشراء</label>
-                                            <input type="text" name="units[${unitIndex}][price_purchase]" id="price_purchase_${unitIndex}" class="form-control product_price_purchase" required placeholder="ادخل سعر شراء الوحدة">
+                                            <input type="text" name="units[${unitIndex}][price_purchase]" id="price_purchase_${unitIndex}" class="form-control product_price_purchase" placeholder="ادخل سعر شراء الوحدة" value="0">
                                         </div>
                                         <div class="col-md-2">
                                             <label for="conversion_factor_${unitIndex}" class="form-label">معامل الوحدة</label>
@@ -215,19 +217,15 @@
                 });
 
                 $(`#price_${unitIndex}`).rules('add', {
-                    required: true,
                     number: true,
                     messages: {
-                        required: "يرجى إدخال سعر البيع الوحدة",
                         number: "يجب أن يكون سعر البيع عددًا"
                     }
                 });
 
                 $(`#price_purchase_${unitIndex}`).rules('add', {
-                    required: true,
                     number: true,
                     messages: {
-                        required: "يرجى إدخال سعر الشراء الوحدة",
                         number: "يجب أن يكون سعر الشراء عددًا"
                     }
                 });
@@ -274,10 +272,10 @@
                         required: true,
                     },
                     'units[0][price]': {
-                        required: true,
+                        number: true,
                     },
                     'units[0][price_purchase]': {
-                        required: true,
+                        number: true,
                     },
                     'units[0][conversion_factor]': {
                         required: true,
@@ -310,10 +308,10 @@
                         required: 'يرجى اختيار الوحدة'
                     },
                     'units[0][price]': {
-                        required: 'يرجى ادخال سعر بيع الوحدة'
+                        number: 'يجب أن يكون سعر البيع رقمًا'
                     },
                     'units[0][price_purchase]': {
-                        required: 'يرجى ادخال سعر شراء الوحدة'
+                        number: 'يجب أن يكون سعر الشراء رقمًا'
                     },
                     'stocks[0][quantity]': {
                         required: 'يرجى ادخال الكمية للمخزن'

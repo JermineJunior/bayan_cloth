@@ -510,6 +510,13 @@
                                             }
                                         });
                                     totalPrice();
+
+                                    if (flagZeroPrice($('#product-rows tr').first()[0])) {
+                                        notif({
+                                            msg: 'هذا المنتج ليس له سعر بيع محدد',
+                                            type: 'warning'
+                                        });
+                                    }
                                 } else {
                                     notif({
                                         msg: data.message,
@@ -561,6 +568,7 @@
                         maximumFractionDigits: 2
                     }));
                 totalPrice();
+                flagZeroPrice(closestRow[0]);
             });
 
             $('#product-rows').on('change', '.unit_id', function() {
@@ -600,6 +608,13 @@
                                 maximumFractionDigits: 2
                             }));
                         totalPrice();
+
+                        if (flagZeroPrice(currentRow[0])) {
+                            notif({
+                                msg: 'هذا المنتج ليس له سعر بيع محدد',
+                                type: 'warning'
+                            });
+                        }
                     } else {
                         notif({
                             msg: data.message,
@@ -1112,6 +1127,13 @@
 
                             totalPrice();
 
+                            if (flagZeroPrice($('#product-rows tr').first()[0])) {
+                                notif({
+                                    msg: 'هذا المنتج ليس له سعر بيع محدد',
+                                    type: 'warning'
+                                });
+                            }
+
                         } else {
                             notif({
                                 msg: data.message,
@@ -1177,11 +1199,65 @@
 
 
             document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+                const zeroPriceNames = getZeroPriceRows();
+                if (zeroPriceNames.length) {
+                    const msg = 'هذه المنتجات ليس لها سعر بيع محدد:\n' +
+                        zeroPriceNames.join('\n') +
+                        '\n\nلا يزال بإمكانك الحفظ، هل تريد المتابعة؟';
+                    if (!confirm(msg)) {
+                        e.preventDefault();
+                        return;
+                    }
+                }
                 cleanNumbersBeforeSubmit();
             });
 
         });
 
+
+        /* ـــ الدوال المساعدة للتحذير من الأسعار غير المحددة (0) ـــ */
+
+        function isZeroPriceValue(value) {
+            const clean = String(value).replace(/,/g, '').trim();
+            return clean === '' || isNaN(parseFloat(clean)) || parseFloat(clean) === 0;
+        }
+
+        function flagZeroPrice(row) {
+            if (!row) return false;
+
+            const priceInput = row.querySelector('.price');
+            if (!priceInput) return false;
+
+            const zero = isZeroPriceValue(priceInput.value);
+            priceInput.classList.toggle('border-warning', zero);
+            priceInput.classList.toggle('zero-price', zero);
+
+            let hint = row.querySelector('.zero-price-hint');
+            if (zero) {
+                if (!hint) {
+                    hint = document.createElement('small');
+                    hint.className = 'zero-price-hint text-warning d-block';
+                    hint.textContent = 'السعر غير محدد';
+                    priceInput.parentNode.appendChild(hint);
+                }
+            } else if (hint) {
+                hint.remove();
+            }
+
+            return zero;
+        }
+
+        function getZeroPriceRows() {
+            const names = [];
+            document.querySelectorAll('#product-rows tr').forEach(row => {
+                const priceInput = row.querySelector('.price');
+                const nameInput = row.querySelector('.product_name');
+                if (priceInput && isZeroPriceValue(priceInput.value)) {
+                    names.push(nameInput && nameInput.value ? nameInput.value : 'منتج بدون اسم');
+                }
+            });
+            return names;
+        }
 
         function attachCommaFormatter(selector) {
 
