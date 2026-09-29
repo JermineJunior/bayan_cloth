@@ -113,18 +113,9 @@
     </style>
 @endsection
 
-{{-- @section('page-header')
-    <!-- breadcrumb -->
-    <div class="breadcrumb-header justify-content-between">
-        <div class="my-auto">
-            <div class="d-flex">
-                <h5 class="content-title mb-0 my-auto">إدارة فواتير المشتريات</h5>
-                <span class="text-muted mt-1 tx-13 mr-2 mb-0">/ فاتورة مشتريات جديدة</span>
-            </div>
-        </div>
-    </div>
-    <!-- breadcrumb -->
-@endsection --}}
+@section('page-header')
+    @include('includes.invoice-type-indicator', ['type' => 'purchase'])
+@endsection
 
 @section('content')
     <form id="invoiceForm" action="{{ route('purchase_invoice.store') }}" method="POST">

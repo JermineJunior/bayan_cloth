@@ -113,6 +113,10 @@
     </style>
 @endsection
 
+@section('page-header')
+    @include('includes.invoice-type-indicator', ['type' => 'preliminary_transform'])
+@endsection
+
 @section('content')
     <form id="invoiceForm" action="{{ route('preliminaryInvoice.transform.store', $preliminaryInvoice->id) }}" method="POST">
         @csrf

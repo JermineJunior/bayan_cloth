@@ -113,6 +113,10 @@
     </style>
 @endsection
 
+@section('page-header')
+    @include('includes.invoice-type-indicator', ['type' => 'purchase'])
+@endsection
+
 @section('content')
     <form id="invoiceForm" action="{{ route('purchase_invoice.update', $purchase_invoice->id) }}" method="POST">
         @csrf
