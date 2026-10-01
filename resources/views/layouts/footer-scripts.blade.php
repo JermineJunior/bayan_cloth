@@ -1,3 +1,7 @@
+<!-- Runtime config for front-end assets (kept out of JS files so tokens live only in the env) -->
+<script>
+    window.MAPBOX_TOKEN = @json(config('services.mapbox.token'));
+</script>
 <!-- Back-to-top -->
 <a href="#top" id="back-to-top"><i class="las la-angle-double-up"></i></a>
 <!-- JQuery min js -->
