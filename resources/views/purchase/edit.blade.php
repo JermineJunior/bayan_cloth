@@ -235,26 +235,10 @@
                     <div class="card-body scrollable-card">
                         <input type="text" name="search" id="search" class="form-control search"
                             placeholder="قم بالبحث هنا ">
-                        <div class="table-responsive">
-                            <table class="table  table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th wdith="80%">المنتج</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body_search">
-                                    @foreach ($products as $product)
-                                        <tr>
-                                            <th>{{ $product->name }}</th>
-                                            <th><a href="#"
-                                                    class="btn btn-add-invoice {{ in_array($product->id, $productIds) ? 'btn-white disabled' : 'btn-primary' }}"
-                                                    data-id="{{ $product->id }}"><i class="fa fa-plus"></i></a>
-                                            </th>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div id="body_search">
+                            @foreach ($products as $product)
+                                <a href="#" class="product-pick-item product-pick-item--grad btn btn-add-invoice {{ in_array($product->id, $productIds) ? 'btn-white disabled' : 'btn-primary' }}" data-id="{{ $product->id }}">{{ $product->name }}</a>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -1200,15 +1184,8 @@
                         result.products.forEach((product, index) => {
                             let isAdded = productIds.includes(product.id);
                             rows += `
-                                    <tr>
-                                        <td>${product.name}</td>
-                                        <td>
-                                            <a href="#" class="btn btn-add-invoice ${isAdded ? 'btn-white disabled' : 'btn-primary'}" data-id="${product.id}">
-                                                <i class="fa fa-plus"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                `;
+                                <a href="#" class="product-pick-item product-pick-item--grad btn btn-add-invoice ${isAdded ? 'btn-white disabled' : 'btn-primary'}" data-id="${product.id}">${product.name}</a>
+                            `;
                         });
 
                         tbody.append(rows);

@@ -28,33 +28,10 @@
                     <div class="card-body">
                         <input type="text" name="search" id="search" class="form-control search"
                             placeholder="قم بالبحث هنا ">
-                        <div class="table-responsive">
-                            <table class="table  table-bordered table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>المنتج</th>
-                                        {{-- <th>الكمية</th> --}}
-                                        {{-- <th>السعر</th> --}}
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="body_search">
-                                    @foreach ($products as $product)
-                                        <tr>
-                                            <th>{{ $loop->iteration }}</th>
-                                            <th>{{ $product->name }}</th>
-                                            {{-- <th>{{ $product->convertQuantity($product->stocks()->first()->pivot->quantity) }}
-                                            </th> --}}
-                                            {{-- <th>{{ number_format($product->units()->first()->pivot->price_purchase) . ' لل' . $product->units()->first()->name }}
-                                            </th> --}}
-                                            <th><a href="#" class="btn btn-primary btn-add-invoice"
-                                                    data-id="{{ $product->id }}"><i class="fa fa-plus"></i></a>
-                                            </th>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                        <div id="body_search">
+                            @foreach ($products as $product)
+                                <a href="#" class="product-pick-item product-pick-item--grad btn btn-primary btn-add-invoice" data-id="{{ $product->id }}">{{ $product->name }}</a>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -513,16 +490,8 @@
                             if (product.quantity == 0) return;
 
                             rows += `
-                                    <tr>
-                                        <td>${index + 1}</td>
-                                        <td>${product.name}</td>
-                                        <td>
-                                            <a href="#" class="btn btn-primary btn-add-invoice" data-id="${product.id}">
-                                                <i class="fa fa-plus"></i>
-                                            </a>
-                                        </td>
-                                    </tr>
-                                `;
+                                <a href="#" class="product-pick-item product-pick-item--grad btn btn-primary btn-add-invoice" data-id="${product.id}">${product.name}</a>
+                            `;
                         });
 
                         tbody.append(rows);

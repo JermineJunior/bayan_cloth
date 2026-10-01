@@ -64,7 +64,7 @@ Route::group(
         Route::get(uri: 'branch/checkName', action: [BranchController::class, 'checkName'])->name(name: 'branch.checkName');
         // Stock Route
         Route::resource(name: 'stock', controller: StockController::class)->except(methods: ['edit', 'create']);
-        Route::post(uri: '/stock/toggleStatus/{stock}', action: [StockController::class, 'toggleStatus'])->name(name: 'stock.toggleStatus');
+        Route::post(uri: '/stock/toggleStatus/{stock}', action: [StockController::class, 'toggleStatus'])->name(name: 'stock.toggleiStatus');
         Route::get(uri: '/stock/transform/list', action: [StockController::class, 'transform_list'])->name(name: 'stock.transform.list');
         Route::get(uri: '/stock/transform/create', action: [StockController::class, 'transform_create'])->name(name: 'stock.transform.create');
         Route::post(uri: '/stock/transform', action: [StockController::class, 'transform_store'])->name(name: 'stock.transform.store');
