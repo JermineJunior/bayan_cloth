@@ -1,4 +1,6 @@
 /.phpunit.cache
+.idea
+.code
 /node_modules
 /public/build
 /public/hot
@@ -6,6 +8,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+*.zip
 /docker
 .env
 .env.backup
