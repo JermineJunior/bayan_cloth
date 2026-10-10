@@ -167,6 +167,7 @@ class PermissionTableSeeder extends Seeder
             'تقرير مفصل للمخازن حسب الفترة',
             'تقرير المبيعات حسب المندوب',
             'تقرير مردود المبيعات حسب المندوب',
+            'تقرير عمولة المندوب',
             'تقرير مديونيات عملاء المندوب',
             'بيع منتجات غير متوفرة',
             'طباعة فاتورة مبيعات',
@@ -179,7 +180,7 @@ class PermissionTableSeeder extends Seeder
             'اضافة طلب شراء',
             'تعديل طلب شراء',
             'حذف طلب شراء',
-            'منصرفات مشتريات خارجية', 
+            'منصرفات مشتريات خارجية',
             'طباعة فاتورة مشتريات',
             'طباعة فاتورة مردود مبيعات',
             'طباعة فاتورة مردود مشتريات',
@@ -187,7 +188,7 @@ class PermissionTableSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(attributes: ['name' => $permission]);
+            Permission::firstOrCreate(attributes: ['name' => $permission, 'guard_name' => 'web']);
         }
     }
 }
