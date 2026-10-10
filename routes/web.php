@@ -253,6 +253,8 @@ Route::group(
         Route::post('/report/represenative/sale_invoices_return', [SaleInvoiceReportController::class, 'representative_return_show'])->name('report.sale_invoice_return.representative.show');
         Route::get('report/representative/customer', [SaleInvoiceReportController::class, 'representative_customer'])->name('report.representative.customer.index');
         Route::post('report/representative/customer', [SaleInvoiceReportController::class, 'representative_customer_show'])->name('report.representative.customer.show');
+        Route::get('report/representative/cut', [SaleInvoiceReportController::class, 'representative_cut_index'])->name('report.representative.cut.index');
+        Route::post('report/representative/cut', [SaleInvoiceReportController::class, 'representative_cut_show'])->name('report.representative.cut.show');
         Route::get('report/customer/accounting', [ReportController::class, 'customer_accouht_index'])->name('report.customer.account.index');
         Route::post('report/customer/accounting', [ReportController::class, 'customer_accouht_show'])->name('report.customer.account.show');
 
