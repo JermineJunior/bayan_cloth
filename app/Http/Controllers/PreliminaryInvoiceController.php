@@ -101,6 +101,15 @@ class PreliminaryInvoiceController extends Controller
 
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
+
+            $rep_percentage = 0;
+            $rep_cut_amount = 0;
+            if (!empty($request->representative_id)) {
+                $rep_percentage = (float) (Tree4::find($request->representative_id)->rep_percentage ?? 0);
+                $rep_base_amount = (float) $request->total - ($request->tax_status ? (float) $request->tax : 0);
+                $rep_cut_amount = round($rep_base_amount * $rep_percentage / 100, 2);
+            }
+
             $sale_invoice = SaleInvoice::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
@@ -121,6 +130,8 @@ class PreliminaryInvoiceController extends Controller
                     'deferend_amount' => $request->get('deferend_amount'),
                     'process_no' => $request->get('process_no'),
                     'invoice_status' => $invoice_status,
+                    'rep_percentage' => $rep_percentage,
+                    'rep_cut_amount' => $rep_cut_amount,
                     'branch_id' => session('branch_id'),
                     'user_id' => Auth::id(),
                 ],

@@ -20,7 +20,8 @@ class RevenueController extends Controller
         $banks = Tree4::where('tree3_code', 1203)->get();
         $safes = Tree4::where('tree3_code', 1202)->get();
         $dains = Tree4::get();
-        return view('revenue.index', compact('revenues', 'dains', 'banks', 'safes'));
+        $representatives = Tree4::where('tree3_code', 1206)->get();
+        return view('revenue.index', compact('revenues', 'dains', 'banks', 'safes', 'representatives'));
     }
 
     public function store(StoreRevenueRequest $request): View|RedirectResponse
@@ -29,12 +30,25 @@ class RevenueController extends Controller
             DB::beginTransaction();
             $sum = 0;
             $transaction_no = (float) str_replace(',', '', $request->madin_name[1] ?? '') > 0 ? $request->transaction_no : null;
+
+            $representative_id = $request->representative_id ?: null;
+            $rep_percentage = 0;
+            $rep_cut_amount = 0;
+            if ($representative_id) {
+                $rep_percentage = (float) (Tree4::find($representative_id)->rep_percentage ?? 0);
+                $base = (float) ($request->madin_name[0] ?? 0) + (float) ($request->madin_name[1] ?? 0);
+                $rep_cut_amount = round($base * $rep_percentage / 100, 2);
+            }
+
             $revenue = Revenue::create([
                 'dain_id' => $request->dain,
                 'bank_id' => $request->madin_id[1] ?? null,
                 'cach_id' => $request->madin_id[0] ?? null,
                 'cach_name' => $request->madin_name[0] ?? null,
                 'bank_name' => $request->madin_name[1] ?? null,
+                'representative_id' => $representative_id,
+                'rep_percentage' => $rep_percentage,
+                'rep_cut_amount' => $rep_cut_amount,
                 'transaction_no' => $transaction_no,
                 'branch_id' => session('branch_id'),
                 'note' => $request->note,
@@ -71,15 +85,36 @@ class RevenueController extends Controller
     {
         try {
             DB::beginTransaction();
+
+            $old_representative_id = $revenue->representative_id;
+            $old_rep_percentage = (float) $revenue->rep_percentage;
+
             $revenue->delete();
             $sum = 0;
             $transaction_no = (float) str_replace(',', '', $request->madin_name[1] ?? '') > 0 ? $request->transaction_no : null;
+
+            $representative_id = $request->representative_id ?: null;
+            $rep_percentage = 0;
+            $rep_cut_amount = 0;
+            $base = (float) ($request->madin_name[0] ?? 0) + (float) ($request->madin_name[1] ?? 0);
+            if ($representative_id) {
+                if ((int) $representative_id === (int) $old_representative_id) {
+                    $rep_percentage = $old_rep_percentage;
+                } else {
+                    $rep_percentage = (float) (Tree4::find($representative_id)->rep_percentage ?? 0);
+                }
+                $rep_cut_amount = round($base * $rep_percentage / 100, 2);
+            }
+
             $revenue = Revenue::create([
                 'dain_id' => $request->dain,
                 'bank_id' => $request->madin_id[1] ?? null,
                 'cach_id' => $request->madin_id[0] ?? null,
                 'cach_name' => $request->madin_name[0] ?? null,
                 'bank_name' => $request->madin_name[1] ?? null,
+                'representative_id' => $representative_id,
+                'rep_percentage' => $rep_percentage,
+                'rep_cut_amount' => $rep_cut_amount,
                 'transaction_no' => $transaction_no,
                 'branch_id' => session('branch_id'),
                 'note' => $request->note,

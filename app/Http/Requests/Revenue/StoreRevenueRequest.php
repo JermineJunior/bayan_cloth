@@ -24,6 +24,7 @@ class StoreRevenueRequest extends FormRequest
     {
         return [
             'dain' =>'required|exists:tree4s,id',
+            'representative_id' => 'nullable|exists:tree4s,id',
             'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn () => (float) str_replace(',', '', $this->madin_name[1] ?? '') > 0)],
         ];
     }

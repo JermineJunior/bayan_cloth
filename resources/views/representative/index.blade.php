@@ -92,6 +92,7 @@
                                     <th class="wd-5p border-bottom-0">#</th>
                                     <th class="wd-20p border-bottom-0">الاسم</th>
                                     <th class="wd-20p border-bottom-0">رقم الهاتف</th>
+                                    <th class="wd-15p border-bottom-0">نسبة المندوب %</th>
                                     <th class="wd-15p border-bottom-0">العمليات </th>
                                 </tr>
                             </thead>
@@ -102,13 +103,15 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $representative->tree4_name }}</td>
                                         <td>{{ $representative->phone }}</td>
+                                        <td>{{ $representative->rep_percentage }}</td>
                                         <td>
                                             @can('تعديل المندوب')
                                                 <a class="modal-effect btn btn-outline-success btn-sm"
                                                     data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
                                                     data-id="{{ $representative->id }}" data-name="{{ $representative->tree4_name }}"
                                                     data-phone="{{ $representative->phone }}" data-email="{{ $representative->email }}"
-                                                    data-address="{{ $representative->address }}" data- title="تعديل">
+                                                    data-address="{{ $representative->address }}"
+                                                    data-percentage="{{ $representative->rep_percentage }}" data- title="تعديل">
                                                     <i class="fa fa-edit">
                                                     </i></a>
                                             @endcan
@@ -164,6 +167,12 @@
                                     autocomplete="off">
                             </div>
 
+                            <div class="form-group">
+                                <label>نسبة المندوب %</label>
+                                <input type="number" name="rep_percentage" id="rep_percentage" class="form-control"
+                                    min="0" max="100" step="0.01" autocomplete="off">
+                            </div>
+
                         </div>
                         <div class="modal-footer">
                             <button class="btn ripple btn-primary" type="submit">إضافة </button>
@@ -206,6 +215,11 @@
                                 <label>عنوان المندوب</label>
                                 <input id="address_ed" type="text" name="address" class="form-control"
                                     autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label>نسبة المندوب %</label>
+                                <input id="percentage_ed" type="number" name="rep_percentage" class="form-control"
+                                    min="0" max="100" step="0.01" autocomplete="off">
                             </div>
                             <div class="modal-footer">
                                 <button class="btn ripple btn-primary" type="submit">تحديث البيانات </button>
@@ -288,6 +302,7 @@
                 var email = button.data('email');
                 var phone = button.data('phone');
                 var address = button.data('address');
+                var percentage = button.data('percentage');
                 var modal = $(this);
                 $('#edit_representative').attr('action', '{{ route('representative.update', ':id') }}'.replace(':id',
                     id));
@@ -295,6 +310,7 @@
                 modal.find('.modal-body #email_ed').val(email);
                 modal.find('.modal-body #phone_ed').val(phone);
                 modal.find('.modal-body #address_ed').val(address);
+                modal.find('.modal-body #percentage_ed').val(percentage);
                 modal.find('.modal-body #representative_id').val(id);
             });
 

@@ -48,6 +48,15 @@ class SaleInvoiceContoller extends Controller
             DB::beginTransaction();
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
+
+            $rep_percentage = 0;
+            $rep_cut_amount = 0;
+            if (!empty($request->representative_id)) {
+                $rep_percentage = (float) (Tree4::find($request->representative_id)->rep_percentage ?? 0);
+                $rep_base_amount = (float) $request->total - ($request->tax_status ? (float) $request->tax : 0);
+                $rep_cut_amount = round($rep_base_amount * $rep_percentage / 100, 2);
+            }
+
             $sale_invoice = SaleInvoice::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
@@ -68,6 +77,8 @@ class SaleInvoiceContoller extends Controller
                     'deferend_amount' => $request->get('deferend_amount'),
                     'process_no' => $request->get('process_no'),
                     'invoice_status' => $invoice_status,
+                    'rep_percentage' => $rep_percentage,
+                    'rep_cut_amount' => $rep_cut_amount,
                     'branch_id' => session('branch_id'),
                     'user_id' => Auth::id(),
                 ],
@@ -211,6 +222,21 @@ class SaleInvoiceContoller extends Controller
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
 
+            $old_representative_id = $sale_invoice->representative_id;
+            $old_rep_percentage = (float) $sale_invoice->rep_percentage;
+
+            $rep_percentage = 0;
+            $rep_cut_amount = 0;
+            if (!empty($request->representative_id)) {
+                if ((int) $request->representative_id === (int) $old_representative_id) {
+                    $rep_percentage = $old_rep_percentage;
+                } else {
+                    $rep_percentage = (float) (Tree4::find($request->representative_id)->rep_percentage ?? 0);
+                }
+                $rep_base_amount = (float) $request->total - ($request->tax_status ? (float) $request->tax : 0);
+                $rep_cut_amount = round($rep_base_amount * $rep_percentage / 100, 2);
+            }
+
             $oldDetails = $sale_invoice->details;
             foreach ($oldDetails as $item) {
                 $product = Product::with(['stocks', 'units'])->find($item->product_id);
@@ -251,6 +277,8 @@ class SaleInvoiceContoller extends Controller
                 'deferend_amount' => $request->deferend_amount,
                 'process_no' => $request->process_no,
                 'invoice_status' => $invoice_status,
+                'rep_percentage' => $rep_percentage,
+                'rep_cut_amount' => $rep_cut_amount,
                 'branch_id' => session('branch_id'),
                 'user_id' => Auth::id(),
             ]);
