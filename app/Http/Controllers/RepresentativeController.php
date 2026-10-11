@@ -53,6 +53,7 @@ class RepresentativeController extends Controller
 
     public function update(UpdateRepresentativeRequest $request, Tree4 $representative): RedirectResponse
     {
+        //TODO::bug here
         try {
             DB::beginTransaction();
 
@@ -64,7 +65,7 @@ class RepresentativeController extends Controller
                 'rep_percentage' => $request->rep_percentage ?? 0,
             ]);
 
-            Db::commit();
+            DB::commit();
 
             return back()->with('success_updated', 'تم تحديث البيانات بنجاج');
         } catch (\Exception $e) {
@@ -77,7 +78,7 @@ class RepresentativeController extends Controller
     {
         try {
             DB::beginTransaction();
-            if($representative->saleRepresentatives()->count() > 0 || $representative->saleReturnRepresentatives()->count() > 0){
+            if ($representative->saleRepresentatives()->count() > 0 || $representative->saleReturnRepresentatives()->count() > 0) {
                 DB::rollBack();
                 return back()->withErrors('يلا يمكن حذف هذا المندوب لانه مرتبط ببعض الحسابات ');
             }

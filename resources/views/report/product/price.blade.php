@@ -71,6 +71,15 @@
             margin-bottom: 5px;
         }
 
+        .top-right img.logo {
+            width: 80px;
+            height: auto;
+            display: block;
+            margin-left: auto;
+            margin-right: 0;
+            margin-bottom: 5px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -155,6 +164,12 @@
                 height: auto;
                 display: block !important;
             }
+
+            .top-right img.logo {
+                max-width: 80px !important;
+                height: auto;
+                display: block !important;
+            }
         }
     </style>
 @endsection
@@ -186,6 +201,7 @@
 
                     <!-- اليمين (تاريخ مثلاً) -->
                     <div class="top-right">
+                        <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo" alt="الشعار">
                         <p>{{ date('d/m/Y') }}</p>
                         @if ($representative)
                             <p class="rep-info">اسم المندوب : {{ $representative->tree4_name }}</p>
@@ -193,38 +209,51 @@
                                 <p class="rep-info">رقم تلفون المندوب : {{ $representative->phone }}</p>
                             @endif
                         @endif
+                        @if ($selectedCategory)
+                            <p class="rep-info">القسم : {{ $selectedCategory->name }}</p>
+                        @endif
                         <p style=" direction: rtl;">اسم العميل: {{ '..........................' }}</p>
                     </div>
                 </div>
 
                 <!-- ✅ الجدول -->
+                @php $visibleColumns = $show_expiry ? 7 : 6; @endphp
                 <table>
                     <thead>
                         <tr>
                             <th>#</th>
                             <th>Item</th>
                             <th>Generic name</th>
-                            <th>Expare date</th>
+                            @if ($show_expiry)
+                                <th>Expare date</th>
+                            @endif
                             <th>Unit</th>
                             <th>W.Price</th>
-                            <th>Order</th>
+                          {{--   <th>Order</th> --}}
                         </tr>
                     </thead>
                     <tbody>
                         @php $index = 1; @endphp
                         @foreach ($categories as $category)
-                            <td colspan="2" class="company_name">{{ $category->name }}</td>
+                            @if ($show_company)
+                                <tr>
+                                    <td colspan="{{ $visibleColumns }}" class="company_name">{{ $category->name }}</td>
+                                </tr>
+                            @endif
                             @foreach ($category->products as $product)
+                                @php $unit = $product->units->sortByDesc('id')->first(); @endphp
                                 <tr>
                                     <td>{{ $index++ }}</td>
                                     <td class="product-name">{{ $product->name }}</td>
                                     <td class="product-generic">{{ $product->name_en }}</td>
-                                    <td>{{ $product->expire_date }}</td>
-                                    <td>{{ $product->units()->orderByDesc('id')->first()->name }}</td>
+                                    @if ($show_expiry)
+                                        <td>{{ $product->expire_date }}</td>
+                                    @endif
+                                    <td>{{ $unit?->name ?? '---' }}</td>
                                     <td class="product-price">
-                                        {{ number_format($product->units()->orderByDesc('id')->first()->pivot->price) }}
+                                        {{ $unit ? number_format($unit->pivot->price) : '---' }}
                                     </td>
-                                    <td></td>
+                                  {{--   <td></td> --}}
                                 </tr>
                             @endforeach
                         @endforeach

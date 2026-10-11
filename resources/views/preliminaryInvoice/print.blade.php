@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/print-document.css') }}">
     <style>
         .card {
             border: none !important;
@@ -124,7 +125,9 @@
         }
 
         @media print {
-            #print_Button , .create_invoice {
+
+            #print_Button,
+            .create_invoice {
                 display: none !important;
             }
         }
@@ -213,6 +216,16 @@
                                                             </td>
                                                         </tr>
                                                     @endforeach
+                                                    <tr class="fill-row">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
@@ -226,7 +239,8 @@
                                                         <td colspan="6"></td>
                                                         <td>الخصم </td>
                                                         <td>
-                                                            {{ number_format($PreliminaryInvoice->discount_amount, 2) }}</td>
+                                                            {{ number_format($PreliminaryInvoice->discount_amount, 2) }}
+                                                        </td>
                                                     </tr>
                                                     <tr>
                                                         <td colspan="6"></td>
@@ -246,8 +260,9 @@
                         <button class="btn btn-primary float-left mt-3 mr-2" id="print_Button" onclick="printDiv()">
                             <i class="mdi mdi-printer ml-1"></i> طبـاعة
                         </button>
-                        <a href="{{ route('preliminaryInvoice.create') }}" class="btn btn-outline-primary float-left mt-3 mr-2 create_invoice">
-                            <i class="mdi mdi-plus ml-1"></i> فاتورة مبدئية جديدة 
+                        <a href="{{ route('preliminaryInvoice.create') }}"
+                            class="btn btn-outline-primary float-left mt-3 mr-2 create_invoice">
+                            <i class="mdi mdi-plus ml-1"></i> فاتورة مبدئية جديدة
                         </a>
                     </div>
                 </div>
@@ -264,7 +279,7 @@
             document.body.innerHTML = printContents;
             window.print();
             document.body.innerHTML = originalContents;
-            window.location.href = '{{ route('sale_invoice.index') }}';
+            window.location.href = '{{ route('preliminaryInvoice.index') }}';
         }
     </script>
 @endsection

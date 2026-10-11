@@ -14,6 +14,7 @@ use App\Models\Restriction;
 use App\Models\SaleInvoice;
 use App\Models\StockDetail;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use App\Models\PurchaseInvoice;
 use App\Models\SaleInvoiceDetail;
 use App\Models\SaleInvoiceReturn;
@@ -711,12 +712,24 @@ class ReportController extends Controller
     public function select_representative()
     {
         $representatives = Tree4::where('tree3_code', 1206)->get();
-        return view('report.product.select_representative', compact('representatives'));
+        $categories = Category::orderBy('order', 'asc')->get();
+        return view('report.product.select_representative', compact('representatives', 'categories'));
     }
 
-    public function price(Request $request): View
+    public function price(Request $request): View|RedirectResponse
     {
-        $categories = Category::whereHas('products', function ($q) {
+        $show_expiry = $request->boolean('show_expiry');
+        $show_company = $request->boolean('show_company');
+
+        $selectedCategory = null;
+        if ($request->mode === 'category') {
+            if (! $request->filled('category_id')) {
+                return back()->with('error', 'يجب اختيار القسم لعرض سعر القسم المحدد');
+            }
+            $selectedCategory = Category::find($request->category_id);
+        }
+
+        $categoriesQuery = Category::whereHas('products', function ($q) {
             $q->whereHas('stocks', function ($q2) {
                 $q2->where('product_stocks.quantity', '>', 0);
             });
@@ -727,12 +740,18 @@ class ReportController extends Controller
                         $q2->where('product_stocks.quantity', '>', 0);
                     });
                 },
+                'products.units',
             ])
-            ->orderBy('order', 'ASC')
-            ->get();
+            ->orderBy('order', 'ASC');
+
+        if ($selectedCategory) {
+            $categoriesQuery->where('id', $selectedCategory->id);
+        }
+
+        $categories = $categoriesQuery->get();
         $representative = Tree4::find($request->representative_id);
 
-        return view('report.product.price', compact('categories', 'representative'));
+        return view('report.product.price', compact('categories', 'representative', 'show_expiry', 'show_company', 'selectedCategory'));
     }
 
     public function revenueAccount()

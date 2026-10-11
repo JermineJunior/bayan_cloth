@@ -34,7 +34,11 @@
                             <form method="POST" action="{{ route('product.price') }}" id="demo-form2"
                                 class="form-horizontal form-label-left">
                                 @csrf
-                                
+
+                                @if (session('error'))
+                                    <div class="alert alert-danger">{{ session('error') }}</div>
+                                @endif
+
                                 <div class="col">
                                     <label> المندوب</label>
                                     <select  name="representative_id" class="form-control select2">
@@ -46,8 +50,34 @@
                                     <small>في حالة لم يتم اختيار اي مندوب سوف يتم عرض تقرير كشف الاسعار بدون اي بيانات للمندوب</small>
                                 </div>
                                 <br>
+                                <div class="col">
+                                    <label> القسم</label>
+                                    <select name="category_id" class="form-control select2">
+                                        <option value="">-- من فضلك قم باختيار القسم --</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <br>
+                                <div class="col">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" name="show_expiry" value="1" class="custom-control-input"
+                                            id="show_expiry" checked>
+                                        <label class="custom-control-label" for="show_expiry">إظهار تاريخ الصلاحية</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" name="show_company" value="1" class="custom-control-input"
+                                            id="show_company" checked>
+                                        <label class="custom-control-label" for="show_company">إظهار أسماء الشركات</label>
+                                    </div>
+                                </div>
+                                <br>
                                 <div class="d-flex justify-content-center">
-                                    <button type="submit" class="btn btn-primary"> بـحـث</button>
+                                    <button type="submit" name="mode" value="all" class="btn btn-primary mx-2"> عرض سعر
+                                        عام</button>
+                                    <button type="submit" name="mode" value="category" class="btn btn-primary mx-2"> عرض
+                                        سعر للقسم المحدد</button>
                                 </div>
                             </form>
                         </div>
