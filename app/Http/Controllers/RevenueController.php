@@ -20,7 +20,7 @@ class RevenueController extends Controller
         $revenues = Revenue::withCount('allocations')->where('branch_id', session('branch_id'))->orderByDesc('id')->get();
         $banks = Tree4::where('tree3_code', 1203)->get();
         $safes = Tree4::where('tree3_code', 1202)->get();
-        $dains = Tree4::get();
+        $dains = Tree4::where('tree3_code',1205)->get(); // pharmacies only(customers)
         $representatives = Tree4::where('tree3_code', 1206)->get();
         return view('revenue.index', compact('revenues', 'dains', 'banks', 'safes', 'representatives'));
     }

@@ -36,11 +36,6 @@ class ProductsImport implements ToCollection
             // تحقق التكرار
             $exists = Product::where('barcode', $row[0])->orWhere('name', $row[1]);
 
-            // تحقق من name_en فقط لو فيه قيمة
-            if (!empty($row[2])) {
-                $exists->orWhere('name_en', $row[2]);
-            }
-
             if ($exists->exists()) {
                 continue;
             }

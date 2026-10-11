@@ -19,7 +19,7 @@ class ExpenseController extends Controller
         $expenses = Expense::where('branch_id', session('branch_id'))->orderByDesc('id')->get();
         $banks = Tree4::where('tree3_code', 1203)->get();
         $safes = Tree4::where('tree3_code', 1202)->get();
-        $madins = Tree4::get();
+        $madins = Tree4::whereNot('tree3_code',1205)->get();
         return view('expense.index', compact('expenses', 'madins', 'banks', 'safes'));
     }
 

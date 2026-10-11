@@ -225,11 +225,11 @@
                             <th>Item</th>
                             <th>Generic name</th>
                             @if ($show_expiry)
-                                <th>Expare date</th>
+                                <th>Expire date</th>
                             @endif
                             <th>Unit</th>
                             <th>W.Price</th>
-                          {{--   <th>Order</th> --}}
+                            {{--   <th>Order</th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -253,7 +253,7 @@
                                     <td class="product-price">
                                         {{ $unit ? number_format($unit->pivot->price) : '---' }}
                                     </td>
-                                  {{--   <td></td> --}}
+                                    {{--   <td></td> --}}
                                 </tr>
                             @endforeach
                         @endforeach

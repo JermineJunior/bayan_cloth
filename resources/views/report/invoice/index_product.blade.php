@@ -91,9 +91,8 @@
                                     </div>
                                     <div class="col-md-6">
                                         <select name="curencey_id" id="curencey_id" class="form-control" required>
-                                            <option value="">قم باختيار العملة</option>
                                             @foreach ($curenceies as $curencey)
-                                                <option value="{{ $curencey->id }}">{{ $curencey->name }}</option>
+                                                <option value="{{ $curencey->id }}" {{ $curencey->is_base ? 'selected' : '' }}>{{ $curencey->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
