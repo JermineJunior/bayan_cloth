@@ -4,10 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Revenue extends Model
 {
     protected $fillable = ['dain_id', 'cach_id', 'bank_id', 'cach_name', 'bank_name', 'transaction_no', 'note','branch_id', 'representative_id', 'rep_percentage', 'rep_cut_amount'];
+
+    public function allocations(): HasMany
+    {
+        return $this->hasMany(RevenueAllocation::class);
+    }
 
     public function cach(): BelongsTo
     {

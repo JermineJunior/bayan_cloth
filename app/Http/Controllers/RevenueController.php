@@ -11,12 +11,13 @@ use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Revenue\StoreRevenueRequest;
 use App\Http\Requests\Revenue\UpdateRevenueRequest;
 use App\Models\Revenue;
+use App\Models\SaleInvoice;
 
 class RevenueController extends Controller
 {
     public function index(): View
     {
-        $revenues = Revenue::where('branch_id', session('branch_id'))->orderByDesc('id')->get();
+        $revenues = Revenue::withCount('allocations')->where('branch_id', session('branch_id'))->orderByDesc('id')->get();
         $banks = Tree4::where('tree3_code', 1203)->get();
         $safes = Tree4::where('tree3_code', 1202)->get();
         $dains = Tree4::get();
@@ -145,6 +146,15 @@ class RevenueController extends Controller
     {
         try {
             DB::beginTransaction();
+            foreach ($revenue->allocations as $allocation) {
+                $sale_invoice = SaleInvoice::find($allocation->sale_invoice_id);
+                if ($sale_invoice) {
+                    $sale_invoice->update([
+                        'deferend_amount' => round((float) $sale_invoice->deferend_amount + (float) $allocation->amount, 2),
+                        'invoice_status' => 0,
+                    ]);
+                }
+            }
             $revenue->delete();
             DB::commit();
             return back()->with('success_deleted', 'successfully deleted');
