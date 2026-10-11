@@ -122,18 +122,26 @@
                                                     <i class="fa fa-print"></i>
                                                 </a>
                                             @endcan
+                                            @if ($sale_invoice->allocations_count > 0)
+                                                <span class="badge badge-success">مسدد فواتير</span>
+                                            @endif
                                             @can('تعديل فاتورة مبيعات')
-                                                <a class="btn btn-outline-success btn-sm"
-                                                    href="{{ route('sale_invoice.edit', $sale_invoice->id) }}" title="تعديل">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
+                                                @if ($sale_invoice->allocations_count == 0)
+                                                    <a class="btn btn-outline-success btn-sm"
+                                                        href="{{ route('sale_invoice.edit', $sale_invoice->id) }}"
+                                                        title="تعديل">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                @endif
                                             @endcan
                                             @can('حذف فاتورة مبيعات')
-                                                <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
-                                                    data-toggle="modal" href="#deleteModal" data-id="{{ $sale_invoice->id }}"
-                                                    title="حذف">
-                                                    <i class="fa fa-trash">
-                                                    </i></a>
+                                                @if ($sale_invoice->allocations_count == 0)
+                                                    <a class="modal-effect btn btn-outline-danger btn-sm"
+                                                        data-target="#deleteModal" data-toggle="modal" href="#deleteModal"
+                                                        data-id="{{ $sale_invoice->id }}" title="حذف">
+                                                        <i class="fa fa-trash">
+                                                        </i></a>
+                                                @endif
                                             @endcan
                                             {{-- @if (!$sale_invoice->returnInvoice)
                                                 @can('اضافة مردودات المبيعات')

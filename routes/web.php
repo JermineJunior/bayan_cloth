@@ -21,6 +21,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CompoundContoller;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RevenueController;
+use App\Http\Controllers\CustomerInvoicePaymentController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CurenceyController;
@@ -295,6 +296,11 @@ Route::group(
         // Route expense and Revenue
         Route::resource(name: 'expense', controller: ExpenseController::class);
         Route::resource(name: 'revenue', controller: RevenueController::class);
+
+        // Route Customer Invoice Payment (تحصيل فواتير العملاء)
+        Route::get(uri: 'customer-invoice-payment/create', action: [CustomerInvoicePaymentController::class, 'create'])->name(name: 'customer-invoice-payment.create');
+        Route::post(uri: 'customer-invoice-payment/unpaid', action: [CustomerInvoicePaymentController::class, 'unpaid'])->name(name: 'customer-invoice-payment.unpaid');
+        Route::post(uri: 'customer-invoice-payment', action: [CustomerInvoicePaymentController::class, 'store'])->name(name: 'customer-invoice-payment.store');
 
         // Route Curencey
         Route::resource(name: 'curencey', controller: CurenceyController::class)->only(methods: ['index', 'store', 'update','destroy']);

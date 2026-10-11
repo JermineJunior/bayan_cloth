@@ -24,7 +24,7 @@ class SaleInvoiceContoller extends Controller
 {
     public function index(): View
     {
-        $sale_invoices = SaleInvoice::where('branch_id', session('branch_id'))->orderBy('invoice_number', 'DESC')->get();
+        $sale_invoices = SaleInvoice::withCount('allocations')->where('branch_id', session('branch_id'))->orderBy('invoice_number', 'DESC')->get();
         return view('sale.index', compact('sale_invoices'));
     }
 
@@ -203,6 +203,9 @@ class SaleInvoiceContoller extends Controller
 
     public function edit(SaleInvoice $sale_invoice): View
     {
+        if ($sale_invoice->allocations()->exists()) {
+            return redirect()->route('sale_invoice.index')->withErrors(['error' => 'لا يمكن تعديل هذه الفاتورة لانها مرتبطه بتحصيل فواتير العملاء']);
+        }
         $customers = Tree4::whereTree3_code(1205)->orWhere('tree3_code', '2301')->get();
         $stocks = Stock::get();
         $representatives = Tree4::where('tree3_code', '1206')->get();
@@ -216,6 +219,9 @@ class SaleInvoiceContoller extends Controller
 
     public function update(UpdateSaleInvoiceRequest $request, SaleInvoice $sale_invoice): RedirectResponse
     {
+        if ($sale_invoice->allocations()->exists()) {
+            return redirect()->route('sale_invoice.index')->withErrors(['error' => 'لا يمكن تعديل هذه الفاتورة لانها مرتبطه بتحصيل فواتير العملاء']);
+        }
         try {
             DB::beginTransaction();
 
@@ -379,6 +385,9 @@ class SaleInvoiceContoller extends Controller
 
     public function destroy(SaleInvoice $sale_invoice, Request $request): RedirectResponse
     {
+        if ($sale_invoice->allocations()->exists()) {
+            return back()->withErrors(['error' => 'لا يمكن حذف هذه الفاتورة لانها مرتبطه بتحصيل فواتير العملاء']);
+        }
         try {
             DB::beginTransaction();
             foreach ($sale_invoice->details as $item) {

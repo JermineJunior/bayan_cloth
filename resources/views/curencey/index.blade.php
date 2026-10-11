@@ -117,13 +117,15 @@
                                                     <i class="fa fa-edit">
                                                     </i></a>
                                             @endcan
-                                            @can('حذف العملة')
-                                                <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
-                                                    data-toggle="modal" href="#deleteModal" data-id="{{ $curencey->id }}"
-                                                    title="حذف">
-                                                    <i class="fa fa-trash">
-                                                    </i></a>
-                                            @endcan
+                                            @if ($curencey->id !== 1)
+                                                @can('حذف العملة')
+                                                    <a class="modal-effect btn btn-outline-danger btn-sm"
+                                                        data-target="#deleteModal" data-toggle="modal" href="#deleteModal"
+                                                        data-id="{{ $curencey->id }}" title="حذف">
+                                                        <i class="fa fa-trash">
+                                                        </i></a>
+                                                @endcan
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach
@@ -158,8 +160,9 @@
                             </div>
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label for="exampleInputEmail1">رمز العملة </label>
-                                <input type="text" name="symbol" id="symbol" class="form-control" autocomplete="off"
-                                    placeholder="مثلا جنيه سوداني او دولار امريكي او ريال سعودي" required>
+                                <input type="text" name="symbol" id="symbol" class="form-control"
+                                    autocomplete="off" placeholder="مثلا جنيه سوداني او دولار امريكي او ريال سعودي"
+                                    required>
                             </div>
 
                         </div>
@@ -468,7 +471,7 @@
             }
 
             function cleanNumbersBeforeSubmit() {
-                let singleFields = ['amount','amount_ed'];
+                let singleFields = ['amount', 'amount_ed'];
                 singleFields.forEach(id => {
                     let el = document.getElementById(id);
                     if (el && el.value) {

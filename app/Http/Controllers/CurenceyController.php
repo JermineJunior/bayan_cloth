@@ -10,7 +10,7 @@ class CurenceyController extends Controller
 {
     public function index(): View
     {
-        $curenceies = Curencey::whereNot('id', 1)->get();
+        $curenceies = Curencey::get();
         return view('curencey.index', compact('curenceies'));
     }
 

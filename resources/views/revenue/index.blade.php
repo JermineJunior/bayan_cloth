@@ -129,22 +129,28 @@
                                             @endif
                                         </td>
                                         <td>
+                                            @if ($revenue->allocations_count > 0)
+                                                <span class="badge badge-success">مسدد فواتير</span>
+                                            @endif
                                             @can('تعديل ايراد')
-                                                <a class="modal-effect btn btn-outline-success btn-sm"
-                                                    data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
-                                                    data-id="{{ $revenue->id }}" data-cach-id="{{ $revenue->cach_id }}"
-                                                    data-cach-name="{{ $revenue->cach->tree4_name ?? null }}"
-                                                    data-bank-id="{{ $revenue->bank_id }}"
-                                                    data-bank-name="{{ $revenue->bankName->tree4_name ?? null }}"
-                                                    data-dain-id="{{ $revenue->dain_id }}" data-note="{{ $revenue->note }}"
-                                                    data-cach-price="{{ number_format($revenue->cach_name, 2) }}"
-                                                    data-bank-price="{{ number_format($revenue->bank_name, 2) }}"
-                                                    data-transaction-no="{{ $revenue->transaction_no }}"
-                                                    data-representative-id="{{ $revenue->representative_id }}"
-                                                    data-rep-percentage="{{ $revenue->rep_percentage }}"
-                                                    data-dain-name="{{ $revenue->dain->tree4_name }}" title="تعديل">
-                                                    <i class="fa fa-edit">
-                                                    </i></a>
+                                                @if ($revenue->allocations_count == 0)
+                                                    <a class="modal-effect btn btn-outline-success btn-sm"
+                                                        data-effect="effect-super-scaled" data-toggle="modal"
+                                                        href="#editModal" data-id="{{ $revenue->id }}"
+                                                        data-cach-id="{{ $revenue->cach_id }}"
+                                                        data-cach-name="{{ $revenue->cach->tree4_name ?? null }}"
+                                                        data-bank-id="{{ $revenue->bank_id }}"
+                                                        data-bank-name="{{ $revenue->bankName->tree4_name ?? null }}"
+                                                        data-dain-id="{{ $revenue->dain_id }}" data-note="{{ $revenue->note }}"
+                                                        data-cach-price="{{ number_format($revenue->cach_name, 2) }}"
+                                                        data-bank-price="{{ number_format($revenue->bank_name, 2) }}"
+                                                        data-transaction-no="{{ $revenue->transaction_no }}"
+                                                        data-representative-id="{{ $revenue->representative_id }}"
+                                                        data-rep-percentage="{{ $revenue->rep_percentage }}"
+                                                        data-dain-name="{{ $revenue->dain->tree4_name }}" title="تعديل">
+                                                        <i class="fa fa-edit">
+                                                        </i></a>
+                                                @endif
                                             @endcan
                                             @can('حذف ايراد')
                                                 <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"

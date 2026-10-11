@@ -52,5 +52,10 @@ class SaleInvoice extends Model
         return $this->hasOne(SaleInvoiceReturn::class, 'sale_invoice_id');
     }
 
+    public function allocations(): HasMany
+    {
+        return $this->hasMany(RevenueAllocation::class);
+    }
+
     
 }

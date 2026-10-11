@@ -256,9 +256,6 @@
                 'تقرير مردود مبيعات مفصل',
                 'تقرير مبيعات ملخص',
                 'تقرير مردود مبيعات ملخص',
-                'تقرير المبيعات حسب المندوب',
-                'تقرير مردود المبيعات حسب المندوب',
-                'تقرير عمولة المندوب',
                 ])
                 <li class="slide">
                     <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
@@ -323,19 +320,6 @@
                             <li><a class="slide-item" href="{{ route('report.sale_return_invoice.summary.index') }}">تقرير
                                     مردود مبيعات ملخص
                                 </a></li>
-                        @endcan
-                        @can('تقرير المبيعات حسب المندوب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.sale_invoice.representative.index') }}">
-                                    تقرير المبيعات حسب المندوب</a></li>
-                        @endcan
-                        @can('تقرير مردود المبيعات حسب المندوب')
-                            <li><a class="slide-item mb-3"
-                                    href="{{ route('report.sale_invoice_return.representative.index') }}">
-                                    تقرير مردود المبيعات حسب المندوب</a></li>
-                        @endcan
-                        @can('تقرير عمولة المندوب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.representative.cut.index') }}">
-                                    تقرير عمولة المندوب</a></li>
                         @endcan
                     </ul>
                 </li>
@@ -435,7 +419,6 @@
                 'كشف
                 حساب الايرادات',
                 'كشف حساب المصروفات',
-                'تقرير مديونيات عملاء المندوب',
                 'تقرير مدينونيات العملاء',
                 ])
                 <li class="slide">
@@ -471,15 +454,47 @@
                             <li><a class="slide-item mb-3" href="{{ route('report.revenue') }}">
                                     تقرير كشف الايرادات </a></li>
                         @endcan
-                        @can('تقرير مديونيات عملاء المندوب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.representative.customer.index') }}">
-                                    تقرير مديونيات عملاء المندوب </a></li>
-                        @endcan
                         @can('تقرير مدينونيات العملاء')
                             <li><a class="slide-item mb-3" href="{{ route('report.customer.account.index') }}">
                                     تقرير مدينونيات العملاء </a></li>
                         @endcan
 
+                    </ul>
+                </li>
+            @endcanany
+
+            @canany([
+                'تقرير المبيعات حسب المندوب',
+                'تقرير مردود المبيعات حسب المندوب',
+                'تقرير عمولة المندوب',
+                'تقرير مديونيات عملاء المندوب',
+                ])
+                <li class="slide">
+                    <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
+                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
+                            width="24" height="24" fill="currentColor">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
+                        </svg>
+                        <span class="side-menu__label"> تقارير المندوبين</span><i
+                            class="angle fe fe-chevron-down"></i></a>
+                    <ul class="slide-menu">
+                        @can('تقرير المبيعات حسب المندوب')
+                            <li><a class="slide-item mb-3" href="{{ route('report.sale_invoice.representative.index') }}">
+                                    تقرير المبيعات حسب المندوب</a></li>
+                        @endcan
+                        @can('تقرير مردود المبيعات حسب المندوب')
+                            <li><a class="slide-item mb-3"
+                                    href="{{ route('report.sale_invoice_return.representative.index') }}">
+                                    تقرير مردود المبيعات حسب المندوب</a></li>
+                        @endcan
+                        @can('تقرير عمولة المندوب')
+                            <li><a class="slide-item mb-3" href="{{ route('report.representative.cut.index') }}">
+                                    تقرير عمولة المندوب</a></li>
+                        @endcan
+                        @can('تقرير مديونيات عملاء المندوب')
+                            <li><a class="slide-item mb-3" href="{{ route('report.representative.customer.index') }}">
+                                    تقرير مديونيات عملاء المندوب</a></li>
+                        @endcan
                     </ul>
                 </li>
             @endcanany
@@ -549,6 +564,7 @@
 
             @canany([
                 'الايردادات',
+                'تحصيل فواتير العملاء',
                 'قيود مالية اخرى',
                 'المصروفات',
                 'القيود المركبة',
@@ -567,7 +583,7 @@
                 <li class="side-item side-item-category" style="font-weight: bold;"> الشجرة المحاسبية </li>
 
             @endcanany
-            @canany(['الايردادات', 'قيود مالية اخرى', 'المصروفات', 'القيود المركبة', 'قائمة القيود'])
+            @canany(['الايردادات', 'تحصيل فواتير العملاء', 'قيود مالية اخرى', 'المصروفات', 'القيود المركبة', 'قائمة القيود'])
 
                 <li class="slide">
                     <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
@@ -579,6 +595,9 @@
                     <ul class="slide-menu">
                         @can('الايردادات')
                             <li><a class="slide-item" href="{{ route('revenue.index') }}"> الايردادات</a></li>
+                        @endcan
+                        @can('تحصيل فواتير العملاء')
+                            <li><a class="slide-item" href="{{ route('customer-invoice-payment.create') }}"> تحصيل فواتير العملاء</a></li>
                         @endcan
                         @can('المصروفات')
                             <li><a class="slide-item" href="{{ route('expense.index') }}"> المصروفات</a></li>
