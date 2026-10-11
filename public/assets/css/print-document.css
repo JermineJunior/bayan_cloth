@@ -6,25 +6,29 @@ tr.fill-row { display: none; }
 @media print {
     html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
 
+    #global-loader, .app-sidebar, .app-sidebar__overlay, .main-header, .main-footer,
+    .breadcrumb-header, .page-header, .no-print, .btn, button,
+    body.sidebar-mini #global-loader, body.sidebar-mini .app-sidebar,
+    body.sidebar-mini .app-sidebar__overlay, body.sidebar-mini .main-header,
+    body.sidebar-mini .main-footer, body.sidebar-mini .breadcrumb-header,
+    body.sidebar-mini .page-header, body.sidebar-mini .no-print,
+    body.sidebar-mini .btn, body.sidebar-mini button { display: none !important; }
+
+    .main-content.app-content { margin: 0 !important; padding: 0 !important; }
+    .container-fluid { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
+
     .main-content-body-invoice, .card, .card-invoice, .card-body, .col-xl-12 {
         padding: 0 !important; margin: 0 !important; border: 0 !important;
         box-shadow: none !important; background: transparent !important;
         width: 100% !important; max-width: 100% !important;
     }
 
-    .invoice {
-        width: 100% !important; margin: 0 !important; padding: 0 !important;
-        display: flex; flex-direction: column;
-        min-height: 272mm;
-    }
-    .invoice .table-container { flex: 1 1 auto; display: flex; flex-direction: column; }
-    .invoice .invoice-table { flex: 1 1 auto; height: 100%; }
+    .invoice { width: 100% !important; margin: 0 !important; padding: 0 !important; }
 
-    .invoice-table tr.fill-row { display: table-row; }
-    .invoice-table tr.fill-row td { height: 100%; border-top: 0; border-bottom: 0; }
-    .invoice-table tbody tr:not(.fill-row) td,
-    .invoice-table tfoot td { height: 1px; }
+    .row { margin: 0 !important; }
+    .col-md-12, .col-xl-12 { padding: 0 !important; }
 
+    .invoice-table { width: 194mm; }
     .invoice-table thead { display: table-header-group; }
     .invoice-table tfoot { display: table-row-group; }
     .invoice-table tr { page-break-inside: avoid; }

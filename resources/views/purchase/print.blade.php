@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('assets/css/print-document.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/print-document.css') }}?v={{ filemtime(public_path('assets/css/print-document.css')) }}">
     <style>
         .card {
             border: none !important;
@@ -211,15 +211,6 @@
                                                             </td>
                                                         </tr>
                                                     @endforeach
-                                                    <tr class="fill-row">
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                        <td></td>
-                                                    </tr>
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
@@ -277,7 +268,7 @@
                                 </div><!-- bd -->
                             </div><!-- bd -->
                         </div>
-                        <hr class="mg-b-40">
+                        <hr class="mg-b-40 no-print">
                         <button class="btn btn-primary float-left mt-3 mr-2" id="print_Button" onclick="printDiv()">
                             <i class="mdi mdi-printer ml-1"></i> طبـاعة
                         </button>
@@ -295,12 +286,10 @@
 @section('js')
     <script>
         function printDiv() {
-            var printContents = document.getElementById('print').innerHTML;
-            var originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
             window.print();
-            document.body.innerHTML = originalContents;
-            window.location.href = '{{ route('purchase_invoice.index') }}';
         }
+        window.addEventListener('afterprint', function () {
+            window.location.href = '{{ route('purchase_invoice.index') }}';
+        });
     </script>
 @endsection
