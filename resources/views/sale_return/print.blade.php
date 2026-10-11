@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/print-document.css') }}">
     <style>
         .card {
             border: none !important;
@@ -212,6 +213,15 @@
                                                             </td>
                                                         </tr>
                                                     @endforeach
+                                                    <tr class="fill-row">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
@@ -291,7 +301,7 @@
             document.body.innerHTML = printContents;
             window.print();
             document.body.innerHTML = originalContents;
-            window.location.href = '{{ route('sale_invoice.index') }}';
+            window.location.href = '{{ route('sale_invoice_return.index') }}';
         }
     </script>
 @endsection

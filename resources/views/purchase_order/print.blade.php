@@ -235,7 +235,7 @@
             document.body.innerHTML = printContents;
             window.print();
             document.body.innerHTML = originalContents;
-            window.location.href = '{{ route('sale_invoice.index') }}';
+            window.location.href = '{{ route('purchase_order.index') }}';
         }
     </script>
 @endsection

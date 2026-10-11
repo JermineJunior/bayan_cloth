@@ -22,7 +22,7 @@
         <div class="my-auto">
             <div class="d-flex">
                 <h5 class="content-title mb-0 my-auto"> التقارير المحاسبية </h5><span
-                    class="text-muted mt-1 tx-13 mr-2 mb-0">/ تقرير الموقف المالي للمورد</span>
+                    class="text-muted mt-1 tx-13 mr-2 mb-0">/ تقرير الموقف المالي للعميل</span>
             </div>
         </div>
     </div>
@@ -35,7 +35,7 @@
             <div class="card">
                 <div class="card-header pb-0">
                     <div class="d-flex justify-content-between gap-2">
-                        <h5 class="content-title mb-0 my-auto"> تقرير الموقف المالي للمورد :</h5>
+                        <h5 class="content-title mb-0 my-auto"> تقرير الموقف المالي للعميل :</h5>
 
                         <a href="javascript:history.back()" class="btn btn-warning">
                             <i class="fa fa-arrow-right"></i>&nbsp;&nbsp;رجوع

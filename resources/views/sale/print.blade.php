@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/print-document.css') }}">
     <style>
         .card {
             border: none !important;
@@ -214,6 +215,16 @@
                                                             </td>
                                                         </tr>
                                                     @endforeach
+                                                    <tr class="fill-row">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                    </tr>
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
