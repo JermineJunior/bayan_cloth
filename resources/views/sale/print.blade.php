@@ -192,89 +192,89 @@
                                                 <thead>
                                                     <tr>
                                                         <th>م</th>
-                                                        <th class="w-30p">المنتج</th>
+                                                        <th class="product-cell">المنتج</th>
                                                         <th>الكمية</th>
                                                         <th>البونص</th>
                                                         <th>الوحدة</th>
                                                         <th>تاريخ الصلاحية</th>
                                                         <th>سعر الوحدة</th>
-                                                        <th>الاجمالي</th>
+                                                        <th>الإجمالي</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach ($sale_invoice->details as $item)
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
-                                                            <td class="wd-30p">{{ $item->product->name }}</td>
+                                                            <td class="product-cell">{{ $item->product->name }}</td>
                                                             <td>{{ number_format($item->qty) }}</td>
                                                             <td>{{ number_format($item->bounce) }}</td>
                                                             <td>{{ $item->unit->name }}</td>
-                                                            <td class="wd-15p">{{ $item->expire_date }}</td>
-                                                            <td class="wd-15p">{{ number_format($item->price, 2) }}</td>
-                                                            <td class="wd-30p">{{ number_format($item->row_sub_total, 2) }}
+                                                            <td>{{ $item->expire_date }}</td>
+                                                            <td>{{ number_format($item->price, 2) }}</td>
+                                                            <td>{{ number_format($item->row_sub_total, 2) }}
                                                             </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>جملة الفاتورة</td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">جملة الفاتورة</td>
+                                                        <td colspan="2">
                                                             {{ number_format($sale_invoice->sub_total_amount + $sale_invoice->tax_amount, 2) }}
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>الخصم </td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">الخصم</td>
+                                                        <td colspan="2">
                                                             {{ number_format($sale_invoice->discount_amount, 2) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>صافي الفاتورة</td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">صافي الفاتورة</td>
+                                                        <td colspan="2">
                                                             {{ number_format($sale_invoice->total_amount, 2) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>مدفوع نقداً </td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">مدفوع نقداً</td>
+                                                        <td colspan="2">
                                                             {{ number_format($sale_invoice->cash_amount_total, 2) }}
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>مدفوع بالبنك</td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">مدفوع بالبنك</td>
+                                                        <td colspan="2">
                                                             {{ number_format($sale_invoice->bank_amount_total, 2) }}
                                                         </td>
                                                     </tr>
                                                     @if ($sale_invoice->transaction_no)
                                                         <tr>
-                                                            <td colspan="6"></td>
-                                                            <td>رقم عملية البنك</td>
-                                                            <td>{{ $sale_invoice->transaction_no }}</td>
+                                                            <td colspan="4"></td>
+                                                            <td colspan="2">رقم عملية البنك</td>
+                                                            <td colspan="2">{{ $sale_invoice->transaction_no }}</td>
                                                         </tr>
                                                     @endif
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td> اجل</td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">آجل</td>
+                                                        <td colspan="2">
                                                             {{ number_format($sale_invoice->deferend_amount, 2) }}
                                                         </td>
                                                     </tr>
                                                     @if ($sale_invoice->customer_id != null)
                                                         <tr>
-                                                            <td colspan="6"></td>
-                                                            <td>جملة المطالبة السابقة</td>
-                                                            <td>{{ number_format($madinTotal - $dainTotal) }}</td>
+                                                            <td colspan="4"></td>
+                                                            <td colspan="2">جملة المطالبة السابقة</td>
+                                                            <td colspan="2">{{ number_format($madinTotal - $dainTotal) }}</td>
                                                         </tr>
                                                         @if ($sale_invoice->deferend_amount > 0)
                                                             <tr>
-                                                                <td colspan="6"></td>
-                                                                <td>جملة المطالبة الكلية</td>
-                                                                <td>{{ number_format($allMadinTotal - $allDainTotal) }}
+                                                                <td colspan="4"></td>
+                                                                <td colspan="2">جملة المطالبة الكلية</td>
+                                                                <td colspan="2">{{ number_format($allMadinTotal - $allDainTotal) }}
                                                                 </td>
                                                             </tr>
                                                         @endif

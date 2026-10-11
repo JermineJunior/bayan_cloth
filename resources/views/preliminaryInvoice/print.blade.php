@@ -193,49 +193,49 @@
                                                 <thead>
                                                     <tr>
                                                         <th>م</th>
-                                                        <th class="w-30p">المنتج</th>
+                                                        <th class="product-cell">المنتج</th>
                                                         <th>الكمية</th>
                                                         <th>البونص</th>
-                                                        <th>الوحدة</td>
+                                                        <th>الوحدة</th>
                                                         <th>تاريخ الصلاحية</th>
                                                         <th>سعر الوحدة</th>
-                                                        <th>الاجمالي</th>
+                                                        <th>الإجمالي</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     @foreach ($PreliminaryInvoice->details as $item)
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
-                                                            <td class="wd-30p">{{ $item->product->name }}</td>
+                                                            <td class="product-cell">{{ $item->product->name }}</td>
                                                             <td>{{ number_format($item->qty) }}</td>
                                                             <td>{{ number_format($item->bounce) }}</td>
                                                             <td>{{ $item->unit->name }}</td>
-                                                            <td class="wd-15p">{{ $item->expire_date }}</td>
-                                                            <td class="wd-15p">{{ number_format($item->price, 2) }}</td>
-                                                            <td class="wd-30p">{{ number_format($item->row_sub_total, 2) }}
+                                                            <td>{{ $item->expire_date }}</td>
+                                                            <td>{{ number_format($item->price, 2) }}</td>
+                                                            <td>{{ number_format($item->row_sub_total, 2) }}
                                                             </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>جملة الفاتورة</td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">جملة الفاتورة</td>
+                                                        <td colspan="2">
                                                             {{ number_format($PreliminaryInvoice->sub_total_amount + $PreliminaryInvoice->tax_amount, 2) }}
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>الخصم </td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">الخصم</td>
+                                                        <td colspan="2">
                                                             {{ number_format($PreliminaryInvoice->discount_amount, 2) }}
                                                         </td>
                                                     </tr>
                                                     <tr>
-                                                        <td colspan="6"></td>
-                                                        <td>صافي الفاتورة</td>
-                                                        <td>
+                                                        <td colspan="4"></td>
+                                                        <td colspan="2">صافي الفاتورة</td>
+                                                        <td colspan="2">
                                                             {{ number_format($PreliminaryInvoice->total_amount, 2) }}</td>
                                                     </tr>
                                                 </tfoot>

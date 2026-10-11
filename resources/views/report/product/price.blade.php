@@ -14,11 +14,37 @@
         }
 
         .header {
-            position: relative;
-            margin-bottom: 40px;
-            min-height: 140px;
-            /* 🔹 زودنا الارتفاع شوية */
+            margin-bottom: 20px;
             margin-left: 5px;
+        }
+
+        /* ✅ جدول الهيدر (٣ خانات) */
+        .report-header {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .report-header td {
+            border: none;
+            padding: 6px;
+            vertical-align: middle;
+        }
+
+        .report-header td.header-left {
+            width: 25%;
+            text-align: left;
+        }
+
+        .report-header td.header-center {
+            width: 50%;
+            text-align: center;
+        }
+
+        .report-header td.header-right {
+            width: 25%;
+            text-align: right;
+            font-size: 14px;
+            line-height: 1.6;
         }
 
         /* ✅ اسم الشركة */
@@ -42,41 +68,10 @@
             color: #333;
         }
 
-        .top-right {
-            position: absolute;
-            top: 0;
-            right: 0;
-            text-align: right;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .top-left {
-            position: absolute;
-            top: 0;
-            left: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            font-size: 14px;
-            line-height: 1.4;
-            width: 150px;
-            min-height: 120px;
-        }
-
-        .top-left img.logo {
+        .report-header img.logo {
             width: 80px;
             height: auto;
             display: block;
-            margin-bottom: 5px;
-        }
-
-        .top-right img.logo {
-            width: 80px;
-            height: auto;
-            display: block;
-            margin-left: auto;
-            margin-right: 0;
             margin-bottom: 5px;
         }
 
@@ -86,9 +81,9 @@
             margin-bottom: 30px;
         }
 
-        table,
-        th,
-        td {
+        .price-table,
+        .price-table th,
+        .price-table td {
             border: 1px solid black;
         }
 
@@ -151,24 +146,59 @@
         }
 
         @media print {
-            #print_Button {
+            @page {
+                size: A4 portrait;
+                margin: 8mm;
+            }
+
+            #global-loader,
+            .app-sidebar,
+            .app-sidebar__overlay,
+            .main-header,
+            .main-footer,
+            .breadcrumb-header,
+            .page-header,
+            .btn {
                 display: none !important;
             }
 
-            .top-left {
-                display: flex !important;
+            .main-content.app-content,
+            .container-fluid {
+                padding: 0 !important;
+                margin: 0 !important;
             }
 
-            .top-left img.logo {
-                max-width: 80px !important;
-                height: auto;
-                display: block !important;
+            .card,
+            .card-body {
+                padding: 0 !important;
+                margin: 0 !important;
+                border: 0 !important;
             }
 
-            .top-right img.logo {
-                max-width: 80px !important;
-                height: auto;
-                display: block !important;
+            table {
+                width: 100%;
+            }
+
+            thead {
+                display: table-header-group;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+
+            th,
+            td {
+                white-space: nowrap;
+            }
+
+            td.product-name,
+            td.product-generic {
+                white-space: normal;
+            }
+
+            #print_Button {
+                display: none !important;
             }
         }
     </style>
@@ -181,44 +211,45 @@
             <div class="card-body">
                 <!-- ✅ الهيدر -->
                 <div class="header">
-                    <!-- الشمال (شعار + بريد وهاتف) -->
-                    <div class="top-left">
-                        <div>
-                            <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo" alt="الشعار">
-                        </div>
-                        @if (GeneralSiteSettings('email'))
-                            <div class="company-info">{{ GeneralSiteSettings('email') }}</div>
-                        @endif
-                        @if (GeneralSiteSettings('phone'))
-                            <div class="company-info">{{ GeneralSiteSettings('phone') }}</div>
-                        @endif
+                    <table class="report-header">
+                        <tr>
+                            <!-- الشمال (شعار + بريد وهاتف) -->
+                            <td class="header-left">
+                                <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo" alt="الشعار">
+                                @if (GeneralSiteSettings('email'))
+                                    <div class="company-info">{{ GeneralSiteSettings('email') }}</div>
+                                @endif
+                                @if (GeneralSiteSettings('phone'))
+                                    <div class="company-info">{{ GeneralSiteSettings('phone') }}</div>
+                                @endif
+                            </td>
 
-                    </div>
+                            <!-- العنوان الرئيسي -->
+                            <td class="header-center">
+                                <h1>{{ GeneralSiteSettings('name') }}</h1>
+                            </td>
 
-                    <!-- العنوان الرئيسي -->
-                    <h1>{{ GeneralSiteSettings('name') }}</h1>
-
-
-                    <!-- اليمين (تاريخ مثلاً) -->
-                    <div class="top-right">
-                        <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo" alt="الشعار">
-                        <p>{{ date('d/m/Y') }}</p>
-                        @if ($representative)
-                            <p class="rep-info">اسم المندوب : {{ $representative->tree4_name }}</p>
-                            @if ($representative->phone)
-                                <p class="rep-info">رقم تلفون المندوب : {{ $representative->phone }}</p>
-                            @endif
-                        @endif
-                        @if ($selectedCategory)
-                            <p class="rep-info">القسم : {{ $selectedCategory->name }}</p>
-                        @endif
-                        <p style=" direction: rtl;">اسم العميل: {{ '..........................' }}</p>
-                    </div>
+                            <!-- اليمين (تاريخ مثلاً) -->
+                            <td class="header-right">
+                                <p>{{ date('d/m/Y') }}</p>
+                                @if ($representative)
+                                    <p class="rep-info">اسم المندوب : {{ $representative->tree4_name }}</p>
+                                    @if ($representative->phone)
+                                        <p class="rep-info">رقم هاتف المندوب : {{ $representative->phone }}</p>
+                                    @endif
+                                @endif
+                                @if ($selectedCategory)
+                                    <p class="rep-info">القسم : {{ $selectedCategory->name }}</p>
+                                @endif
+                                <p style=" direction: rtl;">اسم العميل: {{ '..........................' }}</p>
+                            </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <!-- ✅ الجدول -->
                 @php $visibleColumns = $show_expiry ? 7 : 6; @endphp
-                <table>
+                <table class="price-table">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -272,12 +303,7 @@
 @section('js')
     <script>
         function printDiv() {
-            var printContents = document.getElementById('print').innerHTML;
-            var originalContents = document.body.innerHTML;
-            document.body.innerHTML = printContents;
             window.print();
-            document.body.innerHTML = originalContents;
-            location.reload();
         }
     </script>
 @endsection

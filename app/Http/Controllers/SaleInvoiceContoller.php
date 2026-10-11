@@ -509,6 +509,10 @@ class SaleInvoiceContoller extends Controller
             'default_font' => 'dejavusans',
             'mode' => 'utf-8',
             'format' => 'A4',
+            'margin_left' => 8,
+            'margin_right' => 8,
+            'margin_top' => 8,
+            'margin_bottom' => 8,
         ]);
 
         $html = view('sale.pdf', compact('sale_invoice', 'madinTotal', 'dainTotal', 'allMadinTotal', 'allDainTotal', 'bank'))->render();

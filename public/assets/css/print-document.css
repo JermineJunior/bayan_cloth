@@ -28,8 +28,16 @@ tr.fill-row { display: none; }
     .row { margin: 0 !important; }
     .col-md-12, .col-xl-12 { padding: 0 !important; }
 
-    .invoice-table { width: 194mm; }
+    .invoice-table { width: 100%; }
     .invoice-table thead { display: table-header-group; }
     .invoice-table tfoot { display: table-row-group; }
     .invoice-table tr { page-break-inside: avoid; }
+}
+
+.invoice-table td.product-cell,
+.invoice-table th.product-cell { width: 38%; }
+
+@media print {
+    .invoice-table th, .invoice-table td { white-space: nowrap; }
+    .invoice-table td.product-cell { white-space: normal; }
 }

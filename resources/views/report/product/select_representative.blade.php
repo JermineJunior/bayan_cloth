@@ -9,7 +9,7 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h5 class="content-title mb-0 my-auto"> تقرير المخازن </h5><span
+                <h5 class="content-title mb-0 my-auto"> تقارير المنتجات </h5><span
                     class="text-muted mt-1 tx-13 mr-2 mb-0">/ تقرير كشف السعر</span>
             </div>
         </div>
@@ -47,7 +47,7 @@
                                             <option value="{{ $representative->id }}">{{ $representative->tree4_name }}</option>
                                         @endforeach
                                     </select>
-                                    <small>في حالة لم يتم اختيار اي مندوب سوف يتم عرض تقرير كشف الاسعار بدون اي بيانات للمندوب</small>
+                                    <small>في حالة لم يتم اختيار أي مندوب سوف يتم عرض تقرير كشف الأسعار بدون أي بيانات للمندوب</small>
                                 </div>
                                 <br>
                                 <div class="col">

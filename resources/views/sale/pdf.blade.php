@@ -4,18 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        /* إزالة هوامش الصفحة نهائياً */
-        @page {
-            margin: 0;
-        }
-
         body {
             font-family: dejavusans, sans-serif;
             direction: rtl;
             text-align: right;
             font-size: 14px;
             margin: 0;
-            padding: 15px;
+            padding: 0;
         }
 
         .invoice {
@@ -24,45 +19,113 @@
             background: #fff;
         }
 
-        .invoice-details {
-            border: 1px solid #eee;
-            background: #f9f9f9;
+        /* الهيدر */
+        .invoice-header {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
         }
 
-        .invoice-details td {
-            padding: 10px;
-            vertical-align: top;
+        .invoice-header td {
+            border: none;
+            border-bottom: 7px solid #042d7a;
+            padding: 6px;
+            vertical-align: middle;
         }
 
-        table {
+        .invoice-header img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .invoice-header h2 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: bold;
+            color: #042d7a;
+        }
+
+        .invoice-header p {
+            margin: 3px 0;
+        }
+
+        /* العنوان */
+        .modern-details {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            margin: 15px 0;
+        }
+
+        .modern-details td {
+            background: #f9fbff;
+            border: 1px solid #e3e8f3;
+            padding: 10px 12px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .modern-details td.title-banner {
+            background: #042d7a;
+            color: #fff;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+        }
+
+        .modern-details .label {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .modern-details .value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #042d7a;
+        }
+
+        /* الجدول */
+        .invoice-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
             page-break-inside: auto;
         }
 
-        thead {
+        .invoice-table thead {
             display: table-header-group;
+            background: #f1f1f1;
         }
 
-        tfoot {
-            display: table-footer-group;
+        .invoice-table tfoot {
+            display: table-row-group;
+            background: #f9f9f9;
         }
 
-        tr {
+        .invoice-table tr {
             page-break-inside: avoid;
             page-break-after: auto;
         }
 
-        table th,
-        table td {
+        .invoice-table th,
+        .invoice-table td {
             border: 1px solid #ddd;
             padding: 6px;
             text-align: center;
+            white-space: nowrap;
         }
 
-        table thead {
-            background: #f1f1f1;
+        .invoice-table th.product-cell,
+        .invoice-table td.product-cell {
+            width: 38%;
+            white-space: normal;
+        }
+
+        .invoice-table tfoot th,
+        .invoice-table tfoot td {
+            border: none;
+            border-bottom: 1px solid #ddd;
         }
     </style>
 </head>
@@ -71,56 +134,66 @@
 
     <div class="invoice">
 
-        <!-- الهيدر -->
-        <table style="width:100%; border:none; margin-bottom:20px;">
-            <tr>
+        @php
+            $logo = GeneralSiteSettings('logo');
+            $logoPath = $logo ? public_path('image/logo/' . $logo) : null;
+        @endphp
 
+        <!-- الهيدر -->
+        <table class="invoice-header">
+            <tr>
                 <td style="width:20%; text-align:right;">
-                    @if (GeneralSiteSettings('logo'))
-                        <img src="{{ asset('image/logo/bayan.jpg') }}" style="width:60px;height:60px;">
+                    @if ($logoPath && file_exists($logoPath))
+                        <img src="{{ $logoPath }}" alt="Logo">
                     @endif
                 </td>
 
                 <td style="width:60%; text-align:center;">
-                    <h2 style="margin:0;font-size:22px;font-weight:bold;color:#042d7a;">
-                        {{ GeneralSiteSettings('name') }}
-                    </h2>
-                    <p style="margin:3px 0;">{{ GeneralSiteSettings('address') }}</p>
-                    <p style="margin:0;">{{ GeneralSiteSettings('phone') }}</p>
+                    <h2>{{ GeneralSiteSettings('name') }}</h2>
+                    <p>{{ GeneralSiteSettings('location') }}</p>
+                    <p>{{ GeneralSiteSettings('phone') }}</p>
                 </td>
 
                 <td style="width:20%; text-align:left;">
-                    @if (GeneralSiteSettings('logo'))
-                        <img src="{{ asset('image/logo/bayan.jpg') }}" style="width:60px;height:60px;">
+                    @if ($logoPath && file_exists($logoPath))
+                        <img src="{{ $logoPath }}" alt="Logo">
                     @endif
                 </td>
-
             </tr>
         </table>
 
-        <!-- بيانات الفاتورة -->
-        <table class="invoice-details" style="width:100%; margin:15px 0;">
+        <!-- العنوان وبيانات الفاتورة -->
+        <table class="modern-details">
             <tr>
-                <td style="width:33%;">
-                    <p><strong>رقم الفاتورة:</strong> {{ $sale_invoice->invoice_number }}</p>
-                    <p><strong>تاريخ الفاتورة:</strong> {{ $sale_invoice->date }}</p>
+                <td colspan="4" class="title-banner">فاتورة مبيعات</td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="label">رقم الفاتورة</div>
+                    <div class="value">{{ $sale_invoice->invoice_number }}</div>
                 </td>
-                <td style="width:33%;">
-                    <p><strong>اسم العميل:</strong> {{ $sale_invoice->customer->tree4_name ?? '---' }}</p>
+                <td>
+                    <div class="label">تاريخ الفاتورة</div>
+                    <div class="value">{{ $sale_invoice->date }}</div>
                 </td>
-                <td style="width:33%;">
-                    <p><strong>اسم المندوب:</strong> {{ $sale_invoice->representative->tree4_name ?? '---' }}</p>
+                <td>
+                    <div class="label">العميل</div>
+                    <div class="value">{{ $sale_invoice->customer->tree4_name ?? '---' }}</div>
+                </td>
+                <td>
+                    <div class="label">المندوب</div>
+                    <div class="value">{{ $sale_invoice->representative->tree4_name ?? '---' }}</div>
                 </td>
             </tr>
         </table>
 
         <!-- الجدول -->
-        <table>
+        <table class="invoice-table">
 
             <thead>
                 <tr>
                     <th>م</th>
-                    <th>المنتج</th>
+                    <th class="product-cell">المنتج</th>
                     <th>الكمية</th>
                     <th>البونص</th>
                     <th>الوحدة</th>
@@ -134,7 +207,7 @@
                 @foreach ($sale_invoice->details as $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->product->name }}</td>
+                        <td class="product-cell">{{ $item->product->name }}</td>
                         <td>{{ number_format($item->qty) }}</td>
                         <td>{{ number_format($item->bounce) }}</td>
                         <td>{{ $item->unit->name }}</td>
@@ -147,54 +220,53 @@
 
             <tfoot>
                 <tr>
-                    <td colspan="6"></td>
-                    <td><strong>جملة الفاتورة</strong></td>
-                    <td>{{ number_format($sale_invoice->sub_total_amount + $sale_invoice->tax_amount, 2) }}</td>
+                    <td colspan="4"></td>
+                    <td colspan="2">جملة الفاتورة</td>
+                    <td colspan="2">{{ number_format($sale_invoice->sub_total_amount + $sale_invoice->tax_amount, 2) }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6"></td>
-                    <td><strong>الخصم</strong></td>
-                    <td>{{ number_format($sale_invoice->discount_amount, 2) }}</td>
+                    <td colspan="4"></td>
+                    <td colspan="2">الخصم</td>
+                    <td colspan="2">{{ number_format($sale_invoice->discount_amount, 2) }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6"></td>
-                    <td><strong>صافي الفاتورة</strong></td>
-                    <td>{{ number_format($sale_invoice->total_amount, 2) }}</td>
+                    <td colspan="4"></td>
+                    <td colspan="2">صافي الفاتورة</td>
+                    <td colspan="2">{{ number_format($sale_invoice->total_amount, 2) }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6"></td>
-                    <td><strong>مدفوع نقداً</strong></td>
-                    <td>{{ number_format($sale_invoice->cash_amount_total, 2) }}</td>
+                    <td colspan="4"></td>
+                    <td colspan="2">مدفوع نقداً</td>
+                    <td colspan="2">{{ number_format($sale_invoice->cash_amount_total, 2) }}</td>
                 </tr>
                 <tr>
-                    <td colspan="6"></td>
-                    <td><strong>مدفوع بالبنك</strong></td>
-                    <td>{{ number_format($sale_invoice->bank_amount_total, 2) }}</td>
+                    <td colspan="4"></td>
+                    <td colspan="2">مدفوع بالبنك</td>
+                    <td colspan="2">{{ number_format($sale_invoice->bank_amount_total, 2) }}</td>
                 </tr>
                 @if ($sale_invoice->transaction_no)
                     <tr>
-                        <td colspan="6"></td>
-                        <td><strong>رقم عملية البنك</strong></td>
-                        <td>{{ $sale_invoice->transaction_no }}</td>
+                        <td colspan="4"></td>
+                        <td colspan="2">رقم عملية البنك</td>
+                        <td colspan="2">{{ $sale_invoice->transaction_no }}</td>
                     </tr>
                 @endif
                 <tr>
-                    <td colspan="6"></td>
-                    <td><strong>أجل</strong></td>
-                    <td>{{ number_format($sale_invoice->deferend_amount, 2) }}</td>
+                    <td colspan="4"></td>
+                    <td colspan="2">آجل</td>
+                    <td colspan="2">{{ number_format($sale_invoice->deferend_amount, 2) }}</td>
                 </tr>
                 @if ($sale_invoice->customer_id != null)
                     <tr>
-                        <td colspan="6"></td>
-                        <td>جملة المطالبة السابقة</td>
-                        <td>{{ number_format($madinTotal - $dainTotal) }}</td>
+                        <td colspan="4"></td>
+                        <td colspan="2">جملة المطالبة السابقة</td>
+                        <td colspan="2">{{ number_format($madinTotal - $dainTotal) }}</td>
                     </tr>
                     @if ($sale_invoice->deferend_amount > 0)
                         <tr>
-                            <td colspan="6"></td>
-                            <td>جملة المطالبة الكلية</td>
-                            <td>{{ number_format($allMadinTotal - $allDainTotal) }}
-                            </td>
+                            <td colspan="4"></td>
+                            <td colspan="2">جملة المطالبة الكلية</td>
+                            <td colspan="2">{{ number_format($allMadinTotal - $allDainTotal) }}</td>
                         </tr>
                     @endif
                 @endif
