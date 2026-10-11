@@ -19,6 +19,9 @@ class CustomerInvoicePaymentController extends Controller
 {
     public function create(): View
     {
+        if (true) {
+            return view('coming-soon');
+        }
         $customers = Tree4::where('tree3_code', 1205)->get();
         $safes = Tree4::where('tree3_code', 1202)->get();
         $banks = Tree4::where('tree3_code', 1203)->get();
@@ -35,7 +38,7 @@ class CustomerInvoicePaymentController extends Controller
             ->orderBy('date')
             ->orderBy('id')
             ->get()
-            ->map(fn ($invoice) => [
+            ->map(fn($invoice) => [
                 'id' => $invoice->id,
                 'invoice_number' => $invoice->invoice_number,
                 'date' => $invoice->date,
@@ -53,7 +56,7 @@ class CustomerInvoicePaymentController extends Controller
             [
                 'customer_id' => 'required|exists:tree4s,id',
                 'representative_id' => 'nullable|exists:tree4s,id',
-                'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn () => (float) str_replace(',', '', $request->madin_name[1] ?? '') > 0)],
+                'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn() => (float) str_replace(',', '', $request->madin_name[1] ?? '') > 0)],
             ],
             [
                 'customer_id.required' => 'يرجى اختيار العميل.',
