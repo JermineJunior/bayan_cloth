@@ -212,7 +212,6 @@
                 'تقرير مردود مبيعات ملخص',
                 'تقرير المبيعات حسب المندوب',
                 'تقرير مردود المبيعات حسب المندوب',
-                'تقرير عمولة المندوب',
                 'تقرير المشتريات حسب المورد',
                 'تقرير راجع مشتريات حسب المورد',
                 'تقرير مشتريات حسب المستخدم',
@@ -240,338 +239,296 @@
                 'تقرير الجرد للمشتريات',
                 'تقرير الجرد للمبيعات',
                 'تقرير كشف السعر',
-                ])
-                <li class="side-item side-item-category" style="font-weight: bold;"> التقارير </li>
-
-            @endcanany
-            @canany([
-                'تقرير المبيعات حسب العميل',
-                'تقرير راجع مبيعات حسب العميل',
-                'تقرير مبيعات حسب المستخدم',
-                'تقرير
-                راجع مبيعات حسب المستخدم',
-                'تقرير مبيعات حسب الشركة',
-                'تقرير مردود مبيعات حسب الشركة',
-                'تقرير مبيعات مفصل',
-                'تقرير مردود مبيعات مفصل',
-                'تقرير مبيعات ملخص',
-                'تقرير مردود مبيعات ملخص',
-                'تقرير المبيعات حسب المندوب',
-                'تقرير مردود المبيعات حسب المندوب',
+                'تقرير عمولة المندوب',
+                'تقرير كشف حساب',
+                'تقرير دفتر اليومية',
+                'تقرير القيود',
+                'الدفاتر المحاسبية',
                 ])
                 <li class="slide">
-                    <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
+                    <a class="side-menu__item" data-toggle="slide" href="#"><svg
                             xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
                             width="24" height="24" fill="currentColor">
                             <path d="M3 17h2v-6H3v6zm4 0h2V7H7v10zm4 0h2v-4h-2v4zm4 0h2V4h-2v13zm4 0h2v-8h-2v8z" />
                         </svg>
 
-                        <span class="side-menu__label"> تقارير المبيعات</span><i class="angle fe fe-chevron-down"></i></a>
+                        <span class="side-menu__label">التقارير</span><i class="angle fe fe-chevron-down"></i></a>
                     <ul class="slide-menu">
-                        @can('تقرير المبيعات حسب العميل')
-                            <li><a class="slide-item" href="{{ route('report.sale_invoice.customer.index') }}">تقرير المبيعات
-                                    حسب العميل
-                                </a></li>
-                        @endcan
-                        @can('تقرير راجع مبيعات حسب العميل')
-                            <li><a class="slide-item" href="{{ route('report.sale_return_invoice.customer.index') }}">تقرير
-                                    راجع مبيعات حسب العميل
-                                </a></li>
-                        @endcan
-                        @can('تقرير مبيعات حسب المستخدم')
-                            <li><a class="slide-item" href="{{ route('report.sale_invoice.agent.index') }}">تقرير مبيعات حسب
-                                    المستخدم
-                                </a></li>
-                        @endcan
-                        @can('تقرير راجع مبيعات حسب المستخدم')
-                            <li><a class="slide-item" href="{{ route('report.sale_return_invoice.agent.index') }}">تقرير راجع
-                                    ميبعات حسب المستخدم
-                                </a></li>
-                        @endcan
-                        @can('تقرير مبيعات حسب الشركة')
-                            <li><a class="slide-item" href="{{ route('report.sale_invoice.category.index') }}">تقرير مبيعات
-                                    حسب الشركة
-                                </a></li>
-                        @endcan
-                        @can('تقرير مردود مبيعات حسب الشركة')
-                            <li><a class="slide-item" href="{{ route('report.sale_return_invoice.category.index') }}">تقرير
-                                    مردود مبيعات حسب الشركة
-                                </a></li>
-                        @endcan
-                        @can('تقرير مبيعات حسب الشركة')
-                            <li><a class="slide-item" href="{{ route('report.sale_invoice.product.index') }}">تقرير مبيعات
-                                    حسب الصنف
-                                </a></li>
-                        @endcan
-                        @can('تقرير مبيعات مفصل')
-                            <li><a class="slide-item" href="{{ route('report.sale_invoice.details.index') }}">تقرير مبيعات
-                                    مفصل
-                                </a></li>
-                        @endcan
-                        @can('تقرير مردود مبيعات مفصل')
-                            <li><a class="slide-item" href="{{ route('report.sale_return_invoice.details.index') }}">تقرير
-                                    مردود مبيعات مفصل
-                                </a></li>
-                        @endcan
-                        @can('تقرير مبيعات ملخص')
-                            <li><a class="slide-item" href="{{ route('report.sale_invoice.summary.index') }}">تقرير مبيعات
-                                    ملخص
-                                </a></li>
-                        @endcan
-                        @can('تقرير مردود مبيعات ملخص')
-                            <li><a class="slide-item" href="{{ route('report.sale_return_invoice.summary.index') }}">تقرير
-                                    مردود مبيعات ملخص
-                                </a></li>
-                        @endcan
-                        @can('تقرير المبيعات حسب المندوب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.sale_invoice.representative.index') }}">
-                                    تقرير المبيعات حسب المندوب</a></li>
-                        @endcan
-                        @can('تقرير مردود المبيعات حسب المندوب')
-                            <li><a class="slide-item mb-3"
-                                    href="{{ route('report.sale_invoice_return.representative.index') }}">
-                                    تقرير مردود المبيعات حسب المندوب</a></li>
-                        @endcan
-                    </ul>
-                </li>
-            @endcan
-            @canany([
-                'تقرير المشتريات حسب المورد',
-                'تقرير راجع مشتريات حسب المورد',
-                'تقرير مشتريات حسب المستخدم',
-                'تقرير
-                راجع مشتريات حسب المستخدم',
-                'تقرير مشتريات حسب الشركة',
-                'تقرير مردود مشتريات حسب الشركة',
-                'تقرير مشتريات
-                مفصل',
-                'تقرير مردود مشتريات مفصل',
-                'تقرير مشتريات ملخص',
-                'تقرير مردود مشتريات ملخص',
-                ])
-                <li class="slide">
-                    <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
-                            width="24" height="24" fill="currentColor">
-                            <path
-                                d="M21 2H3v20l3-3 3 3 3-3 3 3 3-3 3 3V2zM5 4h14v13.17l-1.59-1.59L16 17l-2.41-2.41L11 17l-2.41-2.41L6 17l-1-1V4z" />
-                        </svg>
-                        <span class="side-menu__label"> تقارير المشتريات</span><i
-                            class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu">
-                        @can('تقرير المشتريات حسب المورد')
-                            <li><a class="slide-item" href="{{ route('report.purchase_ivoice.supplier.index') }}">تقرير
-                                    المشتريات حسب المورد
-                                </a></li>
-                        @endcan
-                        @can('تقرير راجع مشتريات حسب المورد')
-                            <li><a class="slide-item"
-                                    href="{{ route('report.purchase_return_invoice.supplier.index') }}">تقرير راجع المشتريات
-                                    حسب المورد
-                                </a></li>
-                        @endcan
-                        @can('تقرير مشتريات حسب المستخدم')
-                            <li><a class="slide-item" href="{{ route('report.purchase_ivoice.agent.index') }}">تقرير
-                                    المشتريات حسب المستخدم
-                                </a></li>
-                        @endcan
-                        @can('تقرير راجع مشتريات حسب المستخدم')
-                            <li><a class="slide-item" href="{{ route('report.purchase_return_invoice.agent.index') }}">تقرير
-                                    راجع مشتريات حسب المستخدم
-                                </a></li>
-                        @endcan
-                        @can('تقرير مشتريات حسب الشركة')
-                            <li><a class="slide-item" href="{{ route('report.purchase_invoice.category.index') }}">تقرير
-                                    مشتريات حسب الشركة
-                                </a></li>
-                        @endcan
-                        @can('تقرير مردود مشتريات حسب الشركة')
-                        <li><a class="slide-item"
-                            href="{{ route('report.purchase_return_invoice.category.index') }}">تقرير مردود مشتريات
-                            حسب الشركة
-                        </a></li>
-                        @endcan
-                        @can('تقرير مشتريات حسب الشركة')
-                            <li><a class="slide-item" href="{{ route('report.purchase_invoice.product.index') }}">تقرير مشتريات
-                                    حسب الصنف
-                                </a></li>
-                        @endcan
-                        @can('تقرير مشتريات مفصل')
-                            <li><a class="slide-item" href="{{ route('report.purchase_invoice.details.index') }}">تقرير
-                                    مشتريات مفصل
-                                </a></li>
-                        @endcan
-                        @can('تقرير مردود مشتريات مفصل')
-                            <li><a class="slide-item"
-                                    href="{{ route('report.purchase_return_invoice.details.index') }}">تقرير مردود مشتريات
-                                    مفصل
-                                </a></li>
-                        @endcan
-                        @can('تقرير مشتريات ملخص')
-                            <li><a class="slide-item" href="{{ route('report.purchase_invoice.summary.index') }}">تقرير
-                                    مشتريات ملخص
-                                </a></li>
-                        @endcan
-                        @can('تقرير مردود مشتريات ملخص')
-                            <li><a class="slide-item"
-                                    href="{{ route('report.purchase_return_invoice.summary.index') }}">تقرير مردود مشتريات
-                                    ملخص
-                                </a></li>
-                        @endcan
-                    </ul>
-                </li>
-            @endcanany
-
-            @canany([
-                'تقرير الموقف المالي للعميل',
-                'تقرير الموقف المالي للمورد',
-                'كشف حساب خزنة',
-                'كشف حساب بنك',
-                'كشف
-                حساب الايرادات',
-                'كشف حساب المصروفات',
-                'تقرير مدينونيات العملاء',
-                ])
-                <li class="slide">
-                    <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
-                            width="24" height="24" fill="currentColor">
-                            <path d="M3 21h18v2H3zm4-4h2v-8H7zm4-4h2v-4h-2zm4-2h2V7h-2z" />
-                        </svg>
-                        <span class="side-menu__label"> التقارير المالية</span><i
-                            class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu">
-                        @can('تقرير الموقف المالي للعميل')
-                            <li><a class="slide-item mb-3" href="{{ route('report.customer.account') }}">
-                                    تقرير الموقف المالي للعميل</a></li>
-                        @endcan
-                        @can('تقرير الموقف المالي للمورد')
-                            <li><a class="slide-item mb-3" href="{{ route('report.supplier.account') }}">
-                                    تقرير الموقف المالي للمورد</a></li>
-                        @endcan
-                        @can('كشف حساب خزنة')
-                            <li><a class="slide-item mb-3" href="{{ route('report.safe.account') }}">
-                                    كشف حساب خزنة</a></li>
-                        @endcan
-                        @can('كشف حساب بنك')
-                            <li><a class="slide-item mb-3" href="{{ route('report.bank.account') }}">
-                                    كشف حساب بنك</a></li>
-                        @endcan
-                        @can('كشف حساب المصروفات')
-                            <li><a class="slide-item mb-3" href="{{ route('report.expense') }}">
-                                    تقرير كشف المصروفات </a></li>
-                        @endcan
-                        @can('كشف حساب الايرادات')
-                            <li><a class="slide-item mb-3" href="{{ route('report.revenue') }}">
-                                    تقرير كشف الايرادات </a></li>
-                        @endcan
-                        @can('تقرير مدينونيات العملاء')
-                            <li><a class="slide-item mb-3" href="{{ route('report.customer.account.index') }}">
-                                    تقرير مدينونيات العملاء </a></li>
-                        @endcan
-
-                    </ul>
-                </li>
-            @endcanany
-
-            @canany([
-                'تقرير المبيعات حسب المندوب',
-                'تقرير مردود المبيعات حسب المندوب',
-                'تقرير عمولة المندوب',
-                'تقرير مديونيات عملاء المندوب',
-                ])
-                <li class="slide">
-                    <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
-                            width="24" height="24" fill="currentColor">
-                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
-                        </svg>
-                        <span class="side-menu__label"> تقارير المندوبين</span><i
-                            class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu">
-                        @can('تقرير المبيعات حسب المندوب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.sale_invoice.representative.index') }}">
-                                    تقرير المبيعات حسب المندوب</a></li>
-                        @endcan
-                        @can('تقرير مردود المبيعات حسب المندوب')
-                            <li><a class="slide-item mb-3"
-                                    href="{{ route('report.sale_invoice_return.representative.index') }}">
-                                    تقرير مردود المبيعات حسب المندوب</a></li>
-                        @endcan
-                        @can('تقرير عمولة المندوب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.representative.cut.index') }}">
-                                    تقرير عمولة المندوب</a></li>
-                        @endcan
-                        @can('تقرير مديونيات عملاء المندوب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.representative.customer.index') }}">
-                                    تقرير مديونيات عملاء المندوب</a></li>
-                        @endcan
-                    </ul>
-                </li>
-            @endcanany
-
-
-            @canany([
-                'تقرير المنتجات الاكثر طلبا',
-                'تقرير المنتجات التي تجاوزت تاريخ الصلاحية',
-                'تقرير المنتجات التي
-                شارفت على تجاوز تاريخ الصلاحية',
-                'تقرير المنتجات التي تجازوت حد الطلب',
-                'تقرير مفصل للمخازن حسب الفترة',
-                'نقرير حركة المخزن',
-                'تقرير الجرد للمشتريات',
-                'تقرير الجرد للمبيعات',
-                'تقرير كشف السعر',
-                ])
-                <li class="slide">
-                    <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24"
-                            width="24" height="24" fill="currentColor">
-                            <path
-                                d="M20.54 5.23L12 1 3.46 5.23a1 1 0 0 0-.46.84v11.86a1 1 0 0 0 .6.92l8.4 3.44a1 1 0 0 0 .8 0l8.4-3.44a1 1 0 0 0 .6-.92V6.07a1 1 0 0 0-.46-.84zM12 3.25L18.18 6 12 8.75 5.82 6 12 3.25zM5 7.96l6 2.45v9.63L5 17.6V7.96zm14 9.64-6 2.44v-9.63l6-2.45v9.64z" />
-                        </svg>
-
-                        <span class="side-menu__label">تقارير المخازن</span><i class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu">
-                        @can('تقرير المنتجات الاكثر طلبا')
-                            <li><a class="slide-item" href="{{ route('report.top-products') }}">تقرير المنتجات الاكثر
-                                    مبيعا </a></li>
-                        @endcan
-                        @can('تقرير المنتجات التي تجاوزت تاريخ الصلاحية')
-                            <li><a class="slide-item mb-3" href="{{ route('report.expired-products') }}">تقرير المنتجات التي
-                                    تجاوزت تاريخ الصلاحية </a></li>
-                        @endcan
-                        @can('تقرير المنتجات التي شارفت على تجاوز تاريخ الصلاحية')
-                            <li><a class="slide-item mb-3" href="{{ route('report.expiring-products') }}">تقرير المنتجات
-                                    التي
-                                    شارفت على تجاوز تاريخ الصلاحية </a></li>
-                        @endcan
-                        @can('تقرير المنتجات التي تجازوت حد الطلب')
-                            <li><a class="slide-item mb-3" href="{{ route('report.low_stock') }}">تقرير المنتجات التي
-                                    تجاوزت حد الطلب </a></li>
-                        @endcan
-                        @can('تقرير مفصل للمخازن حسب الفترة')
-                            <li><a class="slide-item mb-3" href="{{ route('report.stock.details.index') }}">تقرير مفصل
-                                    للمخازن
-                                    حسب الفترة </a></li>
-                        @endcan
-                        @can('تقرير حركة المخزن')
-                            <li><a class="slide-item mb-3" href="{{ route('burren.info') }}">تقرير حركة المخزن </a></li>
-                        @endcan
-                        @can('تقرير كشف السعر')
-                            <li><a class="slide-item mb-3" href="{{ route('select.representative') }}">تقرير كشف السعر </a></li>
-                        @endcan
-                        @can('تقرير الجرد للمبيعات')
-                            <li><a class="slide-item mb-3" href="{{ route('report.burren.sale_price.index') }}">تقرير الجرد للمبيعات </a></li>
-                        @endcan
-                         @can('تقرير الجرد للمشتريات')
-                            <li><a class="slide-item mb-3" href="{{ route('report.burren.purchase_price.index') }}">تقرير الجرد للمشتريات </a></li>
-                        @endcan
+                        <li class="sub-slide">
+                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                                <span class="sub-side-menu__label">تقارير المبيعات</span><i
+                                    class="sub-angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="sub-slide-menu">
+                                @can('تقرير المبيعات حسب العميل')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.customer.index') }}">تقرير المبيعات
+                                            حسب العميل</a></li>
+                                @endcan
+                                @can('تقرير راجع مبيعات حسب العميل')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_return_invoice.customer.index') }}">تقرير
+                                            راجع مبيعات حسب العميل</a></li>
+                                @endcan
+                                @can('تقرير مبيعات حسب المستخدم')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.agent.index') }}">تقرير مبيعات حسب
+                                            المستخدم</a></li>
+                                @endcan
+                                @can('تقرير راجع مبيعات حسب المستخدم')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_return_invoice.agent.index') }}">تقرير راجع
+                                            ميبعات حسب المستخدم</a></li>
+                                @endcan
+                                @can('تقرير مبيعات حسب الشركة')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.category.index') }}">تقرير مبيعات
+                                            حسب الشركة</a></li>
+                                @endcan
+                                @can('تقرير مردود مبيعات حسب الشركة')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_return_invoice.category.index') }}">تقرير
+                                            مردود مبيعات حسب الشركة</a></li>
+                                @endcan
+                                @can('تقرير مبيعات حسب الشركة')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.product.index') }}">تقرير مبيعات
+                                            حسب الصنف</a></li>
+                                @endcan
+                                @can('تقرير مبيعات مفصل')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.details.index') }}">تقرير مبيعات
+                                            مفصل</a></li>
+                                @endcan
+                                @can('تقرير مردود مبيعات مفصل')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_return_invoice.details.index') }}">تقرير
+                                            مردود مبيعات مفصل</a></li>
+                                @endcan
+                                @can('تقرير مبيعات ملخص')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.summary.index') }}">تقرير مبيعات
+                                            ملخص</a></li>
+                                @endcan
+                                @can('تقرير مردود مبيعات ملخص')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_return_invoice.summary.index') }}">تقرير
+                                            مردود مبيعات ملخص</a></li>
+                                @endcan
+                                @can('تقرير المبيعات حسب المندوب')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.representative.index') }}">تقرير
+                                            المبيعات حسب المندوب</a></li>
+                                @endcan
+                                @can('تقرير مردود المبيعات حسب المندوب')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice_return.representative.index') }}">تقرير
+                                            مردود المبيعات حسب المندوب</a></li>
+                                @endcan
+                            </ul>
+                        </li>
+                        <li class="sub-slide">
+                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                                <span class="sub-side-menu__label">تقارير المشتريات</span><i
+                                    class="sub-angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="sub-slide-menu">
+                                @can('تقرير المشتريات حسب المورد')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_ivoice.supplier.index') }}">تقرير
+                                            المشتريات حسب المورد</a></li>
+                                @endcan
+                                @can('تقرير راجع مشتريات حسب المورد')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_return_invoice.supplier.index') }}">تقرير
+                                            راجع المشتريات حسب المورد</a></li>
+                                @endcan
+                                @can('تقرير مشتريات حسب المستخدم')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_ivoice.agent.index') }}">تقرير
+                                            المشتريات حسب المستخدم</a></li>
+                                @endcan
+                                @can('تقرير راجع مشتريات حسب المستخدم')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_return_invoice.agent.index') }}">تقرير
+                                            راجع مشتريات حسب المستخدم</a></li>
+                                @endcan
+                                @can('تقرير مشتريات حسب الشركة')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_invoice.category.index') }}">تقرير
+                                            مشتريات حسب الشركة</a></li>
+                                @endcan
+                                @can('تقرير مردود مشتريات حسب الشركة')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_return_invoice.category.index') }}">تقرير
+                                            مردود مشتريات حسب الشركة</a></li>
+                                @endcan
+                                @can('تقرير مشتريات حسب الشركة')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_invoice.product.index') }}">تقرير
+                                            مشتريات حسب الصنف</a></li>
+                                @endcan
+                                @can('تقرير مشتريات مفصل')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_invoice.details.index') }}">تقرير
+                                            مشتريات مفصل</a></li>
+                                @endcan
+                                @can('تقرير مردود مشتريات مفصل')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_return_invoice.details.index') }}">تقرير
+                                            مردود مشتريات مفصل</a></li>
+                                @endcan
+                                @can('تقرير مشتريات ملخص')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_invoice.summary.index') }}">تقرير
+                                            مشتريات ملخص</a></li>
+                                @endcan
+                                @can('تقرير مردود مشتريات ملخص')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.purchase_return_invoice.summary.index') }}">تقرير
+                                            مردود مشتريات ملخص</a></li>
+                                @endcan
+                            </ul>
+                        </li>
+                        <li class="sub-slide">
+                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                                <span class="sub-side-menu__label">التقارير المالية</span><i
+                                    class="sub-angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="sub-slide-menu">
+                                @can('تقرير الموقف المالي للعميل')
+                                    <li><a class="sub-slide-item" href="{{ route('report.customer.account') }}">
+                                            تقرير الموقف المالي للعميل</a></li>
+                                @endcan
+                                @can('تقرير الموقف المالي للمورد')
+                                    <li><a class="sub-slide-item" href="{{ route('report.supplier.account') }}">
+                                            تقرير الموقف المالي للمورد</a></li>
+                                @endcan
+                                @can('كشف حساب خزنة')
+                                    <li><a class="sub-slide-item" href="{{ route('report.safe.account') }}">
+                                            كشف حساب خزنة</a></li>
+                                @endcan
+                                @can('كشف حساب بنك')
+                                    <li><a class="sub-slide-item" href="{{ route('report.bank.account') }}">
+                                            كشف حساب بنك</a></li>
+                                @endcan
+                                @can('كشف حساب المصروفات')
+                                    <li><a class="sub-slide-item" href="{{ route('report.expense') }}">
+                                            تقرير كشف المصروفات </a></li>
+                                @endcan
+                                @can('كشف حساب الايرادات')
+                                    <li><a class="sub-slide-item" href="{{ route('report.revenue') }}">
+                                            تقرير كشف الايرادات </a></li>
+                                @endcan
+                                @can('تقرير مدينونيات العملاء')
+                                    <li><a class="sub-slide-item" href="{{ route('report.customer.account.index') }}">
+                                            تقرير مدينونيات العملاء </a></li>
+                                @endcan
+                            </ul>
+                        </li>
+                        <li class="sub-slide">
+                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                                <span class="sub-side-menu__label">تقارير المندوبين</span><i
+                                    class="sub-angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="sub-slide-menu">
+                                @can('تقرير المبيعات حسب المندوب')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice.representative.index') }}">تقرير
+                                            المبيعات حسب المندوب</a></li>
+                                @endcan
+                                @can('تقرير مردود المبيعات حسب المندوب')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.sale_invoice_return.representative.index') }}">تقرير
+                                            مردود المبيعات حسب المندوب</a></li>
+                                @endcan
+                                @can('تقرير عمولة المندوب')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.representative.cut.index') }}">تقرير عمولة
+                                            المندوب</a></li>
+                                @endcan
+                                @can('تقرير مديونيات عملاء المندوب')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.representative.customer.index') }}">تقرير مديونيات
+                                            عملاء المندوب</a></li>
+                                @endcan
+                            </ul>
+                        </li>
+                        <li class="sub-slide">
+                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                                <span class="sub-side-menu__label">تقارير المخازن</span><i
+                                    class="sub-angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="sub-slide-menu">
+                                @can('تقرير المنتجات الاكثر طلبا')
+                                    <li><a class="sub-slide-item" href="{{ route('report.top-products') }}">تقرير
+                                            المنتجات الاكثر مبيعا </a></li>
+                                @endcan
+                                @can('تقرير المنتجات التي تجاوزت تاريخ الصلاحية')
+                                    <li><a class="sub-slide-item" href="{{ route('report.expired-products') }}">تقرير
+                                            المنتجات التي تجاوزت تاريخ الصلاحية </a></li>
+                                @endcan
+                                @can('تقرير المنتجات التي شارفت على تجاوز تاريخ الصلاحية')
+                                    <li><a class="sub-slide-item" href="{{ route('report.expiring-products') }}">تقرير
+                                            المنتجات التي شارفت على تجاوز تاريخ الصلاحية </a></li>
+                                @endcan
+                                @can('تقرير المنتجات التي تجازوت حد الطلب')
+                                    <li><a class="sub-slide-item" href="{{ route('report.low_stock') }}">تقرير
+                                            المنتجات التي تجاوزت حد الطلب </a></li>
+                                @endcan
+                                @can('تقرير مفصل للمخازن حسب الفترة')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.stock.details.index') }}">تقرير مفصل للمخازن
+                                            حسب الفترة </a></li>
+                                @endcan
+                                @can('تقرير حركة المخزن')
+                                    <li><a class="sub-slide-item" href="{{ route('burren.info') }}">تقرير حركة المخزن
+                                        </a></li>
+                                @endcan
+                                @can('تقرير كشف السعر')
+                                    <li><a class="sub-slide-item" href="{{ route('select.representative') }}">تقرير
+                                            كشف السعر </a></li>
+                                @endcan
+                                @can('تقرير الجرد للمبيعات')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.burren.sale_price.index') }}">تقرير الجرد
+                                            للمبيعات </a></li>
+                                @endcan
+                                @can('تقرير الجرد للمشتريات')
+                                    <li><a class="sub-slide-item"
+                                            href="{{ route('report.burren.purchase_price.index') }}">تقرير الجرد
+                                            للمشتريات </a></li>
+                                @endcan
+                            </ul>
+                        </li>
+                        <li class="sub-slide">
+                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                                <span class="sub-side-menu__label">التقارير المحاسبية</span><i
+                                    class="sub-angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="sub-slide-menu">
+                                @can('تقرير كشف حساب')
+                                    <li><a class="sub-slide-item" href="{{ route('account.statement') }}"> تقرير كشف
+                                            حسابات </a></li>
+                                @endcan
+                                @can('تقرير دفتر اليومية')
+                                    <li><a class="sub-slide-item" href="{{ route('journal.index') }}"> تقرير دفتر
+                                            اليومية </a></li>
+                                @endcan
+                                @can('تقرير القيود')
+                                    <li><a class="sub-slide-item" href="{{ route('journalEntry.index') }}"> تقرير القيود
+                                        </a></li>
+                                @endcan
+                                @can('الدفاتر المحاسبية')
+                                    <li><a class="sub-slide-item" href="{{ route('accountingBooks.index') }}"> الدفاتر
+                                            المحاسبية </a></li>
+                                @endcan
+                                {{--  <li><a class="slide-item" href="{{ url('/' . $page='Operation') }}">الارصدة الافتتاحية </a></li>   --}}
+                            </ul>
+                        </li>
                     </ul>
                 </li>
             @endcanany
-
-
 
             @canany([
                 'الايردادات',
@@ -623,36 +580,6 @@
                             <li><a class="slide-item" href="{{ route('daily.index') }}"> قائمة القيود </a>
                             </li>
                         @endcan
-                    </ul>
-                </li>
-            @endcanany
-            @canany(['تقرير كشف حساب', 'تقرير دفتر اليومية', 'تقرير القيود', 'الدفاتر المحاسبية'])
-                <li class="slide">
-                    <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
-                            xmlns="http://www.w3.org/2000/svg" class="side-menu__icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14h-2v-2h2v2zm0-4h-2V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z" />
-                        </svg>
-
-                        <span class="side-menu__label">التقارير المحاسبية</span><i
-                            class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu">
-                        @can('تقرير كشف حساب')
-                            <li><a class="slide-item" href="{{ route('account.statement') }}"> تقرير كشف حسابات </a>
-                            </li>
-                        @endcan
-                        @can('تقرير دفتر اليومية')
-                            <li><a class="slide-item" href="{{ route('journal.index') }}"> تقرير دفتر اليومية </a></li>
-                        @endcan
-                        @can('تقرير القيود')
-                            <li><a class="slide-item" href="{{ route('journalEntry.index') }}"> تقرير القيود </a>
-                            </li>
-                        @endcan
-                        @can('الدفاتر المحاسبية')
-                            <li><a class="slide-item" href="{{ route('accountingBooks.index') }}"> الدفاتر المحاسبية </a>
-                            </li>
-                        @endcan
-                        {{--  <li><a class="slide-item" href="{{ url('/' . $page='Operation') }}">الارصدة الافتتاحية </a></li>   --}}
                     </ul>
                 </li>
             @endcanany
