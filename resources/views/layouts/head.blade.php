@@ -267,4 +267,22 @@
         overflow:  auto !important;
     }
 }
+
+/* ===== Sidebar sub-dropdown (reports) =====
+   The theme gives .sub-slide-item a fixed 28px height. The long Arabic report
+   labels wrap inside the narrow sidebar, and the wrapped lines spill over the
+   next rows. Let the rows grow with their content and give them a little more
+   width by reducing the sub-menu indent. */
+.app-sidebar .slide-menu .sub-slide-menu .sub-slide-item {
+    height: auto !important;
+    min-height: 28px;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    line-height: 1.35;
+    white-space: normal;
+}
+
+.app-sidebar .slide-menu .sub-slide-menu {
+    padding: 0 8px;
+}
 </style>

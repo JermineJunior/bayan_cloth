@@ -255,7 +255,7 @@
                         <span class="side-menu__label">التقارير</span><i class="angle fe fe-chevron-down"></i></a>
                     <ul class="slide-menu">
                         <li class="sub-slide">
-                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                            <a class="slide-item sub-side-menu__item" data-toggle="sub-slide" href="#">
                                 <span class="sub-side-menu__label">تقارير المبيعات</span><i
                                     class="sub-angle fe fe-chevron-down"></i>
                             </a>
@@ -328,7 +328,7 @@
                             </ul>
                         </li>
                         <li class="sub-slide">
-                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                            <a class="slide-item sub-side-menu__item" data-toggle="sub-slide" href="#">
                                 <span class="sub-side-menu__label">تقارير المشتريات</span><i
                                     class="sub-angle fe fe-chevron-down"></i>
                             </a>
@@ -391,7 +391,7 @@
                             </ul>
                         </li>
                         <li class="sub-slide">
-                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                            <a class="slide-item sub-side-menu__item" data-toggle="sub-slide" href="#">
                                 <span class="sub-side-menu__label">التقارير المالية</span><i
                                     class="sub-angle fe fe-chevron-down"></i>
                             </a>
@@ -427,7 +427,7 @@
                             </ul>
                         </li>
                         <li class="sub-slide">
-                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                            <a class="slide-item sub-side-menu__item" data-toggle="sub-slide" href="#">
                                 <span class="sub-side-menu__label">تقارير المندوبين</span><i
                                     class="sub-angle fe fe-chevron-down"></i>
                             </a>
@@ -455,7 +455,7 @@
                             </ul>
                         </li>
                         <li class="sub-slide">
-                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                            <a class="slide-item sub-side-menu__item" data-toggle="sub-slide" href="#">
                                 <span class="sub-side-menu__label">تقارير المخازن</span><i
                                     class="sub-angle fe fe-chevron-down"></i>
                             </a>
@@ -502,7 +502,7 @@
                             </ul>
                         </li>
                         <li class="sub-slide">
-                            <a class="slide-item" data-toggle="sub-slide" href="#">
+                            <a class="slide-item sub-side-menu__item" data-toggle="sub-slide" href="#">
                                 <span class="sub-side-menu__label">التقارير المحاسبية</span><i
                                     class="sub-angle fe fe-chevron-down"></i>
                             </a>
