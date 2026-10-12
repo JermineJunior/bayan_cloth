@@ -201,7 +201,7 @@ class SaleInvoiceContoller extends Controller
         return view('sale.print', compact('sale_invoice', 'madinTotal', 'dainTotal', 'allMadinTotal', 'allDainTotal', 'bank'));
     }
 
-    public function edit(SaleInvoice $sale_invoice): View
+    public function edit(SaleInvoice $sale_invoice): View|RedirectResponse
     {
         if ($sale_invoice->allocations()->exists()) {
             return redirect()->route('sale_invoice.index')->withErrors(['error' => 'لا يمكن تعديل هذه الفاتورة لانها مرتبطه بتحصيل فواتير العملاء']);

@@ -607,9 +607,9 @@
                         @can('الايردادات')
                             <li><a class="slide-item" href="{{ route('revenue.index') }}"> الايردادات</a></li>
                         @endcan
-                      {{--   @can('تحصيل فواتير العملاء')
+                        @can('تحصيل فواتير العملاء')
                             <li><a class="slide-item" href="{{ route('customer-invoice-payment.create') }}"> تحصيل فواتير العملاء</a></li>
-                        @endcan --}}
+                        @endcan 
                         @can('المصروفات')
                             <li><a class="slide-item" href="{{ route('expense.index') }}"> المصروفات</a></li>
                         @endcan

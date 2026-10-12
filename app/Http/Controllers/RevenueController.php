@@ -84,6 +84,9 @@ class RevenueController extends Controller
 
     public function update(UpdateRevenueRequest $request, Revenue $revenue): RedirectResponse|View
     {
+        if ($revenue->allocations()->exists()) {
+            return back()->withErrors(['error' => 'لا يمكن تعديل هذا الايراد لانه مرتبط بتحصيل فواتير العملاء']);
+        }
         try {
             DB::beginTransaction();
 

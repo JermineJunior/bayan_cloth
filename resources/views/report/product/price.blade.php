@@ -200,6 +200,59 @@
             #print_Button {
                 display: none !important;
             }
+
+            #print table {
+                margin-bottom: 8px;
+            }
+
+            #print th {
+                padding: 3px 6px !important;
+                font-size: 12px !important;
+                line-height: 1.2;
+            }
+
+            #print td {
+                padding: 2px 6px !important;
+                font-size: 12px !important;
+                line-height: 1.2;
+            }
+
+            #print td.product-name {
+                font-size: 13px !important;
+            }
+
+            #print td.product-generic {
+                font-size: 12px !important;
+            }
+
+            #print td.product-price {
+                font-size: 13px !important;
+            }
+
+            #print td.company_name {
+                padding: 3px 6px !important;
+                font-size: 13px !important;
+            }
+
+            #print .header {
+                min-height: 0;
+                margin-bottom: 8px;
+            }
+
+            #print .report-header img.logo {
+                max-width: 50px;
+            }
+
+            #print .header h1 {
+                font-size: 20px;
+            }
+
+            #print .header .company-info,
+            #print .header .rep-info,
+            #print .header-right p {
+                font-size: 12px;
+                margin: 0;
+            }
         }
     </style>
 @endsection

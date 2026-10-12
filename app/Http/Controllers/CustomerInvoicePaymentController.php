@@ -19,14 +19,10 @@ class CustomerInvoicePaymentController extends Controller
 {
     public function create(): View
     {
-        if (true) {
-            return view('coming-soon');
-        }
         $customers = Tree4::where('tree3_code', 1205)->get();
         $safes = Tree4::where('tree3_code', 1202)->get();
         $banks = Tree4::where('tree3_code', 1203)->get();
-        $representatives = Tree4::where('tree3_code', 1206)->get();
-        return view('customer_invoice_payment.create', compact('customers', 'safes', 'banks', 'representatives'));
+        return view('customer_invoice_payment.create', compact('customers', 'safes', 'banks'));
     }
 
     public function unpaid(Request $request): JsonResponse
@@ -55,20 +51,40 @@ class CustomerInvoicePaymentController extends Controller
         $request->validate(
             [
                 'customer_id' => 'required|exists:tree4s,id',
-                'representative_id' => 'nullable|exists:tree4s,id',
                 'transaction_no' => ['nullable', 'string', 'max:100', Rule::requiredIf(fn() => (float) str_replace(',', '', $request->madin_name[1] ?? '') > 0)],
             ],
             [
                 'customer_id.required' => 'يرجى اختيار العميل.',
                 'customer_id.exists' => 'العميل غير موجود.',
-                'representative_id.exists' => 'المندوب غير موجود.',
                 'transaction_no.required' => 'يرجى إدخال رقم عملية البنك.',
             ],
         );
 
+        $cash = (float) str_replace(',', '', $request->madin_name[0] ?? '');
+        $bank = (float) str_replace(',', '', $request->madin_name[1] ?? '');
+        $madin_ids = (array) $request->input('madin_id', []);
+
+        if ($cash < 0 || $bank < 0) {
+            return back()->withErrors(['error' => 'لا يمكن ان يكون المبلغ النقدي او مبلغ البنك سالب'])->withInput();
+        }
+
+        if ($cash > 0 && empty($madin_ids[0])) {
+            return back()->withErrors(['error' => 'يرجى اختيار الصندوق الخاص بالمبلغ النقدي'])->withInput();
+        }
+
+        if ($bank > 0 && empty($madin_ids[1])) {
+            return back()->withErrors(['error' => 'يرجى اختيار البنك الخاص بمبلغ الشيك'])->withInput();
+        }
+
+        if ($cash > 0 && !Tree4::where('id', $madin_ids[0])->exists()) {
+            return back()->withErrors(['error' => 'الصندوق المحدد غير موجود'])->withInput();
+        }
+
+        if ($bank > 0 && !Tree4::where('id', $madin_ids[1])->exists()) {
+            return back()->withErrors(['error' => 'البنك المحدد غير موجود'])->withInput();
+        }
+
         try {
-            $cash = (float) str_replace(',', '', $request->madin_name[0] ?? '');
-            $bank = (float) str_replace(',', '', $request->madin_name[1] ?? '');
             $received = round($cash + $bank, 2);
 
             if ($received <= 0) {
@@ -107,23 +123,12 @@ class CustomerInvoicePaymentController extends Controller
 
             $transaction_no = $bank > 0 ? $request->transaction_no : null;
 
-            $representative_id = $request->representative_id ?: null;
-            $rep_percentage = 0;
-            $rep_cut_amount = 0;
-            if ($representative_id) {
-                $rep_percentage = (float) (Tree4::find($representative_id)->rep_percentage ?? 0);
-                $rep_cut_amount = round($received * $rep_percentage / 100, 2);
-            }
-
             $revenue = Revenue::create([
                 'dain_id' => $request->customer_id,
                 'bank_id' => $request->madin_id[1] ?? null,
                 'cach_id' => $request->madin_id[0] ?? null,
                 'cach_name' => $request->madin_name[0] ?? null,
                 'bank_name' => $request->madin_name[1] ?? null,
-                'representative_id' => $representative_id,
-                'rep_percentage' => $rep_percentage,
-                'rep_cut_amount' => $rep_cut_amount,
                 'transaction_no' => $transaction_no,
                 'branch_id' => session('branch_id'),
                 'note' => $request->note,

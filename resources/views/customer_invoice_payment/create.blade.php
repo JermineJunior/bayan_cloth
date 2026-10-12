@@ -64,17 +64,6 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="representative_id">المندوب (اختياري)</label>
-                            <select name="representative_id" id="representative_id" class="form-control" style="width: 100%">
-                                <option value="">-- بدون مندوب --</option>
-                                @foreach ($representatives as $rep)
-                                    <option value="{{ $rep->id }}" data-percentage="{{ $rep->rep_percentage }}">
-                                        {{ $rep->tree4_name }}</option>
-                                @endforeach
-                            </select>
-                            <small id="rep_percentage_note" class="rep-percentage-note text-muted"></small>
-                        </div>
                         <div class="form-group row align-items-center">
                             {{-- المبلغ نقدا --}}
                             <div class="col-md-4">
@@ -292,13 +281,6 @@
                     $submitBtn.html(`<span class="spinner-border spinner-border-sm"></span> جاري حفظ البيانات...`);
                     form.submit();
                 }
-            });
-
-            // نسبة المندوب تحت القائمة المنسدلة
-            $('#representative_id').on('change', function() {
-                var $note = $('#rep_percentage_note');
-                if (!$(this).val()) { $note.text(''); return; }
-                $note.text('نسبة المندوب: ' + $(this).find('option:selected').attr('data-percentage') + '%');
             });
 
             $('#bank_amount').on('input', function() {
