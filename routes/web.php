@@ -259,6 +259,14 @@ Route::group(
         Route::get('report/customer/accounting', [ReportController::class, 'customer_accouht_index'])->name('report.customer.account.index');
         Route::post('report/customer/accounting', [ReportController::class, 'customer_accouht_show'])->name('report.customer.account.show');
 
+        // Route Top Customers Report
+        Route::get('report/sale_invoice/top_customers', [SaleInvoiceReportController::class, 'top_customers_index'])->name('report.sale_invoice.top_customers.index');
+        Route::post('report/sale_invoice/top_customers', [SaleInvoiceReportController::class, 'top_customers_show'])->name('report.sale_invoice.top_customers.show');
+
+        // Route Complete Report
+        Route::get('report/complete', [ReportController::class, 'complete_index'])->name('report.complete.index');
+        Route::post('report/complete', [ReportController::class, 'complete_show'])->name('report.complete.show');
+
         // Route Purchase and Return Purchase
         Route::get('report/purchase_invoice/supplier', [PurchaseInvoiceReportContorller::class, 'supplier_purchase_index'])->name('report.purchase_ivoice.supplier.index');
         Route::post('report/purchase_invoice/supplier', [PurchaseInvoiceReportContorller::class, 'supplier_purchase_show'])->name('report.purchase_invoice.supplier.show');

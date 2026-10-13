@@ -75,6 +75,60 @@ class SaleInvoiceReportController extends Controller
         return view('report.invoice.show_customer', compact('customer', 'operations', 'start', 'end', 'type', 'curencey'));
     }
 
+    public function top_customers_index(): View
+    {
+        $curenceies = Curencey::get();
+        return view('report.invoice.index_top_customers', compact('curenceies'));
+    }
+
+    public function top_customers_show(Request $request): View
+    {
+        $curencey = Curencey::find($request->curencey_id);
+        $start = $request->start;
+        $end = $request->end;
+
+        $limit = $request->limit ?: 10;
+        $limit = in_array($limit, ['10', '20', '50'], true) ? (int) $limit : null;
+
+        $customers = SaleInvoice::with('customer')
+            ->where('branch_id', session('branch_id'))
+            ->whereNotNull('customer_id')
+            ->when($start, function ($query, $start) {
+                $query->whereDate('date', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('date', '<=', $end);
+            })
+            ->groupBy('customer_id')
+            ->selectRaw('customer_id, COUNT(*) as invoices_count, SUM(total_amount) as total_sales')
+            ->orderByDesc('total_sales')
+            ->when($limit, function ($query, $limit) {
+                $query->limit($limit);
+            })
+            ->get();
+
+        $returns = SaleInvoiceReturn::where('branch_id', session('branch_id'))
+            ->whereNotNull('customer_id')
+            ->when($start, function ($query, $start) {
+                $query->whereDate('date', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('date', '<=', $end);
+            })
+            ->groupBy('customer_id')
+            ->selectRaw('customer_id, SUM(total_amount) as total_returns')
+            ->get()
+            ->keyBy('customer_id');
+
+        $customers = $customers->map(function ($customer) use ($returns) {
+            $customer->total_returns = $returns->get($customer->customer_id)->total_returns ?? 0;
+            $customer->net_sales = $customer->total_sales - $customer->total_returns;
+            return $customer;
+        });
+
+        return view('report.invoice.show_top_customers', compact('customers', 'start', 'end', 'curencey'));
+    }
+
     public function agent_index(): View
     {
         $type = 1;

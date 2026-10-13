@@ -19,6 +19,8 @@ use App\Models\PurchaseInvoice;
 use App\Models\SaleInvoiceDetail;
 use App\Models\SaleInvoiceReturn;
 use App\Models\PurchaseInvoiceReturn;
+use App\Models\Revenue;
+use App\Models\Expense;
 
 class ReportController extends Controller
 {
@@ -750,8 +752,9 @@ class ReportController extends Controller
 
         $categories = $categoriesQuery->get();
         $representative = Tree4::find($request->representative_id);
+        $customer_name = trim((string) $request->input('customer_name'));
 
-        return view('report.product.price', compact('categories', 'representative', 'show_expiry', 'show_company', 'selectedCategory'));
+        return view('report.product.price', compact('categories', 'representative', 'show_expiry', 'show_company', 'selectedCategory', 'customer_name'));
     }
 
     public function revenueAccount()
@@ -782,6 +785,86 @@ class ReportController extends Controller
         $curencey = Curencey::find($request->curencey_id);
         $operations = Restriction::with('tree4')->where('branch_id', session('branch_id'))->where('type', operator: 9)->where('madin', '!=', 0)->whereDate('created_at', '>=', $start)->whereDate('created_at', '<=', $end)->get();
         return view('report.expense.show', compact('start', 'end', 'operations', 'curencey'));
+    }
+
+    public function complete_index()
+    {
+        $curenceies = Curencey::get();
+        return view('report.complete.index', compact('curenceies'));
+    }
+
+    public function complete_show(Request $request)
+    {
+        $start = $request->start;
+        $end = $request->end;
+        $curencey = Curencey::find($request->curencey_id);
+
+        $sales = SaleInvoice::where('branch_id', session('branch_id'))
+            ->when($start, function ($query, $start) {
+                $query->whereDate('date', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('date', '<=', $end);
+            })
+            ->selectRaw('COUNT(*) as rows_count, SUM(total_amount) as total_amount, SUM(discount_amount) as discount_amount, SUM(cash_amount_total) as cash_amount_total, SUM(bank_amount_total) as bank_amount_total, SUM(deferend_amount) as deferend_amount')
+            ->first();
+
+        $saleReturns = SaleInvoiceReturn::where('branch_id', session('branch_id'))
+            ->when($start, function ($query, $start) {
+                $query->whereDate('date', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('date', '<=', $end);
+            })
+            ->selectRaw('COUNT(*) as rows_count, SUM(total_amount) as total_amount, SUM(discount_amount) as discount_amount, SUM(cash_amount_total) as cash_amount_total, SUM(bank_amount_total) as bank_amount_total, SUM(deferend_amount) as deferend_amount')
+            ->first();
+
+        $purchases = PurchaseInvoice::where('branch_id', session('branch_id'))
+            ->when($start, function ($query, $start) {
+                $query->whereDate('date', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('date', '<=', $end);
+            })
+            ->selectRaw('COUNT(*) as rows_count, SUM(total_amount) as total_amount, SUM(discount_amount) as discount_amount, SUM(cash_amount_total) as cash_amount_total, SUM(bank_amount_total) as bank_amount_total, SUM(deferend_amount) as deferend_amount')
+            ->first();
+
+        $purchaseReturns = PurchaseInvoiceReturn::where('branch_id', session('branch_id'))
+            ->when($start, function ($query, $start) {
+                $query->whereDate('date', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('date', '<=', $end);
+            })
+            ->selectRaw('COUNT(*) as rows_count, SUM(total_amount) as total_amount, SUM(discount_amount) as discount_amount, SUM(cash_amount_total) as cash_amount_total, SUM(bank_amount_total) as bank_amount_total, SUM(deferend_amount) as deferend_amount')
+            ->first();
+
+        $revenues = Revenue::where('branch_id', session('branch_id'))
+            ->when($start, function ($query, $start) {
+                $query->whereDate('created_at', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('created_at', '<=', $end);
+            })
+            ->selectRaw('COUNT(*) as rows_count, SUM(cach_name) as cach_total, SUM(bank_name) as bank_total')
+            ->first();
+
+        $expenses = Expense::where('branch_id', session('branch_id'))
+            ->when($start, function ($query, $start) {
+                $query->whereDate('created_at', '>=', $start);
+            })
+            ->when($end, function ($query, $end) {
+                $query->whereDate('created_at', '<=', $end);
+            })
+            ->selectRaw('COUNT(*) as rows_count, SUM(cach_name) as cach_total, SUM(bank_name) as bank_total')
+            ->first();
+
+        $netSales = ($sales->total_amount ?? 0) - ($saleReturns->total_amount ?? 0);
+        $netPurchases = ($purchases->total_amount ?? 0) - ($purchaseReturns->total_amount ?? 0);
+        $revenueTotal = ($revenues->cach_total ?? 0) + ($revenues->bank_total ?? 0);
+        $expenseTotal = ($expenses->cach_total ?? 0) + ($expenses->bank_total ?? 0);
+
+        return view('report.complete.show', compact('start', 'end', 'curencey', 'sales', 'saleReturns', 'purchases', 'purchaseReturns', 'revenues', 'expenses', 'netSales', 'netPurchases', 'revenueTotal', 'expenseTotal'));
     }
 
     public function stock_detail_index()
