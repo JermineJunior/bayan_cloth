@@ -466,17 +466,25 @@ class SaleInvoiceContoller extends Controller
     {
         $search = $request->input('search');
         $type = $request->type;
+        $available = $request->boolean('available');
 
         $products = Product::query()
             ->select('id', 'name', 'barcode')
             ->where(function ($query) use ($search) {
                 $query->where('name', 'LIKE', "%$search%")->orWhere('barcode', $search);
             })
+            ->when($available, function ($query) {
+                $query->whereHas('stocks', fn ($q) => $q->where('product_stocks.quantity', '>', 0));
+            })
             ->with('units')
-            ->limit(20)
+            ->when($search !== null && $search !== '', fn ($query) => $query->limit(20))
             ->get();
 
         if ($products->isEmpty()) {
+            if ($type == 3) {
+                return response()->json(['products' => []]);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'هذا المنتج غير متوفر .',

@@ -205,9 +205,7 @@
             document.getElementById('add-product').focus();
 
             let debounceTimer;
-            $('#add-product').on('input', function() {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(function() {
+            function lookupProduct(showError) {
                     const productName = $('#add-product').val().trim();
                     if (productName) {
                         fetch('{{ route('product.getProduct') }}', {
@@ -223,6 +221,9 @@
                             })
                             .then(response => response.json())
                             .then(data => {
+                                if ($('#add-product').val().trim() !== productName) {
+                                    return;
+                                }
                                 if (data.success) {
                                     const tbody = $('#product-rows');
                                     const rowCount = tbody.find('tr').length + 1;
@@ -320,7 +321,7 @@
                                             type: 'error'
                                         });
                                     });
-                                } else {
+                                } else if (showError) {
                                     notif({
                                         msg: data.message,
                                         type: 'error'
@@ -334,7 +335,21 @@
                                 });
                             });
                     }
-                }, 500);
+            }
+
+            $('#add-product').on('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function() {
+                    lookupProduct(false);
+                }, 700);
+            });
+
+            $('#add-product').on('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    clearTimeout(debounceTimer);
+                    lookupProduct(true);
+                }
             });
 
             $(document).on('click', '.remove-product', function() {
@@ -579,11 +594,15 @@
                 });
             });
 
+            let searchXhr;
             let timer;
             $('#search').on('keyup', function() {
                 clearTimeout(timer);
                 timer = setTimeout(function() {
-                    $.ajax({
+                    if (searchXhr) {
+                        searchXhr.abort();
+                    }
+                    searchXhr = $.ajax({
                         url: '{{ route('sale_invoice.search') }}',
                         method: 'POST',
                         headers: {

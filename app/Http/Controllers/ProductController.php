@@ -267,7 +267,7 @@ class ProductController extends Controller
         if (!$product) {
             return response()->json([
                 'success' => false,
-                'message' => 'لا يتوقر هذا المنتج',
+                'message' => 'لا يتوفر هذا المنتج',
             ]);
         }
 

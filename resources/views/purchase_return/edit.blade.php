@@ -480,9 +480,7 @@
             let productIds = @json($productIds);
 
             let debounceTimer;
-            $('#add-product').on('input', function() {
-                clearTimeout(debounceTimer);
-                debounceTimer = setTimeout(function() {
+            function lookupProduct(showError) {
                     const productName = $('#add-product').val().trim();
                     if (productName) {
                         fetch('{{ route('product.getProduct') }}', {
@@ -499,6 +497,9 @@
                             })
                             .then(response => response.json())
                             .then(data => {
+                                if ($('#add-product').val().trim() !== productName) {
+                                    return;
+                                }
                                 if (data.success) {
                                     const tbody = $('#product-rows');
                                     const rowCount = tbody.find('tr').length + 1;
@@ -629,7 +630,7 @@
                                         });
                                     });
 
-                                } else {
+                                } else if (showError) {
                                     notif({
                                         msg: data.message,
                                         type: 'error'
@@ -643,7 +644,21 @@
                                 });
                             });
                     }
-                }, 500);
+            }
+
+            $('#add-product').on('input', function() {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(function() {
+                    lookupProduct(false);
+                }, 700);
+            });
+
+            $('#add-product').on('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    clearTimeout(debounceTimer);
+                    lookupProduct(true);
+                }
             });
 
             $(document).on('click', '.remove-product', function() {
@@ -1239,31 +1254,40 @@
                 });
             });
 
-            $('#search').on('keyup', function() {
-                $.ajax({
-                    url: '{{ route('sale_invoice.search') }}',
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    data: {
-                        search: $('#search').val(),
-                        type: 3
-                    },
-                    success: function(result) {
-                        let tbody = $('#body_search');
-                        tbody.empty();
-                        let rows = '';
-                        result.products.forEach((product, index) => {
-                            let isAdded = productIds.includes(product.id);
-                            rows += `
-                                <a href="#" class="product-pick-item product-pick-item--grad btn btn-add-invoice ${isAdded ? 'btn-white disabled' : 'btn-primary'}" data-id="${product.id}">${product.name}</a>
-                            `;
-                        });
+            let searchDebounceTimer;
+            let searchXhr;
 
-                        tbody.append(rows);
+            $('#search').on('keyup', function() {
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(function() {
+                    if (searchXhr) {
+                        searchXhr.abort();
                     }
-                })
+                    searchXhr = $.ajax({
+                        url: '{{ route('sale_invoice.search') }}',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        data: {
+                            search: $('#search').val(),
+                            type: 3
+                        },
+                        success: function(result) {
+                            let tbody = $('#body_search');
+                            tbody.empty();
+                            let rows = '';
+                            result.products.forEach((product, index) => {
+                                let isAdded = productIds.includes(product.id);
+                                rows += `
+                                    <a href="#" class="product-pick-item product-pick-item--grad btn btn-add-invoice ${isAdded ? 'btn-white disabled' : 'btn-primary'}" data-id="${product.id}">${product.name}</a>
+                                `;
+                            });
+
+                            tbody.append(rows);
+                        }
+                    })
+                }, 300);
             });
 
             $('#apply_tax').on('change', function() {
