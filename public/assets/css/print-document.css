@@ -32,6 +32,14 @@ tr.fill-row { display: none; }
     .invoice-table thead { display: table-header-group; }
     .invoice-table tfoot { display: table-row-group; }
     .invoice-table tr { page-break-inside: avoid; }
+
+    .invoice .invoice-table th, .invoice .invoice-table td { font-size: 15px !important; }
+    .invoice .invoice-table th { font-weight: bold !important; }
+    .invoice .invoice-table tfoot td { font-weight: 600 !important; }
+    .invoice .detail-box .label { font-size: 14px !important; }
+    .invoice .detail-box .value { font-size: 17px !important; }
+    .invoice .invoice-header h1 { font-size: 28px !important; }
+    .invoice .invoice-header h6 { font-size: 14px !important; }
 }
 
 .invoice-table td.product-cell,

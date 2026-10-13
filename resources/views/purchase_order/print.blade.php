@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
+    <link rel="stylesheet" href="{{ asset('assets/css/print-document.css') }}?v={{ filemtime(public_path('assets/css/print-document.css')) }}">
     <style>
         .card {
             border: none !important;
@@ -196,7 +197,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>م</th>
-                                                        <th class="w-30p">المنتج</th>
+                                                        <th class="w-30p product-cell">المنتج</th>
                                                         <th>الكمية</th>
                                                     </tr>
                                                 </thead>
@@ -204,7 +205,7 @@
                                                     @foreach ($purchase_order->details as $item)
                                                         <tr>
                                                             <td>{{ $loop->iteration }}</td>
-                                                            <td class="wd-30p">{{ $item->product->name }}</td>
+                                                            <td class="wd-30p product-cell">{{ $item->product->name }}</td>
                                                             <td>{{ number_format($item->qty) }}</td>
                                                         </tr>
                                                     @endforeach

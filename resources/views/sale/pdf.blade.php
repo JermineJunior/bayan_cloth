@@ -40,7 +40,7 @@
 
         .invoice-header h2 {
             margin: 0;
-            font-size: 22px;
+            font-size: 20pt;
             font-weight: bold;
             color: #042d7a;
         }
@@ -80,7 +80,7 @@
         }
 
         .modern-details .value {
-            font-size: 16px;
+            font-size: 13pt;
             font-weight: bold;
             color: #042d7a;
         }
@@ -114,6 +114,11 @@
             padding: 6px;
             text-align: center;
             white-space: nowrap;
+            font-size: 11pt;
+        }
+
+        .invoice-table thead th {
+            font-weight: bold;
         }
 
         .invoice-table th.product-cell,
