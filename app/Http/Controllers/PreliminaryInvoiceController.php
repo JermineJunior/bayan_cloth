@@ -64,6 +64,15 @@ class PreliminaryInvoiceController extends Controller
                         'row_sub_total' => $request->row_sub_total[$index],
                     ],
                 );
+                $product = Product::whereId($product_id)->first();
+                $productStock = $product?->stocks()->where('stock_id', $request->stock_id[$index])->first();
+                if (!$product || !$productStock || $productStock->pivot->quantity <= 0) {
+                    DB::rollBack();
+                    return redirect()
+                        ->route('preliminaryInvoice.create')
+                        ->withErrors(['error' => 'المنتج "' . ($product->name ?? $product_id) . '" ليس له كمية في المخزن المحدد.'])
+                        ->withInput();
+                }
             }
 
             DB::commit();
@@ -154,7 +163,8 @@ class PreliminaryInvoiceController extends Controller
                 $product_unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $product_unit->pivot->conversion_factor;
                 $productStock = $product->stocks()->where('stock_id', $request->stock_id[$index])->first();
-                if ($qty > $productStock->pivot->quantity && !auth()->user()->can('بيع منتجات غير متوفرة')) {
+                $availableQty = $productStock ? $productStock->pivot->quantity : 0;
+                if ($qty > $availableQty) {
                     DB::rollBack();
                     return redirect()
                         ->route('sale_invoice.create')

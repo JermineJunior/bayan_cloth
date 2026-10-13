@@ -271,13 +271,24 @@ class ProductController extends Controller
             ]);
         }
 
+        $requireStock = $request->boolean('require_stock');
+        $availableStocks = $product->stocks()->wherePivot('quantity', '>', 0)->get(['stocks.id', 'stocks.name']);
+
+        if ($requireStock && $availableStocks->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'no_stock' => true,
+                'message' => 'المنتج "' . $product->name . '" ليس له كمية في المخازن، لا يمكن اضافته للفاتورة',
+            ]);
+        }
+
         return response()->json([
             'success' => true,
             'product' => $product,
             'units' => $product->units,
-            'stocks' => $product->stocks,
+            'stocks' => $requireStock ? $availableStocks : $product->stocks,
             'quantity' => $product->convertQuantity($product->stocks()->where('stock_id', $request->stock_id)->sum('quantity')),
-            'qty_in_stock' => $product->stocks()->first()->pivot->quantity,
+            'qty_in_stock' => $availableStocks->first()?->pivot->quantity,
             'stock_from' => $product->stocks()->where('quantity', '>=', 0)->get(),
         ]);
     }
@@ -310,6 +321,7 @@ class ProductController extends Controller
     public function checkQty(Request $request): JsonResponse
     {
         $qty = $request->input('qty', 1);
+        $bounce = $request->input('bounce', 0);
         $unitId = $request->input('unit_id');
         $productId = $request->input('product_id');
         $stockId = $request->input('stock_id');
@@ -325,45 +337,34 @@ class ProductController extends Controller
         }
 
         // التحقق من تاريخ الصلاحية
-        if ($product->expire_date && $product->expire_date->isPast()) {
+        if ($product->expire_date && Carbon::parse($product->expire_date)->isPast()) {
             return response()->json([
                 'success' => false,
                 'message' => 'هذا المنتج منتهي الصلاحية.',
             ]);
         }
 
-        // في حالة عدم السماح ببيع منتج غير متوفر
-        if (!auth()->user()->can('بيع منتجات غير متوفرة')) {
-            $stock = $product->stocks->firstWhere('id', $stockId);
+        $stock = $product->stocks->firstWhere('id', $stockId);
+        $unit = $unitId ? $product->units->firstWhere('id', $unitId) : null;
+        $conversionFactor = $unit ? $unit->pivot->conversion_factor : 1;
 
-            if (!$stock || $stock->pivot->quantity <= 0) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'المنتج غير متوفر في المخزن.',
-                ]);
-            }
+        $totalQty = ((float) $qty + (float) $bounce) * $conversionFactor;
+        $availableQty = $stock ? $stock->pivot->quantity : 0;
 
-            // التحويل حسب الوحدة
-            if ($unitId) {
-                $unit = $product->units->firstWhere('id', $unitId);
+        // التحقق من الكمية
+        if ($totalQty > $availableQty) {
+            $maxQty = floor(($availableQty / $conversionFactor) * 100) / 100;
 
-                if ($unit) {
-                    $qty *= $unit->pivot->conversion_factor;
-                }
-            }
-
-            // التحقق من الكمية
-            if ($qty > $stock->pivot->quantity) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'الكمية المطلوبة أكبر من المتوفر.',
-                ]);
-            }
+            return response()->json([
+                'success' => false,
+                'max_qty' => $maxQty,
+                'message' => 'الكمية المطلوبة أكبر من المتوفر، المتوفر: ' . $maxQty,
+            ]);
         }
 
         return response()->json([
             'success' => true,
-            'qty' => $qty,
+            'qty' => $totalQty,
             'product' => $product,
         ]);
     }

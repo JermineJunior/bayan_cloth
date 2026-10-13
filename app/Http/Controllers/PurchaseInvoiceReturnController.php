@@ -85,7 +85,8 @@ class PurchaseInvoiceReturnController extends Controller
                 $unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $unit->pivot->conversion_factor;
                 $stock = $product->stocks()->where('stock_id', $request->stock_id)->first();
-                if ($qty > $stock->pivot->quantity && !auth()->user()->can('بيع منتجات غير متوفرة')) {
+                $availableQty = $stock ? $stock->pivot->quantity : 0;
+                if ($qty > $availableQty) {
                     DB::rollBack();
                     return back()->withErrors(['error' => 'الكمية باحد المنتجات أكبر من الكمية الموجودة في المخزن.']);
                 }
@@ -101,7 +102,7 @@ class PurchaseInvoiceReturnController extends Controller
                     'purchase_invoice_return_id' => $purchase_invoice_return->id,
                 ]);
 
-                $newQuantity = $stock->pivot->quantity - $qty;
+                $newQuantity = $availableQty - $qty;
                     $product->stocks()->syncWithoutDetaching([
                         $request->stock_id => ['quantity' => $newQuantity],
                     ]);
@@ -253,7 +254,8 @@ class PurchaseInvoiceReturnController extends Controller
                 $unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $unit->pivot->conversion_factor;
                 $stock = $product->stocks()->where('stock_id', $request->stock_id)->first();
-                if ($qty > $stock->pivot->quantity && !auth()->user()->can('بيع منتجات غير متوفرة')) {
+                $availableQty = $stock ? $stock->pivot->quantity : 0;
+                if ($qty > $availableQty) {
                     DB::rollBack();
                     return back()->withErrors(['error' => 'الكمية باحد المنتجات أكبر من الكمية الموجودة في المخزن.']);
                 }
@@ -269,7 +271,7 @@ class PurchaseInvoiceReturnController extends Controller
                     'purchase_invoice_return_id' => $purchase_invoice_return->id,
                 ]);
 
-                $product->stocks()->updateExistingPivot($request->stock_id, ['quantity' => $stock->pivot->quantity - $qty]);
+                $product->stocks()->updateExistingPivot($request->stock_id, ['quantity' => $availableQty - $qty]);
             }
 
             $last_constant_number = Restriction::where('branch_id', session('branch_id'))->max('constant_number');

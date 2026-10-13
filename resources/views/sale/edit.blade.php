@@ -584,7 +584,8 @@
                                 },
                                 body: JSON.stringify({
                                     name: productName,
-                                    type: 1
+                                    type: 1,
+                                    require_stock: 1
                                 })
                             })
                             .then(response => response.json())
@@ -715,6 +716,11 @@
                                         });
                                     }
 
+                                } else if (data.no_stock) {
+                                    notif({
+                                        msg: data.message,
+                                        type: 'error'
+                                    });
                                 } else if (showError) {
                                     notif({
                                         msg: data.message,
@@ -1452,7 +1458,8 @@
                     },
                     data: JSON.stringify({
                         product_id: button.data('id'),
-                        stock_id: $('#stock_id').val()
+                        stock_id: $('#stock_id').val(),
+                        require_stock: 1
                     }),
                     success(data) {
                         if (data.success) {
@@ -1582,6 +1589,16 @@
                             }
 
                         } else {
+                            addedProducts = addedProducts.filter(id => Number(id) !== Number(productId));
+                            button.prop('disabled', false);
+                            $('.btn-add-invoice').each(function() {
+                                const $btn = $(this);
+                                if (Number($btn.data('id')) === Number(productId)) {
+                                    $btn.removeClass('btn-white disabled')
+                                        .addClass('btn-primary')
+                                        .prop('disabled', false);
+                                }
+                            });
                             notif({
                                 msg: data.message,
                                 type: 'error'

@@ -528,7 +528,8 @@
                                 },
                                 body: JSON.stringify({
                                     name: productName,
-                                    type: 1
+                                    type: 1,
+                                    require_stock: 1
                                 })
                             })
                             .then(response => response.json())
@@ -644,6 +645,11 @@
                                             }
                                         });
                                     totalPrice();
+                                } else if (data.no_stock) {
+                                    notif({
+                                        msg: data.message,
+                                        type: 'error'
+                                    });
                                 } else if (showError) {
                                     notif({
                                         msg: data.message,
@@ -711,6 +717,81 @@
                 totalPrice();
             });
 
+            let checkQtyTimers = {};
+
+            function checkRowQty(currentRow) {
+                const productId = currentRow.find('.product_id').val();
+                const stockId = currentRow.find('.stock_id').val();
+                const unitId = currentRow.find('.unit_id').val();
+                if (!productId || !stockId || !unitId) {
+                    return;
+                }
+
+                const unformat = str => parseFloat(String(str).replace(/,/g, '')) || 0;
+                const qty = unformat(currentRow.find('.qty').val());
+                const bounce = unformat(currentRow.find('.bounce').val());
+
+                $.ajax({
+                    url: '{{ route('product.checkQty') }}',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    data: JSON.stringify({
+                        qty: qty,
+                        bounce: bounce,
+                        unit_id: unitId,
+                        product_id: productId,
+                        stock_id: stockId
+                    })
+                }).done(function(data) {
+                    if (data.success) {
+                        return;
+                    }
+
+                    notif({
+                        msg: data.message,
+                        type: 'error'
+                    });
+
+                    const maxQty = Math.max(0, Number(data.max_qty) || 0);
+                    const qtyInput = currentRow.find('.qty');
+                    const bounceInput = currentRow.find('.bounce');
+
+                    currentRow.data('skipCheckQty', true);
+                    if (bounce > maxQty) {
+                        bounceInput.val(Number(maxQty).toLocaleString('en-US')).trigger('input');
+                        qtyInput.val(Number(0).toLocaleString('en-US')).trigger('input');
+                    } else {
+                        qtyInput.val(Number(Math.max(0, maxQty - bounce)).toLocaleString('en-US')).trigger('input');
+                    }
+                    currentRow.removeData('skipCheckQty');
+
+                    qtyInput.trigger('blur');
+                });
+            }
+
+            function scheduleCheckQty(currentRow) {
+                if (currentRow.data('skipCheckQty')) {
+                    return;
+                }
+
+                const key = currentRow.find('.qty').attr('id') || currentRow.find('.product_id').val();
+                if (!key) {
+                    return;
+                }
+
+                clearTimeout(checkQtyTimers[key]);
+                checkQtyTimers[key] = setTimeout(function() {
+                    checkRowQty(currentRow);
+                }, 400);
+            }
+
+            $('#product-rows').on('input', '.qty, .bounce', function() {
+                scheduleCheckQty($(this).closest('tr'));
+            });
+
             $('#product-rows').on('change', '.unit_id', function() {
                 const unitSelect = $(this);
                 let unitId = unitSelect.val();
@@ -720,6 +801,8 @@
                 const qtyBounce = currentRow.find('.bounce');
                 let oldPrice = currentRow.find('.price').val();
                 let stockId = currentRow.find('.stockId').val();
+
+                scheduleCheckQty(currentRow);
 
                 $.ajax({
                     url: '{{ route('product.getUnitPrice') }}',
@@ -762,6 +845,10 @@
                         type: 'error',
                     });
                 });
+            });
+
+            $('#product-rows').on('change', '.stock_id', function() {
+                scheduleCheckQty($(this).closest('tr'));
             });
 
             $('#product-rows').on('blur', '.qty', function() {
@@ -1253,7 +1340,8 @@
                     },
                     data: JSON.stringify({
                         product_id: button.data('id'),
-                        stock_id: $('#stock_id').val()
+                        stock_id: $('#stock_id').val(),
+                        require_stock: 1
                     }),
                     success(data) {
                         if (data.success) {
@@ -1366,6 +1454,16 @@
                                 });
                             totalPrice();
                         } else {
+                            addedProducts = addedProducts.filter(id => Number(id) !== Number(productId));
+                            button.prop('disabled', false);
+                            $('.btn-add-invoice').each(function() {
+                                const $btn = $(this);
+                                if (Number($btn.data('id')) === Number(productId)) {
+                                    $btn.removeClass('btn-white disabled')
+                                        .addClass('btn-primary')
+                                        .prop('disabled', false);
+                                }
+                            });
                             notif({
                                 msg: data.message,
                                 type: 'error'

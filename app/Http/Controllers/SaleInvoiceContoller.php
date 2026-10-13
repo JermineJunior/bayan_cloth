@@ -101,7 +101,8 @@ class SaleInvoiceContoller extends Controller
                 $product_unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $product_unit->pivot->conversion_factor;
                 $productStock = $product->stocks()->where('stock_id', $request->stock_id[$index])->first();
-                if ($qty > $productStock->pivot->quantity && !auth()->user()->can('بيع منتجات غير متوفرة')) {
+                $availableQty = $productStock ? $productStock->pivot->quantity : 0;
+                if ($qty > $availableQty) {
                     DB::rollBack();
                     return redirect()
                         ->route('sale_invoice.create')
@@ -307,14 +308,16 @@ class SaleInvoiceContoller extends Controller
 
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $unit->pivot->conversion_factor;
 
-                if ($qty > $stock->pivot->quantity && !auth()->user()->can('بيع منتجات غير متوفرة')) {
+                $availableQty = $stock ? $stock->pivot->quantity : 0;
+
+                if ($qty > $availableQty) {
                     DB::rollBack();
                     return back()->withErrors([
                         'error' => 'الكمية باحد المنتجات أكبر من الكمية الموجودة في المخزن.',
                     ]);
                 }
 
-                $product->stocks()->updateExistingPivot($request->stock_id[$index], ['quantity' => $stock->pivot->quantity - $qty]);
+                $product->stocks()->updateExistingPivot($request->stock_id[$index], ['quantity' => $availableQty - $qty]);
 
                 StockDetail::create([
                     'product_id' => $product_id,
@@ -430,15 +433,26 @@ class SaleInvoiceContoller extends Controller
             ]);
         }
 
+        $requireStock = $request->boolean('require_stock');
+        $availableStocks = $product->stocks()->wherePivot('quantity', '>', 0)->get(['stocks.id', 'stocks.name']);
+
+        if ($requireStock && $availableStocks->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'no_stock' => true,
+                'message' => 'المنتج "' . $product->name . '" ليس له كمية في المخازن، لا يمكن اضافته للفاتورة',
+            ]);
+        }
+
         // إذا كان المنتج موجودًا ومفعلًا ولم تنتهِ صلاحيته
         return response()->json([
             'success' => true,
             'product' => $product,
             'units' => $product->units,
             'quantity' => $product->convertQuantity($product->stocks()->where('stock_id', $request->stock_id)->sum('quantity')),
-            'qty_in_stock' => $product->stocks()->first()->pivot->quantity,
+            'qty_in_stock' => $availableStocks->first()?->pivot->quantity,
             'stock_from' => $product->stocks()->where('quantity', '>=', 0)->get(),
-            'stocks' => Stock::get(),
+            'stocks' => $requireStock ? $availableStocks : Stock::get(),
         ]);
     }
 
