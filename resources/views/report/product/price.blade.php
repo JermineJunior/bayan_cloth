@@ -18,10 +18,11 @@
             margin-left: 5px;
         }
 
-        /* ✅ جدول الهيدر (٣ خانات) */
+        /* جدول الهيدر (٣ خانات: شعار | اسم الشركة | شعار) */
         .report-header {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .report-header td {
@@ -43,36 +44,55 @@
         .report-header td.header-right {
             width: 25%;
             text-align: right;
-            font-size: 14px;
-            line-height: 1.6;
         }
 
-        /* ✅ اسم الشركة */
+        /* اسم الشركة */
         .header h1 {
             margin: 0;
-            font-size: 26px;
-            /* 🔹 أكبر من 20px */
-            font-weight: 800;
+            font-size: 30px;
+            font-weight: bold;
             text-align: center;
             color: #0d47a1;
-            /* لون مميز */
             letter-spacing: 1px;
         }
 
-        /* ✅ الوصف تحت اسم الشركة */
-        .header p.title-desc {
-            margin: 2px 0;
-            font-size: 16px;
-            font-weight: 500;
-            text-align: center;
-            color: #333;
+        .report-header img.logo {
+            width: 110px;
+            max-width: 110px;
+            max-height: 110px;
+            height: auto;
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 0;
         }
 
-        .report-header img.logo {
-            width: 80px;
-            height: auto;
-            display: block;
-            margin-bottom: 5px;
+        /* صندوق التاريخ */
+        .date-wrap {
+            text-align: center;
+            margin: 8px 0 6px;
+        }
+
+        .date-box {
+            display: inline-block;
+            border: 1px solid #000;
+            padding: 3px 14px;
+            font-size: 17px;
+            font-weight: bold;
+            line-height: 1.25;
+        }
+
+        /* شريط الموقع / المندوب / العميل / القسم */
+        .info-strip {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #000;
+            background: #eee;
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.25;
+            text-align: center;
+            padding: 4px 6px;
+            margin-top: 6px;
         }
 
         table {
@@ -84,71 +104,65 @@
         .price-table,
         .price-table th,
         .price-table td {
-            border: 1px solid black;
+            border: 1px solid #000;
         }
 
-        /* ✅ الهيدر الخاص بالجدول */
-        th {
-            background-color: #e3f2fd;
-            color: #0d47a1;
-            font-size: 15px;
-            /* 🔹 أكبر من النص العادي */
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center !important;
-            padding: 12px;
-        }
-
-        /* ✅ بيانات الجدول */
-        td {
-            padding: 10px;
-            text-align: center !important;
+        .price-table th,
+        .price-table td {
+            padding: 3px 6px;
+            line-height: 1.25;
             font-size: 14px;
+            text-align: center;
         }
 
-        /* ✅ اسم الشركة */
-        .company_name {
-            background: #bbdefb;
-            color: #0d47a1;
+        /* صف العناوين */
+        .price-table thead th,
+        .price-table tr.column_head th {
+            font-size: 16px;
             font-weight: bold;
-            font-size: 17px;
-            text-align: left;
         }
 
-        /* معلومات الشركة */
-        .company-info {
-            font-size: 16px;
-            font-weight: 600;
+        /* صف اسم الشركة */
+        .price-table td.company_name {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
         }
 
-        /* معلومات المندوب */
-        .rep-info {
-            font-size: 16px;
-            font-weight: 600;
+        /* بيانات المنتج */
+        .price-table td.num,
+        .price-table td.exp,
+        .price-table td.unit,
+        .price-table td.product-price {
+            font-weight: bold;
+            text-align: center;
         }
 
-        /* اسم المنتج */
-        .product-name {
-            font-size: 16px;
-            font-weight: 600;
+        .price-table td.product-name,
+        .price-table td.product-generic {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: left !important;
         }
 
-        /* الاسم العلمي */
-        .product-generic {
+        .price-table td.product-price {
             font-size: 15px;
-            font-weight: 500;
         }
 
-        /* السعر */
-        .product-price {
-            font-size: 16px;
-            font-weight: bold;
+        .price-table td.qty-cell {
+            text-align: center;
         }
 
         @media print {
             @page {
                 size: A4 portrait;
                 margin: 8mm;
+
+                @bottom-center {
+                    content: "صفحة " counter(page) " من " counter(pages);
+                    font-size: 14px;
+                    font-weight: bold;
+                }
             }
 
             #global-loader,
@@ -187,6 +201,12 @@
                 page-break-inside: avoid;
             }
 
+            .price-table tr.column_head,
+            .price-table tr.company_row {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+
             th,
             td {
                 white-space: nowrap;
@@ -205,53 +225,67 @@
                 margin-bottom: 8px;
             }
 
-            #print th {
-                padding: 3px 6px !important;
-                font-size: 12px !important;
-                line-height: 1.2;
-            }
-
-            #print td {
-                padding: 2px 6px !important;
-                font-size: 12px !important;
-                line-height: 1.2;
-            }
-
-            #print td.product-name {
-                font-size: 13px !important;
-            }
-
-            #print td.product-generic {
-                font-size: 12px !important;
-            }
-
-            #print td.product-price {
-                font-size: 13px !important;
-            }
-
-            #print td.company_name {
-                padding: 3px 6px !important;
-                font-size: 13px !important;
-            }
-
             #print .header {
                 min-height: 0;
-                margin-bottom: 8px;
+                margin-bottom: 6px;
+            }
+
+            #print .report-header td {
+                padding: 2px 6px !important;
             }
 
             #print .report-header img.logo {
-                max-width: 50px;
+                max-width: 110px;
+                max-height: 110px;
             }
 
             #print .header h1 {
-                font-size: 20px;
+                font-size: 30px !important;
             }
 
-            #print .header .company-info,
-            #print .header .rep-info,
-            #print .header-right p {
-                font-size: 12px;
-                margin: 0;
+            #print .date-wrap {
+                margin: 4px 0 !important;
+            }
+
+            #print .date-box {
+                font-size: 17px !important;
+                padding: 3px 14px !important;
+            }
+
+            #print .info-strip {
+                font-size: 16px !important;
+                padding: 3px 6px !important;
+                margin-top: 3px !important;
+            }
+
+            #print .price-table th,
+            #print .price-table td {
+                padding: 3px 6px !important;
+                line-height: 1.25 !important;
+            }
+
+            #print .price-table thead th,
+            #print .price-table tr.column_head th {
+                font-size: 16px !important;
+                font-weight: bold !important;
+            }
+
+            #print .price-table td {
+                font-size: 14px !important;
+            }
+
+            #print .price-table td.product-name,
+            #print .price-table td.product-generic {
+                font-size: 14px !important;
+                font-weight: bold !important;
+            }
+
+            #print .price-table td.product-price {
+                font-size: 15px !important;
+            }
+
+            #print .price-table td.company_name {
+                font-size: 14px !important;
             }
         }
     </style>
@@ -266,78 +300,100 @@
                 <div class="header">
                     <table class="report-header">
                         <tr>
-                            <!-- الشمال (شعار + بريد وهاتف) -->
                             <td class="header-left">
                                 <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo" alt="الشعار">
-                                @if (GeneralSiteSettings('email'))
-                                    <div class="company-info">{{ GeneralSiteSettings('email') }}</div>
-                                @endif
-                                @if (GeneralSiteSettings('phone'))
-                                    <div class="company-info">{{ GeneralSiteSettings('phone') }}</div>
-                                @endif
                             </td>
 
-                            <!-- العنوان الرئيسي -->
                             <td class="header-center">
                                 <h1>{{ GeneralSiteSettings('name') }}</h1>
                             </td>
 
-                            <!-- اليمين (تاريخ مثلاً) -->
                             <td class="header-right">
-                                <p>{{ date('d/m/Y') }}</p>
-                                @if ($representative)
-                                    <p class="rep-info">اسم المندوب : {{ $representative->tree4_name }}</p>
-                                    @if ($representative->phone)
-                                        <p class="rep-info">رقم هاتف المندوب : {{ $representative->phone }}</p>
-                                    @endif
-                                @endif
-                                @if ($selectedCategory)
-                                    <p class="rep-info">القسم : {{ $selectedCategory->name }}</p>
-                                @endif
-                                <p style=" direction: rtl;">اسم العميل: {{ '..........................' }}</p>
+                                <img src="{{ asset('image/logo/' . GeneralSiteSettings('logo')) }}" class="logo" alt="الشعار">
                             </td>
                         </tr>
                     </table>
+
+                    <div class="info-strip">{{ GeneralSiteSettings('location') }}</div>
+
+                    <div class="date-wrap">
+                        <span class="date-box">{{ date('d/m/Y') }}</span>
+                    </div>
+
+                    @if ($representative)
+                        <div class="info-strip">
+                            {{ $representative->tree4_name }}{{ $representative->phone ? ' ' . $representative->phone : '' }}
+                        </div>
+                    @endif
+
+                    @if (!empty($customer_name))
+                        <div class="info-strip">العميل: {{ $customer_name }}</div>
+                    @endif
+
+                    @if ($selectedCategory)
+                        <div class="info-strip">{{ $selectedCategory->name }}</div>
+                    @endif
                 </div>
 
                 <!-- ✅ الجدول -->
-                @php $visibleColumns = $show_expiry ? 7 : 6; @endphp
+                @php
+                    $colspan = $show_expiry ? 7 : 6;
+                    $widths = $show_expiry ? [5, 30, 26, 11, 10, 10, 8] : [5, 30, 37, 10, 10, 8];
+                @endphp
                 <table class="price-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Item</th>
-                            <th>Generic name</th>
-                            @if ($show_expiry)
-                                <th>Expire date</th>
-                            @endif
-                            <th>Unit</th>
-                            <th>W.Price</th>
-                            {{--   <th>Order</th> --}}
-                        </tr>
-                    </thead>
+                    <colgroup>
+                        @foreach ($widths as $width)
+                            <col style="width: {{ $width }}%">
+                        @endforeach
+                    </colgroup>
+                    @unless ($show_company)
+                        <thead>
+                            <tr class="column_head">
+                                <th>No.</th>
+                                <th colspan="2">Item Name</th>
+                                @if ($show_expiry)
+                                    <th>Exp</th>
+                                @endif
+                                <th>Unit</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                    @endunless
                     <tbody>
                         @php $index = 1; @endphp
                         @foreach ($categories as $category)
                             @if ($show_company)
-                                <tr>
-                                    <td colspan="{{ $visibleColumns }}" class="company_name">{{ $category->name }}</td>
+                                <tr class="company_row">
+                                    <td colspan="{{ $colspan }}" class="company_name">{{ $category->name }}</td>
+                                </tr>
+                                <tr class="column_head">
+                                    <th>No.</th>
+                                    <th colspan="2">Item Name</th>
+                                    @if ($show_expiry)
+                                        <th>Exp</th>
+                                    @endif
+                                    <th>Unit</th>
+                                    <th>Price</th>
+                                    <th>Qty</th>
                                 </tr>
                             @endif
                             @foreach ($category->products as $product)
                                 @php $unit = $product->units->sortByDesc('id')->first(); @endphp
                                 <tr>
-                                    <td>{{ $index++ }}</td>
+                                    <td class="num">{{ $index++ }}</td>
                                     <td class="product-name">{{ $product->name }}</td>
                                     <td class="product-generic">{{ $product->name_en }}</td>
                                     @if ($show_expiry)
-                                        <td>{{ $product->expire_date }}</td>
+                                        <td class="exp">
+                                            {{ $product->expire_date ? \Illuminate\Support\Carbon::parse($product->expire_date)->format('m/Y') : '' }}
+                                        </td>
                                     @endif
-                                    <td>{{ $unit?->name ?? '---' }}</td>
+                                    <td class="unit">{{ $unit?->name ?? '---' }}</td>
                                     <td class="product-price">
                                         {{ $unit ? number_format($unit->pivot->price) : '---' }}
                                     </td>
-                                    {{--   <td></td> --}}
+                                    <td class="qty-cell"></td>
                                 </tr>
                             @endforeach
                         @endforeach

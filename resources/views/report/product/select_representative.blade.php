@@ -48,6 +48,8 @@
                                         @endforeach
                                     </select>
                                     <small>في حالة لم يتم اختيار أي مندوب سوف يتم عرض تقرير كشف الأسعار بدون أي بيانات للمندوب</small>
+                                    <label>اسم العميل (اختياري)</label>
+                                    <input type="text" name="customer_name" class="form-control" placeholder="اسم العميل" maxlength="100">
                                 </div>
                                 <br>
                                 <div class="col">
