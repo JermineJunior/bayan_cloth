@@ -74,19 +74,19 @@
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
 
                             <!-- مجموعة الإضافة + الحذف -->
-                            <div class="d-flex flex-column flex-md-row gap-2">
+                            <div class="d-flex flex-column flex-md-row gap-1">
 
                                 @can('اضافة منتج')
-                                    <a class="btn btn-primary" href="{{ route('product.create') }}"><i class="fa fa-plus">
+                                    <a class="btn btn-primary ml-2" href="{{ route('product.create') }}"><i class="fa fa-plus">
                                         </i>&nbsp;&nbsp;إضافة منتج
                                         </i></a>
                                 @endcan
-                                <a class="btn btn-success" href="{{ route('product.excel.create') }}">
+                                <a class="btn btn-success ml-2" href="{{ route('product.excel.create') }}">
                                     الاضافة بواسطة الاكسل</a>
                                 <a href="#" class="modal-effect btn btn-info" data-target="#percentModal"
                                     data-toggle="modal"> تغيير
                                     الاسعار بالنسبة</a>
-                                <div class="custom-control custom-checkbox align-self-center">
+                                <div class="custom-control custom-checkbox align-self-center mr-2">
                                     <input type="checkbox" class="custom-control-input" id="no_price_filter">
                                     <label class="custom-control-label" for="no_price_filter">بدون سعر فقط</label>
                                 </div>
