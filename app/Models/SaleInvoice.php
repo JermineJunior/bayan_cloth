@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SaleInvoice extends Model
 {
     protected $fillable = ['customer_id', '
-    _id', 'representative_id', 'invoice_number', 'date', 'sub_total_amount', 'discount_amount', 'tax_amount', 'tax_status', 'total_amount', 'process_no', 'status', 'deferend_amount', 'cash_name', 'bank_name', 'cash_amount_total', 'bank_amount_total', 'transaction_no', 'branch_id', 'invoice_status', 'rep_percentage', 'rep_cut_amount'];
+    _id', 'representative_id', 'invoice_number', 'date', 'sub_total_amount', 'discount_amount', 'tax_amount', 'tax_status', 'total_amount', 'process_no', 'status', 'deferend_amount', 'cash_name', 'bank_name', 'cash_amount_total', 'bank_amount_total', 'transaction_no', 'branch_id', 'invoice_status', 'rep_percentage', 'rep_cut_amount', 'note'];
 
     public function customer(): BelongsTo
     {

@@ -48,6 +48,7 @@ class PreliminaryInvoiceController extends Controller
                 'tax_amount' => $request->tax,
                 'tax_status' => $request->get('tax_status') ? 1 : 0,
                 'total_amount' => $request->total,
+                'note' => $request->note,
                 'branch_id' => session('branch_id'),
             ]);
 
@@ -141,6 +142,7 @@ class PreliminaryInvoiceController extends Controller
                     'invoice_status' => $invoice_status,
                     'rep_percentage' => $rep_percentage,
                     'rep_cut_amount' => $rep_cut_amount,
+                    'note' => $request->note,
                     'branch_id' => session('branch_id'),
                     'user_id' => Auth::id(),
                 ],

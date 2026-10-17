@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PreliminaryInvoice extends Model
 {
-    protected $fillable = ['customer_id', 'representative_id', 'date', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount','tax_status', 'discount_amount','branch_id'];
+    protected $fillable = ['customer_id', 'representative_id', 'date', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount','tax_status', 'discount_amount','branch_id', 'note'];
 
     public function details(): HasMany
     {

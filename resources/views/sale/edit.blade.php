@@ -435,6 +435,7 @@
                                 <input type="hidden" id="deferend_amount" name="deferend_amount" class="form-control"
                                     value="{{ number_format($sale_invoice->deferend_amount) }}" readonly>
 
+                                <div class="form-group"><label for="note">ملاحظات (اختياري)</label><textarea name="note" id="note" class="form-control" rows="2" maxlength="1000">{{ old('note', $sale_invoice->note ?? '') }}</textarea></div>
                                 <div class="text-center mt-1">
                                     <button type="submit" class="btn btn-primary">حفظ الفاتورة</button>
                                     <a href="javascript:history.back()" class="btn btn-warning">رجوع</a>

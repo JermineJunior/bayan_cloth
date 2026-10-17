@@ -29,6 +29,7 @@ class UpdatePurchaseRequest extends FormRequest
             'sub_total' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
             'total' => 'required|numeric|min:0',
+            'note' => 'nullable|string|max:1000',
             'cash_name' => 'nullable|exists:tree4s,id',
             'bank_name' => 'nullable|exists:tree4s,id',
             'cash_amount_total' => 'nullable|numeric',

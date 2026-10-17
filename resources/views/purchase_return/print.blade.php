@@ -264,6 +264,10 @@
                                             </table>
                                         </div>
 
+                                        @if ($purchase_invoice_return->note)
+                                            <div class="invoice-note"><strong>ملاحظات:</strong> {{ $purchase_invoice_return->note }}</div>
+                                        @endif
+
                                     </div>
                                 </div><!-- bd -->
                             </div><!-- bd -->

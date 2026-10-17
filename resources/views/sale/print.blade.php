@@ -283,6 +283,10 @@
                                             </table>
                                         </div>
 
+                                        @if ($sale_invoice->note)
+                                            <div class="invoice-note"><strong>ملاحظات:</strong> {{ $sale_invoice->note }}</div>
+                                        @endif
+
                                     </div>
                                 </div><!-- bd -->
                             </div><!-- bd -->

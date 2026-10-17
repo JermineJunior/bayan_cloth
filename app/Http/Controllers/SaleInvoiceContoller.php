@@ -79,6 +79,7 @@ class SaleInvoiceContoller extends Controller
                     'invoice_status' => $invoice_status,
                     'rep_percentage' => $rep_percentage,
                     'rep_cut_amount' => $rep_cut_amount,
+                    'note' => $request->note,
                     'branch_id' => session('branch_id'),
                     'user_id' => Auth::id(),
                 ],
@@ -286,6 +287,7 @@ class SaleInvoiceContoller extends Controller
                 'invoice_status' => $invoice_status,
                 'rep_percentage' => $rep_percentage,
                 'rep_cut_amount' => $rep_cut_amount,
+                'note' => $request->note,
                 'branch_id' => session('branch_id'),
                 'user_id' => Auth::id(),
             ]);

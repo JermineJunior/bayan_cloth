@@ -49,3 +49,5 @@ tr.fill-row { display: none; }
     .invoice-table th, .invoice-table td { white-space: nowrap; }
     .invoice-table td.product-cell { white-space: normal; }
 }
+
+.invoice-note { margin-top: 10px; padding: 8px 10px; border: 1px solid #999; font-size: 15px; white-space: pre-line; }

@@ -213,6 +213,10 @@
                                             </table>
                                         </div>
 
+                                        @if ($purchase_order->note)
+                                            <div class="invoice-note"><strong>ملاحظات:</strong> {{ $purchase_order->note }}</div>
+                                        @endif
+
                                     </div>
                                 </div><!-- bd -->
                             </div><!-- bd -->

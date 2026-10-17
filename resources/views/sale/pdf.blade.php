@@ -132,6 +132,19 @@
             border: none;
             border-bottom: 1px solid #ddd;
         }
+
+        .invoice-note {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .invoice-note td {
+            border: 1px solid #999;
+            padding: 8px 10px;
+            font-size: 15px;
+            white-space: pre-line;
+        }
     </style>
 </head>
 
@@ -278,6 +291,16 @@
             </tfoot>
 
         </table>
+
+        @if ($sale_invoice->note)
+            <table class="invoice-note">
+                <tbody>
+                    <tr>
+                        <td><strong>ملاحظات:</strong> {{ $sale_invoice->note }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        @endif
 
     </div>
 

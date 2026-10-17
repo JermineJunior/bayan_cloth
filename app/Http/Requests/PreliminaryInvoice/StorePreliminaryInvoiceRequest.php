@@ -28,6 +28,7 @@ class StorePreliminaryInvoiceRequest extends FormRequest
             'sub_total' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
             'total' => 'required|numeric|min:0',
+            'note' => 'nullable|string|max:1000',
 
             'product_id' => 'required|array',
             'product_id.*' => 'required|exists:products,id',
