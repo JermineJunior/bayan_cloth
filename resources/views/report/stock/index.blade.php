@@ -76,7 +76,8 @@
                             </div>
                             </br>
 
-                            <div class="d-flex justify-content-center">
+                            @include('report.partials.quick_date_filters')
+                                <div class="d-flex justify-content-center">
                                 <button type="submit" class="btn btn-primary"> بـحـث</button>
                             </div>
                         </form>
