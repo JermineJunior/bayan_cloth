@@ -55,6 +55,15 @@ class HomeController extends Controller
         $totalPurchases = PurchaseInvoice::whereMonth('created_at', now()->month)->where('branch_id', session('branch_id'))->count();
         $totalPurchaseReturns = PurchaseInvoiceReturn::whereMonth('created_at', now()->month)->where('branch_id', session('branch_id'))->count();
 
+        // آخر فواتير المبيعات والمشتريات
+        $latestSales = SaleInvoice::with('customer')
+            ->where('branch_id', session('branch_id'))
+            ->latest('id')->take(5)->get();
+
+        $latestPurchases = PurchaseInvoice::with('supplier')
+            ->where('branch_id', session('branch_id'))
+            ->latest('id')->take(5)->get();
+
         // مخطط المبيعات (Bar Chart)
         $salesChart = new Chart();
         $salesChart
@@ -94,6 +103,6 @@ class HomeController extends Controller
                 'responsive' => true,
                 'maintainAspectRatio' => false,
             ]);
-        return view('dashboard.index', compact('totalSales', 'totalSalesReturns', 'totalPurchases', 'totalPurchaseReturns', 'salesChart', 'purchaseChart', 'salesComparisonChart', 'purchaseComparisonChart'));
+        return view('dashboard.index', compact('totalSales', 'totalSalesReturns', 'totalPurchases', 'totalPurchaseReturns', 'salesChart', 'purchaseChart', 'salesComparisonChart', 'purchaseComparisonChart', 'latestSales', 'latestPurchases'));
     }
 }

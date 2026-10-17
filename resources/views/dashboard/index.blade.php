@@ -96,6 +96,86 @@
     </div>
     <!-- row closed -->
 
+    <!-- row: latest invoices -->
+    <div class="row row-sm">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-transparent pd-b-0 pd-t-20 bd-b-0">
+                    <h4 class="card-title mb-0">آخر فواتير المبيعات</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>رقم الفاتورة</th>
+                                    <th>العميل</th>
+                                    <th>التاريخ</th>
+                                    <th>الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($latestSales as $sale_invoice)
+                                    <tr>
+                                        <td>
+                                            <a href="{{ route('sale_invoice.pdf', $sale_invoice->id) }}">{{ $sale_invoice->invoice_number }}</a>
+                                        </td>
+                                        <td>{{ $sale_invoice->customer->tree4_name ?? '-' }}</td>
+                                        <td>{{ $sale_invoice->date }}</td>
+                                        <td>{{ number_format($sale_invoice->total_amount, 2) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">لا توجد فواتير</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-transparent pd-b-0 pd-t-20 bd-b-0">
+                    <h4 class="card-title mb-0">آخر فواتير المشتريات</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered mb-0">
+                            <thead>
+                                <tr>
+                                    <th>رقم الفاتورة</th>
+                                    <th>المورد</th>
+                                    <th>التاريخ</th>
+                                    <th>الإجمالي</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($latestPurchases as $purchase_invoice)
+                                    <tr>
+                                        <td>
+                                            <a href="{{ route('purchase_invoice.show', $purchase_invoice->id) }}">{{ $purchase_invoice->invoice_number }}</a>
+                                        </td>
+                                        <td>{{ $purchase_invoice->supplier->tree4_name ?? '-' }}</td>
+                                        <td>{{ $purchase_invoice->date }}</td>
+                                        <td>{{ number_format($purchase_invoice->total_amount, 2) }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="text-center">لا توجد فواتير</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- row closed -->
+
     <!-- row opened -->
     <div class="row row-sm">
         <!-- Chart for Cash Box -->
