@@ -106,12 +106,19 @@
                                     </div>
                                 </div>
                                 <br>
+                                <div class="col-12 mt-3">
+                                    <button type="button" id="add-dain-row" class="btn btn-secondary mb-3">إضافة
+                                        حساب دائن</button>
+                                    <button type="button" id="add-madin-row" class="btn btn-info mb-3">إضافة
+                                        حساب مدين</button>
+                                </div>
                                 <div class="row" id="row-dain">
                                     <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label for="dain">الحساب الدائن</label>
+                                        @php $dainIndex = 0; @endphp
                                         @foreach ($operations as $operation)
                                             @if ($operation->madin == 0)
-                                                <select name="dain[]" class="form-control select2-from">
+                                                <select name="dain[{{ $dainIndex }}]" class="form-control select2-from">
                                                     <option value="">-- من فضلك قم باختيار حساب --</option>
                                                     @foreach ($trees as $tree)
                                                         <option @selected($tree->tree4_code == $operation->tree4_code) value="{{ $tree->id }}">
@@ -119,6 +126,7 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
+                                                @php $dainIndex++; @endphp
                                                 <br>
                                                 <br>
                                             @endif
@@ -128,24 +136,24 @@
                                     <div class="col-xl-5 mb-2">
                                         <span class="tx-danger">*</span><label for="price_dain" class="control-label">
                                             المبلغ</label>
+                                        @php $priceDainIndex = 0; @endphp
                                         @foreach ($operations as $operation)
                                             @if ($operation->madin == 0)
-                                                <input  type="text" name="price_dain[]"
+                                                <input  type="text" name="price_dain[{{ $priceDainIndex }}]"
                                                     class="form-control price_dain" onkeyup="checkPrice()"
                                                     placeholder="يرجى ادخال المبلغ" value="{{ number_format($operation->dain) }}">
+                                                @php $priceDainIndex++; @endphp
                                                 <br>
                                             @endif
                                         @endforeach
                                     </div>
 
-                                    <div class="col-xl-1 col-md-1">
-                                        <label for="">حذف</label>
+                                    <div class="col-12 mb-2">
+                                        @php $noteDainIndex = 0; @endphp
                                         @foreach ($operations as $operation)
                                             @if ($operation->madin == 0)
-                                                <button type="button" class="btn btn-danger remove-madin"><i
-                                                        class="fa fa-trash"></i></button>
-                                                <br>
-                                                <br>
+                                                <input type="text" name="note_dain[{{ $noteDainIndex }}]" class="form-control mb-2" placeholder="ملاحظة (اختياري)" value="{{ $operation->line_note }}">
+                                                @php $noteDainIndex++; @endphp
                                             @endif
                                         @endforeach
                                     </div>
@@ -155,9 +163,10 @@
                                 <div class="row" id="row-madin">
                                     <div class="col-xl-6">
                                         <span class="tx-danger">*</span><label>الحساب المدين</label>
+                                        @php $madinIndex = 0; @endphp
                                         @foreach ($operations as $operation)
                                             @if ($operation->dain == 0)
-                                                <select name="madin[]" class="form-control select2-to">
+                                                <select name="madin[{{ $madinIndex }}]" class="form-control select2-to">
                                                     <option value="">-- من فضلك قم باختيار حساب --</option>
                                                     @foreach ($trees as $tree)
                                                         <option @selected($operation->tree4_code == $tree->tree4_code) value="{{ $tree->id }}">
@@ -165,6 +174,7 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
+                                                @php $madinIndex++; @endphp
                                                 <br><br>
                                             @endif
                                         @endforeach
@@ -172,35 +182,30 @@
                                     <div class="col-xl-5 mb-2">
                                         <span class="tx-danger">*</span><label class="control-label">
                                             المبلغ</label>
+                                        @php $priceMadinIndex = 0; @endphp
                                         @foreach ($operations as $operation)
                                             @if ($operation->dain == 0)
-                                                <input type="text" name="price_madin[]"
+                                                <input type="text" name="price_madin[{{ $priceMadinIndex }}]"
                                                     class="form-control price_madin" onkeyup="checkPrice()"
                                                     placeholder="يرحى ادخال المبلغ" value="{{ number_format($operation->madin) }}">
+                                                @php $priceMadinIndex++; @endphp
                                                 <br>
                                             @endif
                                         @endforeach
                                     </div>
 
-                                    <div class="col-xl-1 col-md-1">
-                                        <label for="">حذف</label>
+                                    <div class="col-12 mb-2">
+                                        @php $noteMadinIndex = 0; @endphp
                                         @foreach ($operations as $operation)
                                             @if ($operation->dain == 0)
-                                                <button type="button" class="btn btn-danger remove-madin"><i
-                                                        class="fa fa-trash"></i></button>
-                                                <br><br>
+                                                <input type="text" name="note_madin[{{ $noteMadinIndex }}]" class="form-control mb-2" placeholder="ملاحظة (اختياري)" value="{{ $operation->line_note }}">
+                                                @php $noteMadinIndex++; @endphp
                                             @endif
                                         @endforeach
                                     </div>
                                 </div>
                                 <div id="madin-container"></div>
 
-                                <div class="col-12 mt-3">
-                                    <button type="button" id="add-dain-row" class="btn btn-secondary mb-3">إضافة
-                                        حساب دائن</button>
-                                    <button type="button" id="add-madin-row" class="btn btn-info mb-3">إضافة
-                                        حساب مدين</button>
-                                </div>
                                 <div class="d-flex justify-content-center">
                                     <button type="submit" id="saveButton" class="btn btn-primary"> إضــافة
                                         القيد</button>
@@ -248,7 +253,8 @@
                 <input type="text" name="price_madin[${indexOf}]" class="form-control price_madin"
                     onkeyup="checkPrice()" placeholder="يرجى ادخال المبلغ">
             </div>
-            <div class="col-xl-1 col-md-1 mt-3">
+            <div class="col-11 mb-2"><input type="text" name="note_madin[${indexOf}]" class="form-control" placeholder="ملاحظة (اختياري)"></div>
+            <div class="col-1 mb-2">
                 <button type="button" class="btn btn-danger remove-madin"><i class="fa fa-trash"></i></button>
             </div>
         </div>`;
@@ -280,8 +286,9 @@
                                     <input type="text" name="price_dain[${indexOf}]" class="form-control price_dain"
                                         onkeyup="checkPrice()" placeholder="يرجى ادخال المبلغ">
                                 </div>
-                                <div class="col-xl-1 col-md-1 mt-3">
-                                    <button type="button" class="btn btn-danger remove-madin"><i class="fa fa-trash"></i></button>
+                                <div class="col-11 mb-2"><input type="text" name="note_dain[${indexOf}]" class="form-control" placeholder="ملاحظة (اختياري)"></div>
+                                <div class="col-1 mb-2">
+                                    <button type="button" class="btn btn-danger remove-dain"><i class="fa fa-trash"></i></button>
                                 </div>
                             </div>`;
 
@@ -324,17 +331,17 @@
                 dain: {
                     required: true,
                 },
-                "madin[]": {
+                "madin[0]": {
                     required: true,
                 },
-                "dain[]": {
+                "dain[0]": {
                     required: true,
                 },
-                "price_dain[]": {
+                "price_dain[0]": {
                     required: true,
                     number: true
                 },
-                "price_madin[]": {
+                "price_madin[0]": {
                     required: true,
                     number: true
                 },
@@ -350,17 +357,17 @@
                 dain: {
                     required: "يرجى إدخال الحساب الدائن.",
                 },
-                "madin[]": {
+                "madin[0]": {
                     required: "يرجى إدخال الحساب المدين.",
                 },
-                "dain[]": {
+                "dain[0]": {
                     required: "يرجى إدخال الحساب الدائن.",
                 },
-                "price_madin[]": {
+                "price_madin[0]": {
                     required: "يرجى إدخال مبلغ الحساب المدين.",
                     number: "يجب أن يكون المبلغ عدداً."
                 },
-                "price_dain[]": {
+                "price_dain[0]": {
                     required: "يرجى إدخال مبلغ الحساب الدائن.",
                     number: "يجب أن يكون المبلغ عدداً."
                 },

@@ -51,7 +51,8 @@
                                 @endif
                                 <tr>
                                     <td></td>
-                                    <td  colspan="2">{{ $restriction->tree4->tree4_name }}</td>
+                                    <td>{{ $restriction->tree4->tree4_name }}</td>
+                                    <td>{{ $restriction->line_note ?? '-' }}</td>
                                 </tr>
                             @endforeach
                             <tr>
@@ -63,7 +64,8 @@
                                 @endif
                                 <tr>
                                     <td></td>
-                                    <td  colspan="2">{{ $restriction->tree4->tree4_name }}</td>
+                                    <td>{{ $restriction->tree4->tree4_name }}</td>
+                                    <td>{{ $restriction->line_note ?? '-' }}</td>
                                 </tr>
                             @endforeach
 

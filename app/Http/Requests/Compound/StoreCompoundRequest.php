@@ -33,6 +33,10 @@ class StoreCompoundRequest extends FormRequest
             'price_dain.*' => 'required|numeric',
             'price_madin' => 'array',
             'price_madin.*' => 'required|numeric',
+            'note_dain' => 'array',
+            'note_dain.*' => 'nullable|string|max:255',
+            'note_madin' => 'array',
+            'note_madin.*' => 'nullable|string|max:255',
         ];
     }
 }
