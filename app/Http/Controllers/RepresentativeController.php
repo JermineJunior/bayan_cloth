@@ -38,7 +38,6 @@ class RepresentativeController extends Controller
                     'email' => $request->email,
                     'phone' => $request->phone,
                     'address' => $request->address,
-                    'rep_percentage' => $request->rep_percentage ?? 0,
                     'user_id' => Auth::id(),
                 ],
             );
@@ -62,7 +61,6 @@ class RepresentativeController extends Controller
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'address' => $request->address,
-                'rep_percentage' => $request->rep_percentage ?? 0,
             ]);
 
             DB::commit();
@@ -111,18 +109,6 @@ class RepresentativeController extends Controller
 
     public function addRepresentative(Request $request): JsonResponse
     {
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-            'rep_percentage' => 'nullable|numeric|between:0,100',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'نسبة المندوب غير صالحة.',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
         try {
             DB::beginTransaction();
 
@@ -138,7 +124,6 @@ class RepresentativeController extends Controller
                     'email' => $request->email,
                     'phone' => $request->phone,
                     'address' => $request->address,
-                    'rep_percentage' => $request->rep_percentage ?? 0,
                     'user_id' => Auth::id(),
                 ],
             );

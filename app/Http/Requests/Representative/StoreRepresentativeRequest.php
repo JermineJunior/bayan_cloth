@@ -26,7 +26,6 @@ class StoreRepresentativeRequest extends FormRequest
             'email' =>'nullable|email|unique:tree4s,email',
             'address' =>'nullable|string|max:255',
             'phone' =>'nullable|unique:tree4s,phone',
-            'rep_percentage' => 'nullable|numeric|between:0,100',
         ];
     }
 }

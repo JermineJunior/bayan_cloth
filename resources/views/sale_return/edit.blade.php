@@ -512,11 +512,6 @@
                             <input type="text" name="address_representative" id="address_representative"
                                 class="form-control" autocomplete="off">
                         </div>
-                        <div class="form-group">
-                            <label>نسبة المندوب %</label>
-                            <input type="number" name="percentage_representative" id="percentage_representative"
-                                class="form-control" min="0" max="100" step="0.01" value="0" autocomplete="off">
-                        </div>
 
                     </div>
                     <div class="modal-footer">
@@ -1196,11 +1191,6 @@
                             uniquePhone: true,
                             number: true
                         },
-                        percentage_representative: {
-                            number: true,
-                            min: 0,
-                            max: 100
-                        },
                     },
                     messages: {
                         name_representative: {
@@ -1211,11 +1201,6 @@
                         },
                         phone_representative: {
                             number: "يجب أن يكون رقم المندوب عدداً."
-                        },
-                        percentage_representative: {
-                            number: "يرجى إدخال نسبة المندوب كرقم.",
-                            min: "يجب أن تكون نسبة المندوب 0 على الأقل.",
-                            max: "يجب ألا تتجاوز نسبة المندوب 100."
                         },
                     },
                     errorPlacement: function(error, element) {
@@ -1245,8 +1230,6 @@
                                 phone: $('#phone_representative')
                                     .val(), // ← بدون علامات تنصيص
                                 address: $('#address_representative').val(),
-                                rep_percentage: $('#percentage_representative').val() !== '' ? $(
-                                        '#percentage_representative').val() : 0,
                                 _token: '{{ csrf_token() }}'
 
                             },

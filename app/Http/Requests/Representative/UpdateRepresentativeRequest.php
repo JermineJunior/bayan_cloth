@@ -26,8 +26,7 @@ class UpdateRepresentativeRequest extends FormRequest
             'name' =>['required','string','max:255',Rule::unique('tree4s','tree4_name')->ignore($this->representative->id,'id')],
             'email' =>['nullable' ,'email',Rule::unique('tree4s','email')->ignore($this->representative->id,'id')],
             'phone' => ['nullable',Rule::unique('tree4s','phone')->ignore($this->representative->id,'id')],
-            'address' => 'nullable|string|max:255',
-            'rep_percentage' => 'nullable|numeric|between:0,100'
+            'address' => 'nullable|string|max:255'
         ];
     }
 }

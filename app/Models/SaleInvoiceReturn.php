@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SaleInvoiceReturn extends Model
 {
-    protected $fillable = ['customer_id', 'representative_id', 'user_id', 'date', 'stock_id', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount', 'tax_status', 'discount_amount', 'status', 'bank_name', 'cash_name', 'cash_amount_total', 'bank_amount_total', 'transaction_no', 'process_no', 'deferend_amount', 'branch_id', 'invoice_status', 'rep_percentage', 'rep_cut_amount', 'note'];
+    protected $fillable = ['customer_id', 'representative_id', 'user_id', 'date', 'stock_id', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount', 'tax_status', 'discount_amount', 'status', 'bank_name', 'cash_name', 'cash_amount_total', 'bank_amount_total', 'transaction_no', 'process_no', 'deferend_amount', 'branch_id', 'invoice_status', 'note'];
 
     public function details(): HasMany
     {

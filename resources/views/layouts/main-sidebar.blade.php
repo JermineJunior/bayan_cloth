@@ -241,7 +241,6 @@
                 'تقرير الجرد للمشتريات',
                 'تقرير الجرد للمبيعات',
                 'تقرير كشف السعر',
-                'تقرير عمولة المندوب',
                 'تقرير كشف حساب',
                 'تقرير دفتر اليومية',
                 'تقرير القيود',
@@ -452,11 +451,6 @@
                                     <li><a class="sub-slide-item"
                                             href="{{ route('report.sale_invoice_return.representative.index') }}">تقرير
                                             مردود المبيعات حسب المندوب</a></li>
-                                @endcan
-                                @can('تقرير عمولة المندوب')
-                                    <li><a class="sub-slide-item"
-                                            href="{{ route('report.representative.cut.index') }}">تقرير عمولة
-                                            المندوب</a></li>
                                 @endcan
                                 @can('تقرير مديونيات عملاء المندوب')
                                     <li><a class="sub-slide-item"

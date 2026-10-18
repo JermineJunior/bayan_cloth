@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Revenue extends Model
 {
-    protected $fillable = ['dain_id', 'cach_id', 'bank_id', 'cach_name', 'bank_name', 'transaction_no', 'note','branch_id', 'representative_id', 'rep_percentage', 'rep_cut_amount'];
+    protected $fillable = ['dain_id', 'cach_id', 'bank_id', 'cach_name', 'bank_name', 'transaction_no', 'note','branch_id', 'representative_id'];
 
     public function allocations(): HasMany
     {

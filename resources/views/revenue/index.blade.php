@@ -106,7 +106,6 @@
                                     <th class="wd-15p border-bottom-0">الخزنة</th>
                                     <th class="wd-10p border-bottom-0">المبلغ</th>
                                     <th class="wd-20p border-bottom-0">ملاحظات</th>
-                                    <th class="wd-20p border-bottom-0">عمولة المندوب</th>
                                     <th class="wd-20p border-bottom-0">العمليات </th>
 
                                 </tr>
@@ -122,12 +121,6 @@
                                         <td>{{ $revenue->cach->tree4_name ?? null }}</td>
                                         <td>{{ number_format($revenue->cach_name + $revenue->bank_name, 2) }}</td>
                                         <td>{{ $revenue->note }}</td>
-                                        <td>
-                                            @if ($revenue->representative_id)
-                                                {{ $revenue->representative->tree4_name ?? null }} -
-                                                {{ number_format($revenue->rep_cut_amount, 2) }}
-                                            @endif
-                                        </td>
                                         <td>
                                             @if ($revenue->allocations_count > 0)
                                                 <span class="badge badge-success">مسدد فواتير</span>
@@ -149,9 +142,8 @@
                                                         data-cach-price="{{ number_format($revenue->cach_name, 2) }}"
                                                         data-bank-price="{{ number_format($revenue->bank_name, 2) }}"
                                                         data-transaction-no="{{ $revenue->transaction_no }}"
-                                                        data-representative-id="{{ $revenue->representative_id }}"
-                                                        data-rep-percentage="{{ $revenue->rep_percentage }}"
-                                                        data-dain-name="{{ $revenue->dain->tree4_name }}" title="تعديل">
+                                                         data-representative-id="{{ $revenue->representative_id }}"
+                                                         data-dain-name="{{ $revenue->dain->tree4_name }}" title="تعديل">
                                                         <i class="fa fa-edit">
                                                         </i></a>
                                                 @endif
@@ -200,11 +192,10 @@
                                     style="width: 100%">
                                     <option value="">-- بدون مندوب --</option>
                                     @foreach ($representatives as $rep)
-                                        <option value="{{ $rep->id }}" data-percentage="{{ $rep->rep_percentage }}">
+                                        <option value="{{ $rep->id }}">
                                             {{ $rep->tree4_name }}</option>
                                     @endforeach
                                 </select>
-                                <small id="rep_percentage_note_add" class="rep-percentage-note text-muted"></small>
                             </div>
                             <div class="form-group row align-items-center">
                                 {{-- المبلغ نقدا --}}
@@ -303,11 +294,10 @@
                                     style="width: 100%">
                                     <option value="">-- بدون مندوب --</option>
                                     @foreach ($representatives as $rep)
-                                        <option value="{{ $rep->id }}" data-percentage="{{ $rep->rep_percentage }}">
+                                        <option value="{{ $rep->id }}">
                                             {{ $rep->tree4_name }}</option>
                                     @endforeach
                                 </select>
-                                <small id="rep_percentage_note_edit" class="rep-percentage-note text-muted"></small>
                             </div>
                             <div class="form-group row align-items-center">
                                 {{-- المبلغ نقدا --}}
@@ -660,25 +650,6 @@
                 }
             });
 
-            // نسبة المندوب تحت القوائم المنسدلة
-            $('#representative_id_add').on('change', function() {
-                var $note = $('#rep_percentage_note_add');
-                if (!$(this).val()) {
-                    $note.text('');
-                    return;
-                }
-                $note.text('نسبة المندوب: ' + $(this).find('option:selected').attr('data-percentage') + '%');
-            });
-
-            $('#representative_id_edit').on('change', function() {
-                var $note = $('#rep_percentage_note_edit');
-                if (!$(this).val()) {
-                    $note.text('');
-                    return;
-                }
-                $note.text('نسبة المندوب: ' + $(this).find('option:selected').attr('data-percentage') + '%');
-            });
-
             // Handling data passing to edit and delete modals
             $('#editModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget);
@@ -694,7 +665,6 @@
                 var note = button.data('note');
                 var transactionNo = button.data('transaction-no');
                 var repId = button.attr('data-representative-id');
-                var repPct = button.attr('data-rep-percentage');
                 var modal = $(this);
                 $('#edit_revenue').attr('action', '{{ route('revenue.update', ':id') }}'.replace(':id',
                     id));
@@ -724,12 +694,6 @@
                 }
 
                 $('#representative_id_edit').val(repId || '').trigger('change');
-                if (repId) {
-                    // نعرض النسبة المحفوظة على السطر وليس نسبة المندوب الحالية
-                    $('#rep_percentage_note_edit').text('نسبة المندوب: ' + repPct + '%');
-                } else {
-                    $('#rep_percentage_note_edit').text('');
-                }
 
                 modal.find('.modal-body #cach_name').val(cachName);
                 modal.find('.modal-body #bank_name').val(bankName);
