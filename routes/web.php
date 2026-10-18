@@ -19,6 +19,7 @@ use App\Http\Controllers\BurrenController;
 use App\Http\Controllers\OpeningContoller;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\CompoundContoller;
+use App\Http\Controllers\CurrencyTransferController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\CustomerInvoicePaymentController;
@@ -164,6 +165,7 @@ Route::group(
         Route::resource(name: 'daily', controller: DailyContoller::class)->except(methods: 'show');
         Route::get(uri: '/daily/{constant_number}', action: [DailyContoller::class, 'show'])->name(name: 'daily.show');
         Route::resource(name: 'compound', controller: CompoundContoller::class)->except(methods: 'show');
+        Route::resource(name: 'currency-transfer', controller: CurrencyTransferController::class)->only(methods: ['index', 'create', 'store', 'show']);
         Route::resource(name: 'opening', controller: OpeningContoller::class)->except(methods: 'show');
 
         // Route Preliminary Invoice

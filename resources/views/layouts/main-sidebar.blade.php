@@ -562,7 +562,7 @@
                 <li class="side-item side-item-category" style="font-weight: bold;"> الشجرة المحاسبية </li>
 
             @endcanany
-            @canany(['الايردادات', 'تحصيل فواتير العملاء', 'قيود مالية اخرى', 'المصروفات', 'القيود المركبة', 'قائمة القيود'])
+            @canany(['الايردادات', 'تحصيل فواتير العملاء', 'قيود مالية اخرى', 'المصروفات', 'القيود المركبة', 'تحويل العملات', 'قائمة القيود'])
 
                 <li class="slide">
                     <a class="side-menu__item" data-toggle="slide" href="{{ url('/' . ($page = '#')) }}"><svg
@@ -586,6 +586,9 @@
                         @endcan
                         @can('القيود المركبة')
                             <li><a class="slide-item" href="{{ route('compound.create') }}">القيود المركبة </a></li>
+                        @endcan
+                        @can('تحويل العملات')
+                            <li><a class="slide-item" href="{{ route('currency-transfer.create') }}">تحويل العملات </a></li>
                         @endcan
                         @can('قائمة القيود')
                             <li><a class="slide-item" href="{{ route('daily.index') }}"> قائمة القيود </a>
