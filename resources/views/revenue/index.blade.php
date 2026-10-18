@@ -132,6 +132,10 @@
                                             @if ($revenue->allocations_count > 0)
                                                 <span class="badge badge-success">مسدد فواتير</span>
                                             @endif
+                                            <a class="btn btn-outline-info btn-sm"
+                                                href="{{ route('revenue.show', $revenue->id) }}" title="طباعة">
+                                                <i class="fa fa-print"></i>
+                                            </a>
                                             @can('تعديل ايراد')
                                                 @if ($revenue->allocations_count == 0)
                                                     <a class="modal-effect btn btn-outline-success btn-sm"

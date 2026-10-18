@@ -79,6 +79,7 @@ class RevenueController extends Controller
 
     public function show(Revenue $revenue): View
     {
+        $revenue->load('allocations.saleInvoice');
         return view('revenue.print', compact('revenue'));
     }
 
