@@ -20,7 +20,11 @@ class UserTableSeeder extends Seeder
             'username' => 'bayan',
             'password' => bcrypt('123'),
         ]);
-
+        $user2 = User::create([
+            'name' => 'admin',
+            'username' => 'admin',
+            'password' => bcrypt('29652'),
+        ]);
         // إنشاء الأدوار
         $owner_role = Role::create(['name' => 'owner']);
 
@@ -32,7 +36,9 @@ class UserTableSeeder extends Seeder
 
         // تعيين الدور للمستخدم
         $user->assignRole('owner');
+        $user2->assignRole('owner');
 
         $user->branches()->syncWithoutDetaching([1]);
+        $user2->branches()->syncWithoutDetaching([1]);
     }
 }
