@@ -91,6 +91,7 @@
                                 <tr>
                                     <th class="wd-5p border-bottom-0">#</th>
                                     <th class="wd-20p border-bottom-0">الاسم</th>
+                                    <th class="wd-15p border-bottom-0">الفروع</th>
                                     <th class="wd-15p border-bottom-0">العمليات </th>
 
                                 </tr>
@@ -101,11 +102,13 @@
                                     <tr data-id="{{ $stock->id }}">
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $stock->name }}</td>
+                                        <td>{{ $stock->branches->pluck('name')->implode('، ') }}</td>
                                         <td>
                                             @can('تعديل المخزن')
                                                 <a class="modal-effect btn btn-outline-success btn-sm"
                                                     data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
                                                     data-id="{{ $stock->id }}" data-name="{{ $stock->name }}"
+                                                    data-branches="{{ $stock->branches->pluck('id')->implode(',') }}"
                                                     title="تعديل">
                                                     <i class="fa fa-edit">
                                                     </i></a>
@@ -143,6 +146,14 @@
                                 <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم المخزن </label>
                                 <input type="text" name="name" id="name" class="form-control" required>
                             </div>
+                            <div class="form-group">
+                                <span class="tx-danger">*</span><label>الفروع</label>
+                                <select name="branches[]" class="form-control" multiple required>
+                                    @foreach ($branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
                         </div>
                         <div class="modal-footer">
@@ -170,6 +181,14 @@
                                 <span class="tx-danger">*</span><label>اسم المخزن</label>
                                 <input id="name_ed" required type="text" name="name" class="form-control"
                                     required>
+                            </div>
+                            <div class="form-group">
+                                <span class="tx-danger">*</span><label>الفروع</label>
+                                <select id="branches_ed" name="branches[]" class="form-control" multiple required>
+                                    @foreach ($branches as $branch)
+                                        <option value="{{ $branch->id }}">{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn ripple btn-primary" type="submit">تحديث البيانات </button>
@@ -244,10 +263,12 @@
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
                 var name = button.data('name');
+                var branches = button.data('branches');
                 var modal = $(this);
                 $('#edit_stock').attr('action', '{{ route('stock.update', ':id') }}'.replace(':id',
                     id));
                 modal.find('.modal-body #name_ed').val(name);
+                $('#branches_ed').val(branches ? String(branches).split(',') : []);
             });
 
             $('#deleteModal').on('show.bs.modal', function(event) {

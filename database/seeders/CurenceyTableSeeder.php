@@ -16,7 +16,7 @@ class CurenceyTableSeeder extends Seeder
         Curencey::create([
             'name'=>'الجنيه السوداني',
             'amount'=>1,
-            'symbol' => 'حنيه سوداني'
+            'symbol' => 'ج.س'
         ]);
     }
 }

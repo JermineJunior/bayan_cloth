@@ -23,6 +23,8 @@ class StoreStockRequest extends FormRequest
     {
         return [
             'name' => 'required|unique:stocks,name',
+            'branches' => 'required|array|min:1',
+            'branches.*' => 'required|exists:branches,id',
         ];
     }
 }

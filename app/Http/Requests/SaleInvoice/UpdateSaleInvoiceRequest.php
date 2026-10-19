@@ -39,6 +39,24 @@ class UpdateSaleInvoiceRequest extends FormRequest
             'product_id' => 'required|array',
             'product_id.*' => 'required|exists:products,id',
 
+            // stock_id may be an array (sale invoice lines) or a scalar (sale return)
+            'stock_id' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $ids = is_array($value) ? $value : [$value];
+                    foreach ($ids as $id) {
+                        $exists = \Illuminate\Support\Facades\DB::table('branch_stock')
+                            ->where('branch_id', session('branch_id'))
+                            ->where('stock_id', $id)
+                            ->exists();
+                        if (!$exists) {
+                            $fail('المخزن المحدد غير تابع لهذا الفرع.');
+                            return;
+                        }
+                    }
+                },
+            ],
+
             'unit_id' => 'required|array',
             'unit_id.*' => 'required|numeric|exists:units,id',
 

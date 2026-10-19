@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Unit;
 use App\Models\Stock;
+use App\Models\Branch;
 use App\Models\Product;
 use App\Models\Transform;
 use Illuminate\View\View;
@@ -13,6 +14,7 @@ use App\Models\Transform_details;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Stock\StoreStockRequest;
 use App\Http\Requests\Stock\UpdateStockRequest;
@@ -23,15 +25,17 @@ class StockController extends Controller
     public function index(): View
     {
         $stocks = Stock::get();
-        return view('stock.index', compact('stocks'));
+        $branches = Branch::get();
+        return view('stock.index', compact('stocks', 'branches'));
     }
 
     public function store(StoreStockRequest $request): RedirectResponse
     {
         $stock = Stock::create(attributes: ['name' => $request->name]);
+        $stock->branches()->sync($request->branches);
         $products = Product::get();
         foreach ($products as $product) {
-            if ($product->stocks()->count() > 0) {
+            if ($product->stocks()->withoutGlobalScopes()->count() > 0) {
                 $product->stocks()->attach($stock->id, [
                     'quantity' => 0,
                     'unit_stock' => $product->units()->first()->pivot->unit_id ?? 0,
@@ -43,22 +47,38 @@ class StockController extends Controller
 
     public function show($id)
     {
-        $stock = Stock::with('products.stocks')->findOrFail($id);
+        $stock = Stock::withoutGlobalScopes()->with('products.stocks')->findOrFail($id);
         return view('stock.show', compact('stock'));
     }
 
-    public function update(UpdateStockRequest $request, Stock $stock): RedirectResponse
+    public function update(UpdateStockRequest $request, $stock): RedirectResponse
     {
+        $stock = Stock::withoutGlobalScopes()->findOrFail($stock);
+
+        $newBranchIds = collect($request->branches)->map(fn ($id) => (int) $id)->all();
+        $removedBranchIds = $stock->branches()->pluck('branch_stock.branch_id')->diff($newBranchIds);
+
+        if ($removedBranchIds->isNotEmpty()) {
+            $hasMovements = StockDetail::whereIn('branch_id', $removedBranchIds)
+                ->where('stock_id', $stock->id)
+                ->exists();
+            if ($hasMovements) {
+                return back()->withErrors('لا يمكن ازالة الفرع لوجود حركات على هذا المخزن');
+            }
+        }
+
         $stock->update(['name' => $request->name]);
+        $stock->branches()->sync($request->branches);
         return back()->with('success_updated', 'تم تحديث البيانات بنجاج');
     }
 
-    public function destroy(Stock $stock): RedirectResponse
+    public function destroy($stock): RedirectResponse
     {
+        $stock = Stock::withoutGlobalScopes()->findOrFail($stock);
         if ($stock->products()->count() > 0) {
             return back()->withErrors('لا يمكن حذف هذا المخزن لانه مرتبط ببعض المنتجات');
         }
-        
+
         $stock->delete();
         return back()->with('success_deleted', 'تم الحذف بنجاح ');
     }
@@ -183,6 +203,10 @@ class StockController extends Controller
 
     public function transform_update(Request $request, Transform $transform)
     {
+        $request->validate([
+            'stock_id_from' => ['required', Rule::exists('branch_stock', 'stock_id')->where('branch_id', session('branch_id'))],
+            'stock_id_to' => ['required', Rule::exists('branch_stock', 'stock_id')->where('branch_id', session('branch_id'))],
+        ]);
         try {
             DB::beginTransaction();
             foreach ($transform->transformDetails as $item) {

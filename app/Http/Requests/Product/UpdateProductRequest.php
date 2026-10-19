@@ -53,7 +53,7 @@ class UpdateProductRequest extends FormRequest
             'barcode' =>['max:255',Rule::unique('products','barcode')->ignore($this->product->id,'id')],
             'name' => ['required','string','max:255',Rule::unique('products','name')->ignore($this->product->id,'id')],
             'category_id' => 'required|exists:categories,id',
-            'stock_id.*' => 'required|exists:stocks,id',
+            'stock_id.*' => ['required', Rule::exists('branch_stock', 'stock_id')->where('branch_id', session('branch_id'))],
             'reorder_level' => 'nullable|integer|min:0',
             'units.*.unit_id' => 'required|exists:units,id',
             'units.*.price' => 'nullable|numeric|min:0',

@@ -39,6 +39,8 @@ class UpdatePurchaseRequest extends FormRequest
             'product_id' => 'required|array',
             'product_id.*' => 'required|exists:products,id',
 
+            'stock_id' => ['required', Rule::exists('branch_stock', 'stock_id')->where('branch_id', session('branch_id'))],
+
             'unit_id' => 'required|array',
             'unit_id.*' => 'required|numeric|exists:units,id',
 
@@ -87,6 +89,8 @@ class UpdatePurchaseRequest extends FormRequest
             'product_id.array' => 'المنتجات يجب أن تكون في شكل قائمة.',
             'product_id.*.required' => 'يجب تحديد المنتج.',
             'product_id.*.exists' => 'المنتج المحدد غير موجود.',
+
+            'stock_id.exists' => 'المخزن المحدد غير تابع لهذا الفرع.',
 
             'unit_id.required' => 'يجب تحديد الوحدات.',
             'unit_id.array' => 'الوحدات يجب أن تكون في شكل قائمة.',

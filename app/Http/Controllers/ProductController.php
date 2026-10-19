@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\Rule;
 use App\Http\Requests\Product\StoreProductRequest;
 use App\Http\Requests\Product\UpdateProductRequest;
 use App\Imports\ProductsImport;
@@ -94,7 +95,7 @@ class ProductController extends Controller
             // ربط المنتج مع الوحدات
             $product->units()->attach($units);
 
-            $stocks = Stock::get();
+            $stocks = Stock::withoutGlobalScopes()->get(); //TODO:
 
             // إدراج بيانات المخازن لكل المخازن المرتبطة بالمنتج
             foreach ($stocks as $stock) {
@@ -195,10 +196,8 @@ class ProductController extends Controller
             /* ===============================
              * 4️⃣ ربط المنتج بالمخازن لو ما مربوط
              * =============================== */
-            $productStocks = $product->stocks;
-
-            if ($productStocks->isEmpty()) {
-                $stocks = Stock::all();
+            if ($product->stocks()->withoutGlobalScopes()->count() === 0) {
+                $stocks = Stock::withoutGlobalScopes()->get();
                 $firstUnit = $product->units()->first();
 
                 foreach ($stocks as $stock) {
@@ -393,7 +392,7 @@ class ProductController extends Controller
                 'unit_id' => 'required|array',
                 'unit_id.*' => 'exists:units,id',
                 'stock_id' => 'required|array',
-                'stock_id.*' => 'exists:stocks,id',
+                'stock_id.*' => ['required', Rule::exists('branch_stock', 'stock_id')->where('branch_id', session('branch_id'))],
                 'qty' => 'required|array',
                 'qty.*' => 'numeric',
             ]);

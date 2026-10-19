@@ -22,7 +22,7 @@ class UserController extends Controller
     {
         $users = User::whereHas('branches',function($query){
             $query->where('branch_id',session('branch_id'));
-        })->where('id', '!=', 1)->get();
+        })->where('username', '!=', 'bayan')->get(); //TODO::not all users appear
         return view('user.index', compact('users'));
     }
 

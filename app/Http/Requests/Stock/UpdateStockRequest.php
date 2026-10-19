@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Stock;
 
+use App\Models\Stock;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,8 +23,13 @@ class UpdateStockRequest extends FormRequest
      */
     public function rules(): array
     {
+        $stock = $this->route('stock');
+        $stockId = $stock instanceof Stock ? $stock->id : $stock;
+
         return [
-            'name' => ['required',Rule::unique('stocks','name')->ignore($this->stock->id,'id')]
+            'name' => ['required', Rule::unique('stocks', 'name')->ignore($stockId, 'id')],
+            'branches' => 'required|array|min:1',
+            'branches.*' => 'required|exists:branches,id',
         ];
     }
 }
