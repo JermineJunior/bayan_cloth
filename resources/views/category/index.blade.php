@@ -15,8 +15,8 @@
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h5 class="content-title mb-0 my-auto"> ادارة الشركات</h5><span class="text-muted mt-1 tx-13 mr-2 mb-0">/
-                    قائمة الشركات</span>
+                <h5 class="content-title mb-0 my-auto"> ادارة الاصناف</h5><span class="text-muted mt-1 tx-13 mr-2 mb-0">/
+                    قائمة الاصناف</span>
             </div>
         </div>
     </div>
@@ -74,7 +74,7 @@
                             @can('اضافة شركة')
                                 <a class="modal-effect btn btn-primary" data-effect="effect-super-scaled" data-toggle="modal"
                                     href="#addModal">
-                                    <i class="fa fa-plus"></i>&nbsp;&nbsp;إضافة شركة
+                                    <i class="fa fa-plus"></i>&nbsp;&nbsp;إضافة صنف
                                 </a>
                             @endcan
 
@@ -134,14 +134,14 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content modal-content-demo">
                     <div class="modal-header">
-                        <h6 class="modal-title">إضافة شركة جديدة </h6><button aria-label="Close" class="close"
+                        <h6 class="modal-title">إضافة صنف جديد </h6><button aria-label="Close" class="close"
                             data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <form id="categoryForm" action="{{ route('category.store') }}" method="post">
                         @csrf
                         <div class="modal-body">
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم الشركة </label>
+                                <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم الصنف </label>
                                 <input type="text" name="name" id="name" class="form-control" autocomplete="off"
                                     required>
                             </div>
@@ -161,7 +161,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content modal-content-demo">
                     <div class="modal-header">
-                        <h6 class="modal-title">تعديل شركة </h6><button aria-label="Close" class="close"
+                        <h6 class="modal-title">تعديل صنف </h6><button aria-label="Close" class="close"
                             data-dismiss="modal" type="button"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <form action="#" method="post" id="edit_category">
@@ -170,7 +170,7 @@
                         <div class="modal-body">
                             <input type="hidden" value="" name="id" id="category_id">
                             <div class="form-group">
-                                <span class="tx-danger">*</span><label>اسم الشركة</label>
+                                <span class="tx-danger">*</span><label>اسم الصنف</label>
                                 <input id="name_ed" required type="text" name="name" class="form-control"
                                     autocomplete="off" required>
                             </div>

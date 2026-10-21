@@ -76,7 +76,7 @@
                         </svg><span class="side-menu__label"> الضبط العام</span><i class="angle fe fe-chevron-down"></i></a>
                     <ul class="slide-menu">
                         @can('قائمة الشركات')
-                            <li><a class="slide-item" href="{{ route('category.index') }}">قائمة الشركات</a></li>
+                            <li><a class="slide-item" href="{{ route('category.index') }}">قائمة الاصناف</a></li>
                         @endcan
                         @can('قائمة الفروع')
                             <li><a class="slide-item" href="{{ route('branch.index') }}">قائمة الفروع</a></li>
