@@ -59,7 +59,8 @@ class PreliminaryInvoiceController extends Controller
                         'stock_id' => $request->stock_id[$index],
                         'qty' => $request->qty[$index],
                         'bounce' => $request->bounce[$index],
-                        'expire_date' => $request->expire_date[$index],
+                        // EXPIRY-HIDDEN
+                        // 'expire_date' => $request->expire_date[$index],
                         'price' => $request->price[$index],
                         'unit_id' => $request->unit_id[$index],
                         'row_sub_total' => $request->row_sub_total[$index],
@@ -145,7 +146,8 @@ class PreliminaryInvoiceController extends Controller
                         'stock_id' => $request->stock_id[$index],
                         'qty' => $request->qty[$index],
                         'bounce' => $request->bounce[$index] ?? 0,
-                        'expire_date' => $request->expire_date[$index],
+                        // EXPIRY-HIDDEN
+                        // 'expire_date' => $request->expire_date[$index],
                         'price' => $request->price[$index],
                         'unit_id' => $request->unit_id[$index],
                         'row_sub_total' => $request->row_sub_total[$index],

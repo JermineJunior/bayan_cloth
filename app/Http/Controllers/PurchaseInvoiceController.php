@@ -76,7 +76,8 @@ class PurchaseInvoiceController extends Controller
                         'product_id' => $product_id,
                         'qty' => $request->qty[$index],
                         'bounce' => $request->bounce[$index] ?? 0,
-                        'expire_date' => $request->expire_date[$index],
+                        // EXPIRY-HIDDEN
+                        // 'expire_date' => $request->expire_date[$index],
                         'price' => $request->price[$index],
                         'unit_id' => $request->unit_id[$index],
                         'row_sub_total' => $request->row_sub_total[$index],
@@ -254,7 +255,8 @@ class PurchaseInvoiceController extends Controller
                         'product_id' => $product_id,
                         'qty' => $request->qty[$index],
                         'bounce' => $request->bounce[$index] ?? 0,
-                        'expire_date' => $request->expire_date[$index],
+                        // EXPIRY-HIDDEN
+                        // 'expire_date' => $request->expire_date[$index],
                         'price' => $request->price[$index],
                         'unit_id' => $request->unit_id[$index],
                         'row_sub_total' => $request->row_sub_total[$index],

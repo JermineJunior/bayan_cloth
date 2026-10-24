@@ -111,7 +111,7 @@
                                     <th class="wd-10p border-bottom-0">الاسم العلمي</th>
                                     <th class="wd-25p border-bottom-0">الكمية</th>
                                     <th class="wd-15p border-bottom-0">الشركة</th>
-                                    <th class="wd-20p border-bottom-0">تاريخ الصلاحية</th>
+{{-- EXPIRY-HIDDEN <th class="wd-20p border-bottom-0">تاريخ الصلاحية</th> --}}
                                     <th class="wd-5p">سعر البيع</th>
                                     <th class="wd-5p">سعر الشراء</th>
                                     <th class="wd-15p border-bottom-0">العمليات </th>
@@ -128,7 +128,7 @@
                                         <td>{{ $product->convertQuantity($product->stocks->sum('pivot.quantity')) ?? null }}
                                         </td>
                                         <td>{{ $product->category->name }}</td>
-                                        <td>{{ $product->expire_date }}</td>
+{{-- EXPIRY-HIDDEN <td>{{ $product->expire_date }}</td> --}}
                                         <td data-zero-price="{{ (($product->units[0]->pivot->price ?? 0) == 0) ? '1' : '0' }}">
                                             {{ number_format($product->units[0]->pivot->price ?? 0) }}
                                             @if (($product->units[0]->pivot->price ?? 0) == 0)

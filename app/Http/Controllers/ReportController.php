@@ -330,26 +330,27 @@ class ReportController extends Controller
         return view('report.supplier.show', compact('purchases', 'start', 'end'));
     }
 
-    public function expiringProducts(): View
-    {
-        $today = Carbon::today();
-        $nextWeek = $today->copy()->addWeek(); // تاريخ بعد 7 أيام
+    // EXPIRY-HIDDEN
+    // public function expiringProducts(): View
+    // {
+    //     $today = Carbon::today();
+    //     $nextWeek = $today->copy()->addWeek(); // تاريخ بعد 7 أيام
+    //
+    //     // جلب المنتجات التي ستنتهي صلاحيتها خلال أسبوع، مع استبعاد المنتجات المنتهية الصلاحية
+    //     $products = Product::whereBetween('expire_date', [$today, $nextWeek])->get();
+    //
+    //     return view('report.product.expiring-products', compact('products'));
+    // }
 
-        // جلب المنتجات التي ستنتهي صلاحيتها خلال أسبوع، مع استبعاد المنتجات المنتهية الصلاحية
-        $products = Product::whereBetween('expire_date', [$today, $nextWeek])->get();
-
-        return view('report.product.expiring-products', compact('products'));
-    }
-
-    public function expiredProducts(): View
-    {
-        $today = Carbon::today();
-
-        // جلب المنتجات التي انتهت صلاحيتها
-        $products = Product::where('expire_date', '<=', $today)->get();
-
-        return view('report.product.expired_products', compact('products'));
-    }
+    // public function expiredProducts(): View
+    // {
+    //     $today = Carbon::today();
+    //
+    //     // جلب المنتجات التي انتهت صلاحيتها
+    //     $products = Product::where('expire_date', '<=', $today)->get();
+    //
+    //     return view('report.product.expired_products', compact('products'));
+    // }
 
     public function lowStockProducts(): View
     {
@@ -720,7 +721,9 @@ class ReportController extends Controller
 
     public function price(Request $request): View|RedirectResponse
     {
-        $show_expiry = $request->boolean('show_expiry');
+        // EXPIRY-HIDDEN
+        // $show_expiry = $request->boolean('show_expiry');
+        $show_expiry = false; // EXPIRY-HIDDEN
         $show_company = $request->boolean('show_company');
 
         $selectedCategory = null;

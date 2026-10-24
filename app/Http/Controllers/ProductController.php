@@ -49,7 +49,8 @@ class ProductController extends Controller
                 'name' => $request->name,
                 'name_en' => $request->name_en,
                 'category_id' => $request->category_id,
-                'expire_date' => $request->expire_date,
+                // EXPIRY-HIDDEN
+                // 'expire_date' => $request->expire_date,
                 'unit_reorder_level' => $request->unit_reorder_level,
                 'unit_qty' => $request->unit_opening_balance,
             ]);
@@ -146,7 +147,8 @@ class ProductController extends Controller
                 'name' => $request->name,
                 'name_en' => $request->name_en,
                 'category_id' => $request->category_id,
-                'expire_date' => $request->expire_date,
+                // EXPIRY-HIDDEN
+                // 'expire_date' => $request->expire_date,
                 'unit_purchase_price' => $request->unit_purchase_price,
                 'unit_reorder_level' => $request->unit_reorder_level,
                 'unit_qty' => $request->unit_opening_balance,
@@ -335,13 +337,14 @@ class ProductController extends Controller
             ]);
         }
 
+        // EXPIRY-HIDDEN
         // التحقق من تاريخ الصلاحية
-        if ($product->expire_date && Carbon::parse($product->expire_date)->isPast()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'هذا المنتج منتهي الصلاحية.',
-            ]);
-        }
+        // if ($product->expire_date && Carbon::parse($product->expire_date)->isPast()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'هذا المنتج منتهي الصلاحية.',
+        //     ]);
+        // }
 
         $stock = $product->stocks->firstWhere('id', $stockId);
         $unit = $unitId ? $product->units->firstWhere('id', $unitId) : null;

@@ -72,8 +72,9 @@ class UpdateProductRequest extends FormRequest
             'stock_id.*.required' => 'يرجى اختيار المخزن.',
             'stock_id.*.exists' => 'المخزن المحدد غير موجود.',
             'reorder_level.required' => 'يرجى إدخال مستوى إعادة الطلب.',
-            'expire_date.required' => 'يرجى تحديد تاريخ الصلاحية.',
-            'expire_date.after_or_equal' => 'تاريخ الصلاحية يجب أن يكون اليوم أو بعده.',
+            // EXPIRY-HIDDEN
+            // 'expire_date.required' => 'يرجى تحديد تاريخ الصلاحية.',
+            // 'expire_date.after_or_equal' => 'تاريخ الصلاحية يجب أن يكون اليوم أو بعده.',
             'units.*.unit_id.required' => 'يرجى اختيار الوحدة.',
             'units.*.unit_id.exists' => 'الوحدة المحددة غير موجودة.',
             'units.*.price.numeric' => 'سعر البيع يجب أن يكون رقمًا.',

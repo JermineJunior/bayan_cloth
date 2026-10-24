@@ -197,7 +197,7 @@
                                                         <th>الكمية</th>
                                                         <th>البونص</th>
                                                         <th>الوحدة</th>
-                                                        <th>تاريخ الصلاحية</th>
+{{-- EXPIRY-HIDDEN <th>تاريخ الصلاحية</th> --}}
                                                         <th>سعر الوحدة</th>
                                                         <th>الإجمالي</th>
                                                     </tr>
@@ -210,7 +210,7 @@
                                                             <td>{{ number_format($item->qty) }}</td>
                                                             <td>{{ number_format($item->bounce) }}</td>
                                                             <td>{{ $item->unit->name }}</td>
-                                                            <td>{{ $item->expire_date }}</td>
+{{-- EXPIRY-HIDDEN <td>{{ $item->expire_date }}</td> --}}
                                                             <td>{{ number_format($item->price, 2) }}</td>
                                                             <td>{{ number_format($item->row_sub_total, 2) }}
                                                             </td>
@@ -219,7 +219,7 @@
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
-                                                        <td colspan="4"></td>
+                                                        <td colspan="3"></td>
                                                         <td colspan="2">جملة الفاتورة</td>
                                                         <td colspan="2">
                                                             {{ number_format($PreliminaryInvoice->sub_total_amount + $PreliminaryInvoice->tax_amount, 2) }}
@@ -227,7 +227,7 @@
                                                     </tr>
                                                     @if ((float) $PreliminaryInvoice->discount_amount > 0)
                                                         <tr>
-                                                            <td colspan="4"></td>
+                                                            <td colspan="3"></td>
                                                             <td colspan="2">الخصم</td>
                                                             <td colspan="2">
                                                                 {{ number_format($PreliminaryInvoice->discount_amount, 2) }}
@@ -235,7 +235,7 @@
                                                         </tr>
                                                     @endif
                                                     <tr>
-                                                        <td colspan="4"></td>
+                                                        <td colspan="3"></td>
                                                         <td colspan="2">صافي الفاتورة</td>
                                                         <td colspan="2">
                                                             {{ number_format($PreliminaryInvoice->total_amount, 2) }}</td>

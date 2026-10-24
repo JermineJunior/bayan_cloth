@@ -285,7 +285,7 @@
                                         <th>الوحدة</th>
                                         <th>الكمية</th>
                                         <th>البونص</th>
-                                        <th>تاريخ الصلاحية</th>
+{{-- EXPIRY-HIDDEN <th>تاريخ الصلاحية</th> --}}
                                         <th>السعر</th>
                                         <th>الإجمالي</th>
                                         <th>حذف</th>
@@ -317,6 +317,17 @@
                                 <div class="col-md-7">
                                     <label>الإجمالي النهائي</label>
                                     <input type="text" name="total" class="form-control" id="total" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row g-2">
+                                <div class="col-md-3">
+                                    <label>تكلفة التوصيل</label>
+                                    <input type="text" name="delivery_cost" id="delivery_cost" class="form-control" value="0.00">
+                                </div>
+                                <div class="col-md-3">
+                                    <label>عمولة المندوب</label>
+                                    <input type="text" name="rep_cut_amount" id="rep_cut_amount" class="form-control" value="0.00">
                                 </div>
                             </div>
 
@@ -545,9 +556,11 @@
                                             <td>
                                                 <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:50px" name="bounce[${unitIndex}]" value="0">
                                             </td>
+{{-- EXPIRY-HIDDEN
                                             <td>
                                                 <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
                                             </td>
+--}}
                                             <td>
                                             <input type="text" id="price_${unitIndex}" class="form-control price" style="width:90px" name="price[${unitIndex}]" value="${Number(data.product.units[0].pivot.price).toLocaleString('en-US', {minimumFractionDigits: 2,maximumFractionDigits: 2})}">
                                             </td>
@@ -900,6 +913,14 @@
             });
 
             document.getElementById('discount').addEventListener('input', function() {
+                totalPrice();
+            });
+
+            document.getElementById('delivery_cost').addEventListener('input', function() {
+                totalPrice();
+            });
+
+            document.getElementById('rep_cut_amount').addEventListener('input', function() {
                 totalPrice();
             });
 
@@ -1432,9 +1453,11 @@
                                     <td>
                                         <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:50px" name="bounce[${unitIndex}]" value="0">
                                     </td>
+{{-- EXPIRY-HIDDEN
                                     <td>
                                         <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
                                     </td>
+--}}
                                     <td>
                                         <input type="text" id="price_${unitIndex}" class="form-control price" style="width:90px" name="price[${unitIndex}]" value="${Number(data.product.units[0].pivot.price).toLocaleString('en-US', {minimumFractionDigits: 2,maximumFractionDigits: 2})}">
                                     </td>
@@ -1630,6 +1653,8 @@
                 '#bank_amount_total');
             attachCommaFormatter('#deferend_amount');
             attachCommaFormatter('#discount');
+            attachCommaFormatter('#delivery_cost');
+            attachCommaFormatter('#rep_cut_amount');
 
             document.getElementById('invoiceForm').addEventListener('submit', function(e) {
                 const zeroPriceNames = getZeroPriceRows();
@@ -1753,13 +1778,15 @@
             document.getElementById('sub_total').value = format(sub_total);
 
             let discount = unformat(document.getElementById('discount').value) || 0;
+            let delivery_cost = unformat(document.getElementById('delivery_cost').value) || 0;
+            let rep_cut_amount = unformat(document.getElementById('rep_cut_amount').value) || 0;
             let tax = $('#apply_tax').is(':checked') ? unformat(sub_total * 17 / 100) || 0 : 0;
             document.getElementById('tax').value = format(tax);
 
             let cash = unformat(document.getElementById('cash_amount_total').value) || 0;
             let bank = unformat(document.getElementById('bank_amount_total').value) || 0;
 
-            let total = unformat(sub_total + tax - discount);
+            let total = unformat(sub_total + tax - discount + delivery_cost + rep_cut_amount);
             document.getElementById('total').value = format(total);
             document.getElementById('deferend_amount').value = format(total - cash - bank);
 
@@ -1820,7 +1847,7 @@
 
             // نفس الشيء للحقول الفردية:
             let singleFields = ['cash_amount_total', 'bank_amount_total', 'discount', 'sub_total', 'tax', 'total',
-                'deferend_amount'
+                'deferend_amount', 'delivery_cost', 'rep_cut_amount'
             ];
             singleFields.forEach(id => {
                 let el = document.getElementById(id);

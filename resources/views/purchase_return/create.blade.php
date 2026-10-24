@@ -266,7 +266,7 @@
                                         <th>الوحدة</th>
                                         <th>الكمية</th> <!-- صغير -->
                                         <th>البونص</th>
-                                        <th>تاريخ الصلاحية</th>
+{{-- EXPIRY-HIDDEN <th>تاريخ الصلاحية</th> --}}
                                         <th>السعر</th> <!-- أكبر -->
                                         <th>الإجمالي</th> <!-- أكبر -->
                                         <th>حذف</th>
@@ -452,9 +452,11 @@
                                             <td>
                                                 <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:90px" name="bounce[${unitIndex}]"  value="1">
                                             </td>
+{{-- EXPIRY-HIDDEN
                                             <td>
                                                 <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
                                             </td>
+--}}
                                             <td>
                                                 <input type="text" id="price_${unitIndex}" class="form-control price" style="width:120px" name="price[${unitIndex}]" value="${Number(data.product.units[0].pivot.price_purchase).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}" >
                                             </td>
@@ -1017,9 +1019,11 @@
                                     <td>
                                         <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:90px" name="bounce[${unitIndex}]" value="0">
                                     </td>
+{{-- EXPIRY-HIDDEN
                                     <td>
                                         <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
                                     </td>
+--}}
                                     <td>
                                         <input type="text" id="price_${unitIndex}" class="form-control price" style="width:120px" name="price[${unitIndex}]" value="${Number(data.product.units[0].pivot.price_purchase).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}">
                                     </td>

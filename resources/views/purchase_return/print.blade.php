@@ -193,7 +193,7 @@
                                                         <th class="product-cell">المنتج</th>
                                                         <th>الكمية</th>
                                                         <th>البونص</th>
-                                                        <th>تاريخ الصلاحية</th>
+{{-- EXPIRY-HIDDEN <th>تاريخ الصلاحية</th> --}}
                                                         <th>سعر الوحدة</th>
                                                         <th>الإجمالي</th>
                                                     </tr>
@@ -205,7 +205,7 @@
                                                             <td class="product-cell">{{ $item->product->name }}</td>
                                                             <td>{{ number_format($item->qty) }}</td>
                                                             <td>{{ number_format($item->bounce) }}</td>
-                                                            <td>{{ $item->expire_date }}</td>
+{{-- EXPIRY-HIDDEN <td>{{ $item->expire_date }}</td> --}}
                                                             <td>{{ number_format($item->price, 2) }}</td>
                                                             <td>{{ number_format($item->row_sub_total, 2) }}
                                                             </td>
@@ -220,7 +220,7 @@
                                                         $showBank = $bank > 0 || $cash <= 0;
                                                     @endphp
                                                     <tr>
-                                                        <td colspan="3"></td>
+                                                        <td colspan="2"></td>
                                                         <td colspan="2">جملة الفاتورة</td>
                                                         <td colspan="2">
                                                             {{ number_format($purchase_invoice_return->sub_total_amount + $purchase_invoice_return->tax_amount, 2) }}
@@ -228,21 +228,21 @@
                                                     </tr>
                                                     @if ((float) $purchase_invoice_return->discount_amount > 0)
                                                         <tr>
-                                                            <td colspan="3"></td>
+                                                            <td colspan="2"></td>
                                                             <td colspan="2">الخصم</td>
                                                             <td colspan="2">
                                                                 {{ number_format($purchase_invoice_return->discount_amount, 2) }}</td>
                                                         </tr>
                                                     @endif
                                                     <tr>
-                                                        <td colspan="3"></td>
+                                                        <td colspan="2"></td>
                                                         <td colspan="2">صافي الفاتورة</td>
                                                         <td colspan="2">
                                                             {{ number_format($purchase_invoice_return->total_amount, 2) }}</td>
                                                     </tr>
                                                     @if ($showCash)
                                                         <tr>
-                                                            <td colspan="3"></td>
+                                                            <td colspan="2"></td>
                                                             <td colspan="2">مدفوع نقداً</td>
                                                             <td colspan="2">
                                                                 {{ number_format($purchase_invoice_return->cash_amount_total, 2) }}
@@ -251,7 +251,7 @@
                                                     @endif
                                                     @if ($showBank)
                                                         <tr>
-                                                            <td colspan="3"></td>
+                                                            <td colspan="2"></td>
                                                             <td colspan="2">مدفوع بالبنك</td>
                                                             <td colspan="2">
                                                                 {{ number_format($purchase_invoice_return->bank_amount_total, 2) }}
@@ -260,13 +260,13 @@
                                                     @endif
                                                     @if ($purchase_invoice_return->transaction_no)
                                                         <tr>
-                                                            <td colspan="3"></td>
+                                                            <td colspan="2"></td>
                                                             <td colspan="2">رقم عملية البنك</td>
                                                             <td colspan="2">{{ $purchase_invoice_return->transaction_no }}</td>
                                                         </tr>
                                                     @endif
                                                     <tr>
-                                                        <td colspan="3"></td>
+                                                        <td colspan="2"></td>
                                                         <td colspan="2">آجل</td>
                                                         <td colspan="2">
                                                             {{ number_format($purchase_invoice_return->deferend_amount, 2) }}

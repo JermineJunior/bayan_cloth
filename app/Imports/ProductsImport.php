@@ -40,17 +40,18 @@ class ProductsImport implements ToCollection
                 continue;
             }
 
-            $expireDate = null;
-            if (!empty($row[6])) {
-                // إذا الرقم جاي من Excel كرقم
-                if (is_numeric($row[6])) {
-                    $unixDate = ($row[6] - 25569) * 86400; // تحويل Excel date إلى timestamp
-                    $expireDate = gmdate('Y-m-d', $unixDate);
-                } else {
-                    // لو موجود بصيغة نصية مثل 12/2/2026
-                    $expireDate = \Carbon\Carbon::createFromFormat('d/m/Y', $row[6])->format('Y-m-d');
-                }
-            }
+            // EXPIRY-HIDDEN
+            // $expireDate = null;
+            // if (!empty($row[6])) {
+            //     // إذا الرقم جاي من Excel كرقم
+            //     if (is_numeric($row[6])) {
+            //         $unixDate = ($row[6] - 25569) * 86400; // تحويل Excel date إلى timestamp
+            //         $expireDate = gmdate('Y-m-d', $unixDate);
+            //     } else {
+            //         // لو موجود بصيغة نصية مثل 12/2/2026
+            //         $expireDate = \Carbon\Carbon::createFromFormat('d/m/Y', $row[6])->format('Y-m-d');
+            //     }
+            // }
 
             // ✅ الحفظ الفعلي
             Product::create([
@@ -60,7 +61,8 @@ class ProductsImport implements ToCollection
                 'category_id' => $category->id,
                 'reorder_level' => $row[4] ?? 0,
                 'unit_reorder_level' => $unit->id ?? null,
-                'expire_date' => $expireDate,
+                // EXPIRY-HIDDEN
+                // 'expire_date' => $expireDate,
             ]);
         }
     }

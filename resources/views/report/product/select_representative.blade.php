@@ -63,11 +63,13 @@
                                 </div>
                                 <br>
                                 <div class="col">
+                                    {{-- EXPIRY-HIDDEN
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" name="show_expiry" value="1" class="custom-control-input"
                                             id="show_expiry" checked>
                                         <label class="custom-control-label" for="show_expiry">إظهار تاريخ الصلاحية</label>
                                     </div>
+                                    --}}
                                     <div class="custom-control custom-checkbox">
                                         <input type="checkbox" name="show_company" value="1" class="custom-control-input"
                                             id="show_company" checked>

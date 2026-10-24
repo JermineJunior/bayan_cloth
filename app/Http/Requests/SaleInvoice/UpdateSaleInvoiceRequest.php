@@ -28,6 +28,8 @@ class UpdateSaleInvoiceRequest extends FormRequest
             'date' => 'required|date',
             'sub_total' => 'required|numeric|min:0',
             'discount_amount' => 'numeric|min:0',
+            'delivery_cost' => 'nullable|numeric|min:0',
+            'rep_cut_amount' => 'nullable|numeric|min:0',
             'total' => 'required|numeric|min:0',
             'note' => 'nullable|string|max:1000',
             'cash_name' => 'nullable|exists:tree4s,id',
@@ -87,6 +89,10 @@ class UpdateSaleInvoiceRequest extends FormRequest
             'total_with_tax.numeric' => 'يجب أن يكون المبلغ الإجمالي مع الضريبة رقمًا صحيحًا أو عشريًا.',
 
             'discount_amount.numeric' => 'يجب أن يكون الخصم رقمًا صحيحًا أو عشريًا.',
+            'delivery_cost.numeric' => 'يجب أن تكون تكلفة التوصيل رقمًا صحيحًا أو عشريًا.',
+            'delivery_cost.min' => 'يجب أن تكون تكلفة التوصيل 0 أو أكثر.',
+            'rep_cut_amount.numeric' => 'يجب أن تكون عمولة المندوب رقمًا صحيحًا أو عشريًا.',
+            'rep_cut_amount.min' => 'يجب أن تكون عمولة المندوب 0 أو أكثر.',
 
             'tax_amount.required' => 'يجب إدخال قيمة الضريبة.',
             'tax_amount.numeric' => 'يجب أن تكون الضريبة رقمًا صحيحًا أو عشريًا.',

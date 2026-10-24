@@ -337,8 +337,11 @@
 
                 <!-- ✅ الجدول -->
                 @php
-                    $colspan = $show_expiry ? 7 : 6;
-                    $widths = $show_expiry ? [5, 30, 26, 11, 10, 10, 8] : [5, 30, 37, 10, 10, 8];
+                    // EXPIRY-HIDDEN
+                    // $colspan = $show_expiry ? 7 : 6;
+                    // $widths = $show_expiry ? [5, 30, 26, 11, 10, 10, 8] : [5, 30, 37, 10, 10, 8];
+                    $colspan = 6;
+                    $widths = [5, 30, 37, 10, 10, 8];
                 @endphp
                 <table class="price-table">
                     <colgroup>
@@ -351,9 +354,11 @@
                             <tr class="column_head">
                                 <th>No.</th>
                                 <th colspan="2">Item Name</th>
+                                {{-- EXPIRY-HIDDEN
                                 @if ($show_expiry)
                                     <th>Exp</th>
                                 @endif
+                                --}}
                                 <th>Unit</th>
                                 <th>Price</th>
                                 <th>Qty</th>
@@ -370,9 +375,11 @@
                                 <tr class="column_head">
                                     <th>No.</th>
                                     <th colspan="2">Item Name</th>
+                                    {{-- EXPIRY-HIDDEN
                                     @if ($show_expiry)
                                         <th>Exp</th>
                                     @endif
+                                    --}}
                                     <th>Unit</th>
                                     <th>Price</th>
                                     <th>Qty</th>
@@ -384,11 +391,13 @@
                                     <td class="num">{{ $index++ }}</td>
                                     <td class="product-name">{{ $product->name }}</td>
                                     <td class="product-generic">{{ $product->name_en }}</td>
+                                    {{-- EXPIRY-HIDDEN
                                     @if ($show_expiry)
                                         <td class="exp">
                                             {{ $product->expire_date ? \Illuminate\Support\Carbon::parse($product->expire_date)->format('m/Y') : '' }}
                                         </td>
                                     @endif
+                                    --}}
                                     <td class="unit">{{ $unit?->name ?? '---' }}</td>
                                     <td class="product-price">
                                         {{ $unit ? number_format($unit->pivot->price) : '---' }}

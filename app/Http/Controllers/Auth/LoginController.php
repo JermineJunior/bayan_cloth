@@ -148,10 +148,11 @@ class LoginController extends Controller
             return redirect()->route('report.representative.customer.index');
         } elseif ($user->can('تقرير المنتجات الاكثر طلبا')) {
             return redirect()->route('report.top-products');
-        } elseif ($user->can('تقرير المنتجات التي تجاوزت تاريخ الصلاحية')) {
-            return redirect()->route('report.expired-products');
-        } elseif ($user->can('تقرير المنتجات التي شارفت على تجاوز تاريخ الصلاحية')) {
-            return redirect()->route('report.expiring-products');
+            // EXPIRY-HIDDEN
+            // } elseif ($user->can('تقرير المنتجات التي تجاوزت تاريخ الصلاحية')) {
+            //     return redirect()->route('report.expired-products');
+            // } elseif ($user->can('تقرير المنتجات التي شارفت على تجاوز تاريخ الصلاحية')) {
+            //     return redirect()->route('report.expiring-products');
         } elseif ($user->can('تقرير المنتجات التي تجازوت حد الطلب')) {
             return redirect()->route('report.low_stock');
         } elseif ($user->can('تقرير مفصل للمخازن حسب الفترة')) {

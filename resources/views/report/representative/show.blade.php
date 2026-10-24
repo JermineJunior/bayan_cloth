@@ -80,7 +80,7 @@
                                                     <th style="font-size:14px"> الوحدة</th>
                                                     <th style="font-size:14px">الكمية</th>
                                                     <th style="font-size:14px">البونص</th>
-                                                    <th style="font-size:14px">تاريخ الصلاحية</th>
+{{-- EXPIRY-HIDDEN <th style="font-size:14px">تاريخ الصلاحية</th> --}}
                                                     <th style="font-size:14px">السعر</th>
                                                     <th style="font-size:14px">المبلغ</th>
                                                 </tr>
@@ -97,14 +97,14 @@
                                                             <td>{{ $item->unit->name }}</td>
                                                             <td>{{ $item->qty }}</td>
                                                             <td>{{ $item->bounce }}</td>
-                                                            <td>{{ $item->expire_date }}</td>
+{{-- EXPIRY-HIDDEN <td>{{ $item->expire_date }}</td> --}}
                                                             <td>{{ number_format($item->price / $curencey->amount,2) }} {{ $curencey->symbol }}</td>
                                                             <td>{{ number_format($item->row_sub_total / $curencey->amount,2) }} {{ $curencey->symbol }}</td>
                                                         </tr>
                                                     @endforeach
                                                 @endforeach
                                                 <tr>
-                                                    <td colspan="10" class="text-center">الاجمالي</td>
+                                                    <td colspan="9" class="text-center">الاجمالي</td>
                                                     <td>{{ number_format($operations->flatMap->details->sum('row_sub_total') / $curencey->amount,2) }} {{ $curencey->symbol }}
                                                 </tr>
 

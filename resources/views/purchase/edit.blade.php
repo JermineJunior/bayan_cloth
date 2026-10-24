@@ -303,12 +303,14 @@
                                                     value="{{ number_format($item->bounce) }}"
                                                     data-bounce="{{ $item->bounce }}">
                                             </td>
+{{-- EXPIRY-HIDDEN
                                             <td>
                                                 <input type="date" id="expire_date_{{ $loop->iteration }}"
                                                     class="form-control expire_date"
                                                     name="expire_date[{{ $loop->iteration }}]"
                                                     value="{{ $item->expire_date }}">
                                             </td>
+--}}
                                             <td>
                                                 <input type="text" id="price_{{ $loop->iteration }}"
                                                     class="form-control price" style="width:120px"
@@ -522,9 +524,11 @@
                                             <td>
                                                 <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:90px" name="bounce[${unitIndex}]" value="1">
                                             </td>
+{{-- EXPIRY-HIDDEN
                                             <td>
                                                 <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
                                             </td>
+--}}
                                             <td>
                                                 <input type="text" id="price_${unitIndex}" class="form-control price" style="width:120px" name="price[${unitIndex}]" value="${Number(data.units[0].pivot.price_purchase).toLocaleString('en-US', {minimumFractionDigits: 2,maximumFractionDigits: 2})}">
                                             </td>
@@ -1100,9 +1104,11 @@
                                     <td>
                                         <input type="text" id="bounce_${unitIndex}" class="form-control bounce" style="width:90px" name="bounce[${unitIndex}]" value="0">
                                     </td>
+{{-- EXPIRY-HIDDEN
                                     <td>
                                         <input type="date" name="expire_date[${unitIndex}]" id="expire_date${unitIndex}" class="form-control" value="${data.product.expire_date}">
                                     </td>
+--}}
                                     <td>
                                         <input type="text" id="price_${unitIndex}" class="form-control price" style="width:120px" name="price[${unitIndex}]"  value="${Number(data.units[0].pivot.price_purchase).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}">
                                     </td>

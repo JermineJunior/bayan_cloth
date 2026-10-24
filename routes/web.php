@@ -204,8 +204,9 @@ Route::group(
         Route::post(uri: 'report/bank/account', action: [ReportController::class, 'bankAccountShow'])->name(name: 'report.bank.show');
         Route::get(uri: 'report/supplier/purchases', action: [ReportController::class, 'supplierPurchases'])->name(name: 'report.supplier_purchases');
         Route::post(uri: 'report/supplier/purchases', action: [ReportController::class, 'show_supplierPurchases'])->name(name: 'report.supplier_purchases.show');
-        Route::get(uri: '/report/expiring-products', action: [ReportController::class, 'expiringProducts'])->name(name: 'report.expiring-products');
-        Route::get(uri: '/report/expired-products', action: [ReportController::class, 'expiredProducts'])->name(name: 'report.expired-products');
+        // EXPIRY-HIDDEN
+        // Route::get(uri: '/report/expiring-products', action: [ReportController::class, 'expiringProducts'])->name(name: 'report.expiring-products');
+        // Route::get(uri: '/report/expired-products', action: [ReportController::class, 'expiredProducts'])->name(name: 'report.expired-products');
         Route::get(uri: '/report/low-stock-products', action: [ReportController::class, 'lowStockProducts'])->name(name: 'report.low_stock');
         Route::get(uri: 'report/revenue/account', action: [ReportController::class, 'revenueAccount'])->name(name: 'report.revenue');
         Route::post(uri: 'report/revenue/account', action: [ReportController::class, 'revenueAccountShow'])->name(name: 'report.revenue.show');

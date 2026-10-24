@@ -100,6 +100,7 @@
                                     </div>
                                 </div>
                             </div>
+                            {{-- EXPIRY-HIDDEN
                             <!-- Expire Date -->
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -108,6 +109,7 @@
                                         value="{{ $product->expire_date }}">
                                 </div>
                             </div>
+                            --}}
                             <!-- Units Section -->
                             <div id="unit-rows" class="col-12">
                                 <br>
@@ -481,16 +483,17 @@
                 return isValid;
             }, "اسم المنتج موجود بالفعل في النظام.");
 
-            // إضافة قاعدة التحقق المخصصة لتاريخ اليوم أو بعده
-            $.validator.addMethod("after_or_equal_today", function(value, element) {
-                var today = new Date();
-                today.setHours(0, 0, 0, 0); // إزالة الوقت لضمان مقارنة صحيحة
-
-                var date = new Date(value);
-                date.setHours(0, 0, 0, 0); // إزالة الوقت من التاريخ المدخل
-
-                return date >= today; // السماح بتاريخ اليوم أو الأيام القادمة فقط
-            }, "يجب أن يكون تاريخ انتهاء الصلاحية اليوم أو بعده.");
+            // EXPIRY-HIDDEN
+            // // إضافة قاعدة التحقق المخصصة لتاريخ اليوم أو بعده
+            // $.validator.addMethod("after_or_equal_today", function(value, element) {
+            //     var today = new Date();
+            //     today.setHours(0, 0, 0, 0); // إزالة الوقت لضمان مقارنة صحيحة
+            //
+            //     var date = new Date(value);
+            //     date.setHours(0, 0, 0, 0); // إزالة الوقت من التاريخ المدخل
+            //
+            //     return date >= today; // السماح بتاريخ اليوم أو الأيام القادمة فقط
+            // }, "يجب أن يكون تاريخ انتهاء الصلاحية اليوم أو بعده.");
 
             document.getElementById('productForm').addEventListener('submit', function(e) {
                 cleanNumbersBeforeSubmit();

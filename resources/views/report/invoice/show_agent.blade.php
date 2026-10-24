@@ -77,7 +77,7 @@
                                                     <th style="font-size:14px">السعر</th>
                                                     <th style="font-size:14px">الكمية</th>
                                                     <th style="font-size:14px">البونص</th>
-                                                    <th style="font-size:14px">تاريخ الصلاحية</th>
+{{-- EXPIRY-HIDDEN <th style="font-size:14px">تاريخ الصلاحية</th> --}}
                                                     <th style="font-size:14px"> الوحدة</th>
                                                     <th style="font-size:14px">الجملة</th>
                                                 </tr>
@@ -94,7 +94,7 @@
                                                             <td>{{ number_format($item->price / $curencey->amount,2) }} {{ $curencey->symbol }}</td>
                                                             <td>{{ $item->qty }}</td>
                                                             <td>{{ $item->bounce }}</td>
-                                                            <td>{{ $item->expire_date }}</td>
+{{-- EXPIRY-HIDDEN <td>{{ $item->expire_date }}</td> --}}
                                                             <td>{{ $item->unit->name }}</td>
                                                             <td>{{ number_format($item->row_sub_total / $curencey->amount,2) }} {{ $curencey->symbol }}</td>
                                                         </tr>

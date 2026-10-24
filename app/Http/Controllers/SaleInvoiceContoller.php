@@ -60,6 +60,8 @@ class SaleInvoiceContoller extends Controller
                     'tax_amount' => $request->get('tax'),
                     'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
+                    'delivery_cost' => $request->get('delivery_cost') ?: 0,
+                    'rep_cut_amount' => $request->get('rep_cut_amount') ?: 0,
                     'status' => 1,
                     'cash_name' => $request->get('cash_name'),
                     'bank_name' => $request->get('bank_name'),
@@ -82,7 +84,8 @@ class SaleInvoiceContoller extends Controller
                         'stock_id' => $request->stock_id[$index],
                         'qty' => $request->qty[$index],
                         'bounce' => $request->bounce[$index] ?? 0,
-                        'expire_date' => $request->expire_date[$index],
+                        // EXPIRY-HIDDEN
+                        // 'expire_date' => $request->expire_date[$index],
                         'price' => $request->price[$index],
                         'unit_id' => $request->unit_id[$index],
                         'row_sub_total' => $request->row_sub_total[$index],
@@ -251,6 +254,8 @@ class SaleInvoiceContoller extends Controller
                 'tax_amount' => $request->tax,
                 'tax_status' => $request->tax_status ? 1 : 0,
                 'total_amount' => $request->total,
+                'delivery_cost' => $request->get('delivery_cost') ?: 0,
+                'rep_cut_amount' => $request->get('rep_cut_amount') ?: 0,
                 'status' => 1,
                 'cash_name' => $request->cash_name,
                 'bank_name' => $request->bank_name,
@@ -271,7 +276,8 @@ class SaleInvoiceContoller extends Controller
                     'stock_id' => $request->stock_id[$index],
                     'qty' => $request->qty[$index],
                     'bounce' => $request->bounce[$index] ?? 0,
-                    'expire_date' => $request->expire_date[$index],
+                    // EXPIRY-HIDDEN
+                    // 'expire_date' => $request->expire_date[$index],
                     'price' => $request->price[$index],
                     'unit_id' => $request->unit_id[$index],
                     'row_sub_total' => $request->row_sub_total[$index],
@@ -400,13 +406,14 @@ class SaleInvoiceContoller extends Controller
                 'message' => 'هذا المنتج غير متوفر .',
             ]);
         }
+        // EXPIRY-HIDDEN
         // إذا كان تاريخ الصلاحية قد انتهى
-        if ($product->expire_date && $product->expire_date < now()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'هذا المنتج منتهي الصلاحية .',
-            ]);
-        }
+        // if ($product->expire_date && $product->expire_date < now()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'هذا المنتج منتهي الصلاحية .',
+        //     ]);
+        // }
 
         $requireStock = $request->boolean('require_stock');
         $availableStocks = $product->stocks()->wherePivot('quantity', '>', 0)->get(['stocks.id', 'stocks.name']);
