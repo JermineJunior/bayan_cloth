@@ -45,10 +45,24 @@ class StockController extends Controller
         return back()->with('success_created', 'تمت اضافة البيانات بنجاح');
     }
 
-    public function show($id)
+    public function show(Request $request, $id): View
     {
-        $stock = Stock::withoutGlobalScopes()->with('products.stocks')->findOrFail($id);
-        return view('stock.show', compact('stock'));
+        $stock = Stock::findOrFail($id);
+        $products = $stock->products()
+            ->with(['category', 'units'])
+            ->when($request->product_id, fn($q, $v) => $q->where('products.id', $v))
+            ->when($request->search, fn($q, $v) => $q->where(fn($w) => $w->where('products.name', 'like', "%$v%")->orWhere('products.name_en', 'like', "%$v%")->orWhere('products.barcode', 'like', "%$v%")))
+            ->when($request->hide_zero, fn($q) => $q->where('product_stocks.quantity', '>', 0))
+            ->orderBy('products.name')
+            ->get();
+
+        foreach ($products as $product) {
+            $product->qty_text = $product->convertQuantity($product->pivot->quantity) ?? $product->pivot->quantity;
+        }
+
+        $allProducts = $stock->products()->orderBy('products.name')->get(['products.id', 'products.name']);
+
+        return view('stock.show', compact('stock', 'products', 'allProducts'));
     }
 
     public function update(UpdateStockRequest $request, $stock): RedirectResponse

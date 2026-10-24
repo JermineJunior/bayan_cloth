@@ -104,6 +104,12 @@
                                         <td>{{ $stock->name }}</td>
                                         <td>{{ $stock->branches->pluck('name')->implode('، ') }}</td>
                                         <td>
+                                            @can('قائمة المخازن')
+                                                <a class="btn btn-outline-primary btn-sm"
+                                                    href="{{ route('stock.show', $stock->id) }}" title="عرض الرصيد">
+                                                    <i class="fa fa-eye">
+                                                    </i></a>
+                                            @endcan
                                             @can('تعديل المخزن')
                                                 <a class="modal-effect btn btn-outline-success btn-sm"
                                                     data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
