@@ -164,7 +164,7 @@
                                             </div>
                                             <div class="detail-box">
                                                 <span class="label">رقم الفاتورة</span>
-                                                <span class="value">{{ $purchase_invoice->invoice_number }}</span>
+                                                <span class="value">{{ $purchase_invoice->display_number }}</span>
                                             </div>
 
                                             <div class="detail-box">

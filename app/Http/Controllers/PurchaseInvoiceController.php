@@ -41,13 +41,14 @@ class PurchaseInvoiceController extends Controller
     {
         try {
             DB::beginTransaction();
+            $invoice_number = PurchaseInvoice::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $invoice_status = $request->deferend_amount != '' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
             $purchase_invoice = PurchaseInvoice::create(
                 attributes: [
                     'supplier_id' => $request->get('supplier_id'),
                     'representative_id' => $request->get('representative_id'),
-                    'invoice_number' => $request->get('invoice_number'),
+                    'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
                     'sub_total_amount' => $request->get('sub_total'),
@@ -158,9 +159,12 @@ class PurchaseInvoiceController extends Controller
             return redirect()->route('purchase_invoice.show', $purchase_invoice->id);
         } catch (\Exception $exception) {
             DB::rollback();
+            $message = (int) $exception->getCode() === 23000 || str_contains($exception->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $exception->getMessage();
             return redirect()
                 ->route('purchase_invoice.create')
-                ->withErrors(['error' => $exception->getMessage()])
+                ->withErrors(['error' => $message])
                 ->withInput();
         }
     }
@@ -169,9 +173,9 @@ class PurchaseInvoiceController extends Controller
     {
         $purchase_invoice = $purchase_invoice->load('tree4', 'details', 'details.product', 'details.unit');
         if ($purchase_invoice->supplier_id) {
-            $restriction = Restriction::where('purchase_invoice_id', $purchase_invoice->id)->latest()->first();
-            $madinTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->where('constant_number', '<', $restriction->constant_number)->sum('madin');
-            $dainTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->where('constant_number', '<', $restriction->constant_number)->sum('dain');
+            $firstId = Restriction::where('purchase_invoice_id', $purchase_invoice->id)->min('id');
+            $madinTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->where('id', '<', $firstId)->sum('madin');
+            $dainTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->where('id', '<', $firstId)->sum('dain');
             $allMadinTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->sum('madin');
 
             $allDainTotal = Restriction::where('tree4_id', $purchase_invoice->supplier_id)->sum('dain');
@@ -219,13 +223,14 @@ class PurchaseInvoiceController extends Controller
                 $product->stocks()->updateExistingPivot($purchase_invoice->stock_id, ['quantity' => $stock->pivot->quantity - $qtyBack]);
             }
 
+            $invoice_number = $purchase_invoice->invoice_number;
             $purchase_invoice->delete();
 
             $purchase_invoice = PurchaseInvoice::create(
                 attributes: [
                     'supplier_id' => $request->get('supplier_id'),
                     'representative_id' => $request->get('representative_id'),
-                    'invoice_number' => $request->get('invoice_number'),
+                    'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
                     'sub_total_amount' => $request->get('sub_total'),
@@ -332,8 +337,11 @@ class PurchaseInvoiceController extends Controller
             return redirect()->route('purchase_invoice.index')->with('success_created', 'Product created successfully.');
         } catch (\Exception $exception) {
             DB::rollback();
+            $message = (int) $exception->getCode() === 23000 || str_contains($exception->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $exception->getMessage();
             return back()
-                ->withErrors(['error' => $exception->getMessage()])
+                ->withErrors(['error' => $message])
                 ->withInput();
         }
     }

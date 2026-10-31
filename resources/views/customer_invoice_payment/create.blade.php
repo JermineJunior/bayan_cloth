@@ -55,6 +55,7 @@
                 <div class="card-body">
                     <form action="{{ route('customer-invoice-payment.store') }}" method="post" id="paymentForm">
                         @csrf
+                        <input type="hidden" name="_branch" value="{{ session('branch_id') }}">
                         <div class="form-group">
                             <span class="tx-danger">*</span><label for="customer_id">اسم العميل</label>
                             <select name="customer_id" id="customer_id" class="form-control" required style="width: 100%">

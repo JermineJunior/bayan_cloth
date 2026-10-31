@@ -46,6 +46,7 @@ class SaleInvoiceContoller extends Controller
     {
         try {
             DB::beginTransaction();
+            $invoice_number = SaleInvoice::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
 
@@ -53,7 +54,7 @@ class SaleInvoiceContoller extends Controller
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
                     'representative_id' => $request->get('representative_id'),
-                    'invoice_number' => $request->get('invoice_number'),
+                    'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'sub_total_amount' => $request->get('sub_total'),
                     'discount_amount' => $request->get('discount'),
@@ -168,12 +169,15 @@ class SaleInvoiceContoller extends Controller
 
             DB::commit();
 
-            return redirect()->route('sale_invoice.print', $sale_invoice);
+            return redirect()->route('sale_invoice.print', [$sale_invoice, 'new' => 1]);
         } catch (\Exception $exception) {
             DB::rollback();
+            $message = (int) $exception->getCode() === 23000 || str_contains($exception->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $exception->getMessage();
             return redirect()
                 ->route('sale_invoice.create')
-                ->withErrors(['error' => $exception->getMessage()])
+                ->withErrors(['error' => $message])
                 ->withInput();
         }
     }
@@ -183,9 +187,9 @@ class SaleInvoiceContoller extends Controller
         $madinTotal = $dainTotal = $allDainTotal = $allMadinTotal = 0;
         $sale_invoice = $sale_invoice->load(['tree4', 'details', 'details.product', 'details.unit']);
         if ($sale_invoice->customer_id) {
-            $restriction = Restriction::where('sale_invoice_id', $sale_invoice->id)->latest()->first();
-            $madinTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('constant_number', '<', $restriction->constant_number)->sum('madin');
-            $dainTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('constant_number', '<', $restriction->constant_number)->sum('dain');
+            $firstId = Restriction::where('sale_invoice_id', $sale_invoice->id)->min('id');
+            $madinTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('id', '<', $firstId)->sum('madin');
+            $dainTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('id', '<', $firstId)->sum('dain');
             $allMadinTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->sum('madin');
 
             $allDainTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->sum('dain');
@@ -242,12 +246,13 @@ class SaleInvoiceContoller extends Controller
                 $product->stocks()->updateExistingPivot($item->stock_id, ['quantity' => $stock->pivot->quantity + $qtyBack]);
             }
 
+            $invoice_number = $sale_invoice->invoice_number;
             $sale_invoice->delete();
 
             $sale_invoice = SaleInvoice::create([
                 'customer_id' => $request->customer_id,
                 'representative_id' => $request->representative_id,
-                'invoice_number' => $request->invoice_number,
+                'invoice_number' => $invoice_number,
                 'date' => $request->date,
                 'sub_total_amount' => $request->sub_total,
                 'discount_amount' => $request->discount,
@@ -361,8 +366,11 @@ class SaleInvoiceContoller extends Controller
             return redirect()->route('sale_invoice.index')->with('success_updated', 'تم تحديث البيانات بنجاج');
         } catch (\Exception $exception) {
             DB::rollback();
+            $message = (int) $exception->getCode() === 23000 || str_contains($exception->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $exception->getMessage();
             return back()
-                ->withErrors(['error' => $exception->getMessage()])
+                ->withErrors(['error' => $message])
                 ->withInput();
         }
     }
@@ -499,9 +507,9 @@ class SaleInvoiceContoller extends Controller
         $sale_invoice = SaleInvoice::with(['tree4', 'details', 'details.product', 'details.unit', 'representative'])->findOrFail($id);
         $madinTotal = $dainTotal = $allDainTotal = $allMadinTotal = 0;
         if ($sale_invoice->customer_id) {
-            $restriction = Restriction::where('sale_invoice_id', $sale_invoice->id)->latest()->first();
-            $madinTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('constant_number', '<', $restriction->constant_number)->sum('madin');
-            $dainTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('constant_number', '<', $restriction->constant_number)->sum('dain');
+            $firstId = Restriction::where('sale_invoice_id', $sale_invoice->id)->min('id');
+            $madinTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('id', '<', $firstId)->sum('madin');
+            $dainTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->where('id', '<', $firstId)->sum('dain');
             $allMadinTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->sum('madin');
 
             $allDainTotal = Restriction::where('tree4_id', $sale_invoice->customer_id)->sum('dain');
@@ -522,7 +530,7 @@ class SaleInvoiceContoller extends Controller
         $html = view('sale.pdf', compact('sale_invoice', 'madinTotal', 'dainTotal', 'allMadinTotal', 'allDainTotal', 'bank'))->render();
 
         $mpdf->WriteHTML($html);
-        $filename = 'invoice_' . $sale_invoice->invoice_number . '.pdf';
+        $filename = 'invoice_' . $sale_invoice->display_number . '.pdf';
         return $mpdf->Output($filename, 'D');
     }
 

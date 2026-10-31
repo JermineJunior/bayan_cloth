@@ -19,17 +19,27 @@ class BranchController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate(['name' => 'required']);
+        $request->validate([
+            'name' => 'required',
+            'code' => 'nullable|string|max:10',
+        ]);
         Branch::create([
             'name' => $request->name,
+            'code' => $request->code,
         ]);
         return back()->with('success_created', 'Success Created');
     }
 
     public function update(Request $request, Branch $branch): RedirectResponse
     {
-        $request->validate(['name' => 'required']);
-        $branch->update(['name' => $request->name]);
+        $request->validate([
+            'name' => 'required',
+            'code' => 'nullable|string|max:10',
+        ]);
+        $branch->update([
+            'name' => $request->name,
+            'code' => $request->code,
+        ]);
         return back()->with('success_deleted', 'Updated Success');
     }
 
@@ -50,6 +60,7 @@ class BranchController extends Controller
 
     public function branchChoose(Branch $branch)
     {
+        abort_unless(auth()->user()->branches->contains($branch), 403);
         session(['branch_id' => $branch->id]);
 
         $user = Auth::user();

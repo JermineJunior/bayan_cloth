@@ -157,6 +157,7 @@
                     </div>
                     <form action="{{ route('expense.store') }}" method="post" id="formStore">
                         @csrf
+                        <input type="hidden" name="_branch" value="{{ session('branch_id') }}">
                         <div class="modal-body">
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label for="madin">اسم الحساب</label>
@@ -246,6 +247,7 @@
                     <form action="#" method="post" id="edit_expense">
                         @csrf
                         @method('PUT')
+                        <input type="hidden" name="_branch" value="{{ session('branch_id') }}">
                         <div class="modal-body">
                             <div class="form-group">
                                 <span class="tx-danger">*</span><label for="madin">اسم الحساب</label>

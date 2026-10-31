@@ -39,6 +39,7 @@ class SaleInvoiceReturnController extends Controller
     {
         try {
             DB::beginTransaction();
+            $invoice_number = SaleInvoiceReturn::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $invoice_status = $request->deferend_amount != '' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
 
@@ -46,7 +47,7 @@ class SaleInvoiceReturnController extends Controller
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
                     'representative_id' => $request->get('representative_id'),
-                    'invoice_number' => $request->get('invoice_number'),
+                    'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
                     'sub_total_amount' => $request->get('sub_total'),
@@ -159,9 +160,12 @@ class SaleInvoiceReturnController extends Controller
             return redirect()->route('sale_invoice_return.show', $sale_invoice_return->id);
         } catch (\Exception $exception) {
             DB::rollback();
+            $message = (int) $exception->getCode() === 23000 || str_contains($exception->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $exception->getMessage();
             return redirect()
                 ->route('sale_invoice_return.create')
-                ->withErrors(['error' => $exception->getMessage()])
+                ->withErrors(['error' => $message])
                 ->withInput();
         }
     }
@@ -213,13 +217,14 @@ class SaleInvoiceReturnController extends Controller
 
             StockDetail::where('sale_invoice_return_id', $sale_invoice_return->id)->where('branch_id', session('branch_id'))->delete();
 
+            $invoice_number = $sale_invoice_return->invoice_number;
             $sale_invoice_return->delete();
 
             $sale_invoice_return = SaleInvoiceReturn::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
                     'representative_id' => $request->get('representative_id'),
-                    'invoice_number' => $request->get('invoice_number'),
+                    'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
                     'sub_total_amount' => $request->get('sub_total'),
@@ -328,8 +333,11 @@ class SaleInvoiceReturnController extends Controller
             return redirect()->route('sale_invoice_return.index')->with('success_created', 'Product created successfully.');
         } catch (\Exception $exception) {
             DB::rollback();
+            $message = (int) $exception->getCode() === 23000 || str_contains($exception->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $exception->getMessage();
             return back()
-                ->withErrors(['error' => $exception->getMessage()])
+                ->withErrors(['error' => $message])
                 ->withInput();
         }
     }

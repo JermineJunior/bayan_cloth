@@ -188,7 +188,7 @@
             <tr>
                 <td>
                     <div class="label">رقم الفاتورة</div>
-                    <div class="value">{{ $sale_invoice->invoice_number }}</div>
+                    <div class="value">{{ $sale_invoice->display_number }}</div>
                 </td>
                 <td>
                     <div class="label">تاريخ الفاتورة</div>

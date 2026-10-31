@@ -240,6 +240,35 @@
                             </path>
                         </svg></a>
                 </div>
+                @php
+                    $currentBranch = \App\Models\Branch::find(session('branch_id'));
+                    $userBranches = auth()->user()->branches;
+                @endphp
+                @if ($currentBranch)
+                    <div class="dropdown nav-item main-header-branch ml-2">
+                        @if ($userBranches->count() > 1)
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                                data-toggle="dropdown" aria-expanded="false" style="font-size: 13px;">
+                                <i class="fa fa-code-fork ml-2"></i>{{ $currentBranch->name }}
+                            </a>
+                            <div class="dropdown-menu">
+                                @foreach ($userBranches as $branch)
+                                    <a class="dropdown-item d-flex align-items-center justify-content-between {{ $branch->id == $currentBranch->id ? 'font-weight-bold' : '' }}"
+                                        href="{{ route('branch.choose', $branch->id) }}">
+                                        <span>{{ $branch->name }}</span>
+                                        @if ($branch->id == $currentBranch->id)
+                                            <i class="fa fa-check mr-2"></i>
+                                        @endif
+                                    </a>
+                                @endforeach
+                            </div>
+                        @else
+                            <span class="nav-link d-flex align-items-center" style="font-size: 13px;">
+                                <i class="fa fa-code-fork ml-2"></i>{{ $currentBranch->name }}
+                            </span>
+                        @endif
+                    </div>
+                @endif
                 <div class="dropdown main-profile-menu nav nav-item nav-link">
                     <a class="profile-user d-flex" href="">
                         @if (GeneralSiteSettings('logo'))

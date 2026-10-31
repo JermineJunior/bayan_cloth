@@ -118,8 +118,8 @@
                                             @endif
                                             @can('طباعة فاتورة مبيعات')
                                                 <a class="btn btn-outline-info btn-sm"
-                                                    href="{{ route('sale_invoice.pdf', $sale_invoice->id) }}" title="طباعة">
-                                                    <i class="fa fa-print"></i>
+                                                    href="{{ route('sale_invoice.print', $sale_invoice->id) }}" title="عرض">
+                                                    <i class="fa fa-eye"></i>
                                                 </a>
                                             @endcan
                                             @if ($sale_invoice->allocations_count > 0)

@@ -77,6 +77,7 @@
                             <form id="dailyForm" action="{{ route('daily.store') }}" method="POST"
                                 class="form-horizontal form-label-left">
                                 @csrf
+                                <input type="hidden" name="_branch" value="{{ session('branch_id') }}">
                                 <div class="col-xl-12">
                                     {{--  <span class="tx-danger">*</span><label for="inputName" class="control-label"> رقم القيد</label>  --}}
                                     <input required type="hidden" value="{{ $constant_number }}" name="constant_number"

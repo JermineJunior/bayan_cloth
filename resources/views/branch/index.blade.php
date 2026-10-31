@@ -108,7 +108,7 @@
                                                 <a class="modal-effect btn btn-outline-success btn-sm"
                                                     data-effect="effect-super-scaled" data-toggle="modal" href="#editModal"
                                                     data-id="{{ $branch->id }}" data-name="{{ $branch->name }}"
-                                                    title="تعديل">
+                                                    data-code="{{ $branch->code }}" title="تعديل">
                                                     <i class="fa fa-edit">
                                                     </i></a>
                                             @endcan
@@ -145,6 +145,11 @@
                                 <span class="tx-danger">*</span><label for="exampleInputEmail1">إسم الفرع </label>
                                 <input type="text" name="name" id="name" class="form-control" autocomplete="off" required>
                             </div>
+                            <div class="form-group">
+                                <label for="code">رمز الفرع (اختياري)</label>
+                                <input type="text" name="code" id="code" class="form-control" maxlength="10"
+                                    autocomplete="off">
+                            </div>
 
                         </div>
                         <div class="modal-footer">
@@ -173,6 +178,11 @@
                                 <span class="tx-danger">*</span><label>اسم الفرع</label>
                                 <input id="name_ed" required type="text" name="name" class="form-control"
                                 autocomplete="off" required>
+                            </div>
+                            <div class="form-group">
+                                <label>رمز الفرع (اختياري)</label>
+                                <input id="code_ed" type="text" name="code" class="form-control" maxlength="10"
+                                    autocomplete="off">
                             </div>
                             <div class="modal-footer">
                                 <button class="btn ripple btn-primary" type="submit">تحديث البيانات </button>
@@ -252,10 +262,12 @@
                 var button = $(event.relatedTarget);
                 var id = button.data('id');
                 var name = button.data('name');
+                var code = button.data('code');
                 var modal = $(this);
                 $('#edit_branch').attr('action', '{{ route('branch.update', ':id') }}'.replace(':id',
                     id));
                 modal.find('.modal-body #name_ed').val(name);
+                modal.find('.modal-body #code_ed').val(code);
                 modal.find('.modal-body #branch_id').val(id);
             });
 

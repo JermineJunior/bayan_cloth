@@ -57,5 +57,13 @@ class SaleInvoice extends Model
         return $this->hasMany(RevenueAllocation::class);
     }
 
-    
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function getDisplayNumberAttribute()
+    {
+        return ($this->branch?->code ? $this->branch->code . '-' : '') . $this->invoice_number;
+    }
 }

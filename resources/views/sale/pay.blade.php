@@ -5,64 +5,21 @@
     <link href="{{ URL::asset('assets/plugins/notify/css/notifIt.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <style>
-        .scrollable-card {
-            max-height: 75vh;
-            /* أو أي ارتفاع يناسبك */
-            overflow-y: hidden;
-            /* نخفي الاسكرول افتراضيًا */
-            scrollbar-width: none;
-            /* لإخفاء الأسهم في فايرفوكس */
-        }
-
-        /* إظهار الاسكرول عند الـ hover */
-        .scrollable-card:hover {
-            overflow-y: auto;
-            /* نعيده عند تمرير الماوس */
-            scrollbar-width: thin;
-            /* فايرفوكس */
-            scrollbar-color: #888 #f1f1f1;
-            /* ألوان الاسكرول */
-        }
-
-        /* تنسيق الاسكرول في كروم وباقي المتصفحات */
-        .scrollable-card::-webkit-scrollbar {
-            width: 8px;
-            display: none;
-            /* نخفيه افتراضيًا */
-        }
-
-        .scrollable-card:hover::-webkit-scrollbar {
-            display: block;
-            /* نظهره عند hover */
-        }
-
-        .scrollable-card::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .scrollable-card::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        .scrollable-card::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
         .invoice-card {
-            height: 75vh;
+            min-height: 75vh;
             /* الكرت بطول الشاشة */
         }
 
         .invoice-body {
-            height: 100%;
             display: flex;
             flex-direction: column;
         }
 
         /* فقط المنتجات تتحرك */
         .invoice-products {
-            flex: 1;
+            flex: 0 0 auto;
+            min-height: 260px;
+            max-height: 50vh;
             overflow-y: auto;
             /* اسكرول رأسي */
             overflow-x: auto;
@@ -72,13 +29,20 @@
             /* يمنع التفاف الأعمدة */
         }
 
-        .invoice-products table th,
-        .invoice-products table td {
+        .invoice-products table th {
             position: sticky;
             top: 0;
             background: #fff;
             z-index: 10;
             border-bottom: 2px solid #ccc;
+            padding: 4px 6px !important;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .invoice-products table td {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
             padding: 4px 6px !important;
             font-size: 13px;
             vertical-align: middle;

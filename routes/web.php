@@ -39,6 +39,7 @@ use App\Http\Controllers\PurchaseInvoiceReturnController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SaleInvoiceReportController;
 use App\Http\Middleware\CheckSession;
+use App\Http\Middleware\CheckBranchMatch;
 
 Auth::routes();
 
@@ -47,7 +48,7 @@ Route::get('/', [HomeController::class, 'index'])
     ->middleware(['auth', CheckSession::class]);
 
 Route::group(
-    attributes: ['prefix' => 'admin', 'middleware' => ['auth']],
+    attributes: ['prefix' => 'admin', 'middleware' => ['auth', CheckBranchMatch::class]],
     routes: function () {
         // Unit Route
         Route::resource(name: 'unit', controller: UnitController::class)->except(methods: ['show', 'edit', 'create']);

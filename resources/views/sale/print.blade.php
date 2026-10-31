@@ -126,7 +126,7 @@
 
 
         @media print {
-            #print_Button, .create_invoice {
+            #print_Button, .create_invoice, .download-pdf, .back-to-list {
                 display: none !important;
             }
         }
@@ -165,7 +165,7 @@
                                             </div>
                                             <div class="detail-box">
                                                 <span class="label">رقم الفاتورة</span>
-                                                <span class="value">{{ $sale_invoice->invoice_number }}</span>
+                                                <span class="value">{{ $sale_invoice->display_number }}</span>
                                             </div>
 
                                             <div class="detail-box">
@@ -323,6 +323,12 @@
                         <button class="btn btn-primary float-left mt-3 mr-2" id="print_Button" onclick="printDiv()">
                             <i class="mdi mdi-printer ml-1"></i> طبـاعة
                         </button>
+                        <a href="{{ route('sale_invoice.pdf', $sale_invoice->id) }}" class="btn btn-outline-danger float-left mt-3 mr-2 download-pdf">
+                            <i class="mdi mdi-file-pdf ml-1"></i> تحميل PDF
+                        </a>
+                        <a href="{{ route('sale_invoice.index') }}" class="btn btn-outline-secondary float-left mt-3 mr-2 back-to-list">
+                            <i class="mdi mdi-arrow-right ml-1"></i> رجوع للقائمة
+                        </a>
                         <a href="{{ route('sale_invoice.create') }}" class="btn btn-outline-primary float-left mt-3 mr-2 create_invoice">
                             <i class="mdi mdi-plus ml-1"></i> فاتورة مبيعات جديدة 
                         </a>
@@ -338,8 +344,10 @@
         function printDiv() {
             window.print();
         }
-        window.addEventListener('afterprint', function () {
-            window.location.href = '{{ route('sale_invoice.index') }}';
-        });
+        @if (request('new'))
+            window.addEventListener('afterprint', function () {
+                window.location.href = '{{ route('sale_invoice.index') }}';
+            });
+        @endif
     </script>
 @endsection

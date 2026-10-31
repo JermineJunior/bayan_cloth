@@ -5,64 +5,21 @@
     <link href="{{ URL::asset('assets/plugins/notify/css/notifIt.css') }}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <style>
-        .scrollable-card {
-            max-height: 75vh;
-            /* أو أي ارتفاع يناسبك */
-            overflow-y: hidden;
-            /* نخفي الاسكرول افتراضيًا */
-            scrollbar-width: none;
-            /* لإخفاء الأسهم في فايرفوكس */
-        }
-
-        /* إظهار الاسكرول عند الـ hover */
-        .scrollable-card:hover {
-            overflow-y: auto;
-            /* نعيده عند تمرير الماوس */
-            scrollbar-width: thin;
-            /* فايرفوكس */
-            scrollbar-color: #888 #f1f1f1;
-            /* ألوان الاسكرول */
-        }
-
-        /* تنسيق الاسكرول في كروم وباقي المتصفحات */
-        .scrollable-card::-webkit-scrollbar {
-            width: 8px;
-            display: none;
-            /* نخفيه افتراضيًا */
-        }
-
-        .scrollable-card:hover::-webkit-scrollbar {
-            display: block;
-            /* نظهره عند hover */
-        }
-
-        .scrollable-card::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .scrollable-card::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 4px;
-        }
-
-        .scrollable-card::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
         .invoice-card {
-            height: 75vh;
+            min-height: 75vh;
             /* الكرت بطول الشاشة */
         }
 
         .invoice-body {
-            height: 100%;
             display: flex;
             flex-direction: column;
         }
 
         /* فقط المنتجات تتحرك */
         .invoice-products {
-            flex: 1;
+            flex: 0 0 auto;
+            min-height: 260px;
+            max-height: 50vh;
             overflow-y: auto;
             /* اسكرول رأسي */
             overflow-x: auto;
@@ -72,13 +29,20 @@
             /* يمنع التفاف الأعمدة */
         }
 
-        .invoice-products table th,
-        .invoice-products table td {
+        .invoice-products table th {
             position: sticky;
             top: 0;
             background: #fff;
             z-index: 10;
             border-bottom: 2px solid #ccc;
+            padding: 4px 6px !important;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        .invoice-products table td {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
             padding: 4px 6px !important;
             font-size: 13px;
             vertical-align: middle;
@@ -123,6 +87,7 @@
 
     <form id="invoiceForm" action="{{ route('sale_invoice.store') }}" method="POST">
         @csrf
+        <input type="hidden" name="_branch" value="{{ session('branch_id') }}">
         <div class="row">
             <div class="col-12 col-xl-12">
                 <div class="card">
@@ -249,7 +214,7 @@
 
             <div class="col-12 col-xl-3">
                 <div class="card">
-                    <div class="card-body scrollable-card">
+                    <div class="card-body">
                         <select id="product_filter" class="form-control mb-2">
                             <option value="0">كل المنتجات</option>
                             <option value="1">المتاح فقط</option>
@@ -275,7 +240,7 @@
                         <div id="error-message" class="error-message"></div>
 
                         <!-- ====== منطقة المنتجات فقط ====== -->
-                        <div class="table-responsive invoice-products scrollable-card">
+                        <div class="table-responsive invoice-products">
                             <table class="table mb-0">
                                 <thead>
                                     <tr>
@@ -325,14 +290,10 @@
                                     <label>تكلفة التوصيل</label>
                                     <input type="text" name="delivery_cost" id="delivery_cost" class="form-control" value="0.00">
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-2">
                                     <label>عمولة المندوب</label>
                                     <input type="text" name="rep_cut_amount" id="rep_cut_amount" class="form-control" value="0.00">
                                 </div>
-                            </div>
-
-                            <div class="row g-2">
-                                <div class="col-md-5"></div>
                                 <div class="col-md-7">
                                     <label>كاش</label>
                                     <div class="form-row-inline">

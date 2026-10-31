@@ -83,6 +83,7 @@
                         <div class="card-body">
                             <form id="compoundForm" action="{{ route('compound.store') }}" method="POST">
                                 @csrf
+                                <input type="hidden" name="_branch" value="{{ session('branch_id') }}">
                                 <div class="row">
                                     <div class="col-xl-4">
                                         <label for="constant_number" class="control-label"> رقم القيد</label>

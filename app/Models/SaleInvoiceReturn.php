@@ -39,4 +39,14 @@ class SaleInvoiceReturn extends Model
     {
         return $this->belongsTo(Tree4::class, 'representatvie_id');
     }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function getDisplayNumberAttribute()
+    {
+        return ($this->branch?->code ? $this->branch->code . '-' : '') . $this->invoice_number;
+    }
 }

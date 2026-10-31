@@ -38,11 +38,12 @@ class PreliminaryInvoiceController extends Controller
     {
         try {
             DB::beginTransaction();
+            $invoice_number = PreliminaryInvoice::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $preliminary_invoice = PreliminaryInvoice::create([
                 'customer_id' => $request->customer_id,
                 'representative_id' => $request->representative_id,
                 'date' => $request->date,
-                'invoice_number' => $request->invoice_number,
+                'invoice_number' => $invoice_number,
                 'sub_total_amount' => $request->sub_total,
                 'discount_amount' => $request->discount,
                 'tax_amount' => $request->tax,
@@ -82,7 +83,10 @@ class PreliminaryInvoiceController extends Controller
             return redirect()->route('PreliminaryInvoice.print', $preliminary_invoice);
         } catch (\Exception $e) {
             DB::rollback();
-            return redirect()->route('PreliminaryInvoice.index')->withErrors($e->getMessage());
+            $message = (int) $e->getCode() === 23000 || str_contains($e->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $e->getMessage();
+            return redirect()->route('PreliminaryInvoice.index')->withErrors($message);
         }
     }
     public function print(PreliminaryInvoice $PreliminaryInvoice)
@@ -110,6 +114,7 @@ class PreliminaryInvoiceController extends Controller
 
             $preliminaryInvoice->delete();
 
+            $invoice_number = SaleInvoice::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
 
@@ -117,7 +122,7 @@ class PreliminaryInvoiceController extends Controller
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
                     'representative_id' => $request->get('representative_id'),
-                    'invoice_number' => SaleInvoice::where('branch_id',session('branch_id'))->max('invoice_number') + 1,
+                    'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'sub_total_amount' => $request->get('sub_total'),
                     'discount_amount' => $request->get('discount'),
@@ -233,9 +238,12 @@ class PreliminaryInvoiceController extends Controller
             return redirect()->route('sale_invoice.print',$sale_invoice);
         } catch (\Exception $exception) {
             DB::rollback();
+            $message = (int) $exception->getCode() === 23000 || str_contains($exception->getMessage(), 'Duplicate entry')
+                ? 'تعذر حفظ الفاتورة بسبب تزامن العمليات، حاول مرة اخرى.'
+                : $exception->getMessage();
             return redirect()
                 ->route('sale_invoice.index')
-                ->withErrors(['error' => $exception->getMessage()])
+                ->withErrors(['error' => $message])
                 ->withInput();
         }
     }
