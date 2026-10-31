@@ -27,6 +27,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CurenceyController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\CustomerDebtReportController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SaleInvoiceContoller;
@@ -197,6 +198,8 @@ Route::group(
         Route::post(uri: 'report/customer/sales', action: [ReportController::class, 'show_customerSales'])->name(name: 'report.customer_sales.show');
         Route::get(uri: 'report/customer/account', action: [ReportController::class, 'customerAccount'])->name(name: 'report.customer.account');
         Route::post(uri: 'report/customer/account', action: [ReportController::class, 'customerAccountShow'])->name(name: 'report.customer.show');
+        Route::get(uri: 'report/customer-debts', action: [CustomerDebtReportController::class, 'index'])->name(name: 'report.customer_debts.index');
+        Route::get(uri: 'report/customer-debts/show', action: [CustomerDebtReportController::class, 'show'])->name(name: 'report.customer_debts.show');
         Route::get(uri: 'report/supplier/account', action: [ReportController::class, 'supplierAccount'])->name(name: 'report.supplier.account');
         Route::post(uri: 'report/supplier/account', action: [ReportController::class, 'supplierAccountShow'])->name(name: 'report.supplier.show');
         Route::get(uri: 'report/safe/account', action: [ReportController::class, 'safeAccount'])->name(name: 'report.safe.account');

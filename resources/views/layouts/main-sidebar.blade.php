@@ -430,6 +430,8 @@
                                 @can('تقرير مدينونيات العملاء')
                                     <li><a class="sub-slide-item" href="{{ route('report.customer.account.index') }}">
                                             تقرير مدينونيات العملاء </a></li>
+                                    <li><a class="sub-slide-item" href="{{ route('report.customer_debts.index') }}">
+                                            تقرير مديونيات العملاء التفصيلي </a></li>
                                 @endcan
                                 @can('التقرير الشامل')
                                     <li><a class="sub-slide-item" href="{{ route('report.complete.index') }}">
