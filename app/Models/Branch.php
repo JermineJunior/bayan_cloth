@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Branch extends Model
 {
-    protected $fillable = ['name', 'code'];
+    protected $fillable = ['name', 'code', 'enable_delivery_cost', 'enable_rep_cut'];
+
+    protected $casts = [
+        'enable_delivery_cost' => 'boolean',
+        'enable_rep_cut' => 'boolean',
+    ];
 
     public function users()
     {

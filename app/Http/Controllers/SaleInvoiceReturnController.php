@@ -55,8 +55,8 @@ class SaleInvoiceReturnController extends Controller
                     'tax_amount' => $request->get('tax'),
                     'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
-                    'delivery_cost' => $request->get('delivery_cost') ?: 0,
-                    'rep_cut_amount' => $request->get('rep_cut_amount') ?: 0,
+                    'delivery_cost' => branchSetting('enable_delivery_cost') ? ($request->get('delivery_cost') ?: 0) : 0,
+                    'rep_cut_amount' => branchSetting('enable_rep_cut') ? ($request->get('rep_cut_amount') ?: 0) : 0,
                     'status' => 1,
                     'cash_name' => $request->get('cash_name'),
                     'bank_name' => $request->get('bank_name'),
@@ -217,6 +217,8 @@ class SaleInvoiceReturnController extends Controller
 
             StockDetail::where('sale_invoice_return_id', $sale_invoice_return->id)->where('branch_id', session('branch_id'))->delete();
 
+            $originalDeliveryCost = $sale_invoice_return->delivery_cost;
+            $originalRepCutAmount = $sale_invoice_return->rep_cut_amount;
             $invoice_number = $sale_invoice_return->invoice_number;
             $sale_invoice_return->delete();
 
@@ -232,8 +234,8 @@ class SaleInvoiceReturnController extends Controller
                     'tax_amount' => $request->get('tax'),
                     'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
-                    'delivery_cost' => $request->get('delivery_cost') ?: 0,
-                    'rep_cut_amount' => $request->get('rep_cut_amount') ?: 0,
+                    'delivery_cost' => branchSetting('enable_delivery_cost') ? ($request->get('delivery_cost') ?: 0) : $originalDeliveryCost,
+                    'rep_cut_amount' => branchSetting('enable_rep_cut') ? ($request->get('rep_cut_amount') ?: 0) : $originalRepCutAmount,
                     'payment_status' => $request->get('payment_status'),
                     'status' => 1,
                     'cash_name' => $request->get('cash_name'),

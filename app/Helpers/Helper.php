@@ -17,6 +17,15 @@ if (!function_exists('GeneralSiteSettings')) {
     }
 }
 
+if (!function_exists('branchSetting')) {
+    function branchSetting(string $key): bool
+    {
+        static $branch = null;
+        $branch ??= \App\Models\Branch::find(session('branch_id'));
+        return (bool) ($branch->{$key} ?? false);
+    }
+}
+
 if (!function_exists('groupPermissions')) {
     // دالة لتجميع الأذونات حسب المجموعات المعرفة في config/permission_groups.php
     function groupPermissions($permissions): array

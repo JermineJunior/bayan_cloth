@@ -26,6 +26,8 @@ class BranchController extends Controller
         Branch::create([
             'name' => $request->name,
             'code' => $request->code,
+            'enable_delivery_cost' => $request->boolean('enable_delivery_cost'),
+            'enable_rep_cut' => $request->boolean('enable_rep_cut'),
         ]);
         return back()->with('success_created', 'Success Created');
     }
@@ -39,6 +41,8 @@ class BranchController extends Controller
         $branch->update([
             'name' => $request->name,
             'code' => $request->code,
+            'enable_delivery_cost' => $request->boolean('enable_delivery_cost'),
+            'enable_rep_cut' => $request->boolean('enable_rep_cut'),
         ]);
         return back()->with('success_deleted', 'Updated Success');
     }

@@ -8,6 +8,25 @@
     <link href="{{ URL::asset('assets/plugins/datatable/css/responsive.dataTables.min.css') }}" rel="stylesheet">
     <!--Internal   Notify -->
     <link href="{{ URL::asset('assets/plugins/notify/css/notifIt.css') }}" rel="stylesheet" />
+    <style>
+        .branch-setting-check {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-left: 0;
+            margin-bottom: 8px;
+        }
+
+        .branch-setting-check .form-check-input {
+            position: static;
+            margin: 0;
+            flex: 0 0 auto;
+        }
+
+        .branch-setting-check .form-check-label {
+            margin: 0;
+        }
+    </style>
 @endsection
 
 @section('page-header')
@@ -100,7 +119,9 @@
                             <tbody>
 
                                 @foreach ($branches as $branch)
-                                    <tr data-id="{{ $branch->id }}">
+                                    <tr data-id="{{ $branch->id }}"
+                                        data-enable-delivery-cost="{{ $branch->enable_delivery_cost ? 1 : 0 }}"
+                                        data-enable-rep-cut="{{ $branch->enable_rep_cut ? 1 : 0 }}">
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $branch->name }}</td>
                                         <td>
@@ -150,6 +171,20 @@
                                 <input type="text" name="code" id="code" class="form-control" maxlength="10"
                                     autocomplete="off">
                             </div>
+                            <div class="form-group">
+                                <div class="form-check branch-setting-check">
+                                    <input type="checkbox" name="enable_delivery_cost" id="enable_delivery_cost_add"
+                                        class="form-check-input" value="1">
+                                    <label class="form-check-label" for="enable_delivery_cost_add">تفعيل تكلفة
+                                        التوصيل</label>
+                                </div>
+                                <div class="form-check branch-setting-check">
+                                    <input type="checkbox" name="enable_rep_cut" id="enable_rep_cut_add"
+                                        class="form-check-input" value="1">
+                                    <label class="form-check-label" for="enable_rep_cut_add">تفعيل عمولة
+                                        المندوب</label>
+                                </div>
+                            </div>
 
                         </div>
                         <div class="modal-footer">
@@ -183,6 +218,20 @@
                                 <label>رمز الفرع (اختياري)</label>
                                 <input id="code_ed" type="text" name="code" class="form-control" maxlength="10"
                                     autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <div class="form-check branch-setting-check">
+                                    <input type="checkbox" name="enable_delivery_cost" id="enable_delivery_cost_ed"
+                                        class="form-check-input" value="1">
+                                    <label class="form-check-label" for="enable_delivery_cost_ed">تفعيل تكلفة
+                                        التوصيل</label>
+                                </div>
+                                <div class="form-check branch-setting-check">
+                                    <input type="checkbox" name="enable_rep_cut" id="enable_rep_cut_ed"
+                                        class="form-check-input" value="1">
+                                    <label class="form-check-label" for="enable_rep_cut_ed">تفعيل عمولة
+                                        المندوب</label>
+                                </div>
                             </div>
                             <div class="modal-footer">
                                 <button class="btn ripple btn-primary" type="submit">تحديث البيانات </button>
@@ -263,12 +312,17 @@
                 var id = button.data('id');
                 var name = button.data('name');
                 var code = button.data('code');
+                var row = button.closest('tr');
+                var enableDeliveryCost = row.data('enableDeliveryCost');
+                var enableRepCut = row.data('enableRepCut');
                 var modal = $(this);
                 $('#edit_branch').attr('action', '{{ route('branch.update', ':id') }}'.replace(':id',
                     id));
                 modal.find('.modal-body #name_ed').val(name);
                 modal.find('.modal-body #code_ed').val(code);
                 modal.find('.modal-body #branch_id').val(id);
+                modal.find('.modal-body #enable_delivery_cost_ed').prop('checked', enableDeliveryCost == 1);
+                modal.find('.modal-body #enable_rep_cut_ed').prop('checked', enableRepCut == 1);
             });
 
             $('#deleteModal').on('show.bs.modal', function(event) {

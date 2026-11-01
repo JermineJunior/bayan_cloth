@@ -61,8 +61,8 @@ class SaleInvoiceContoller extends Controller
                     'tax_amount' => $request->get('tax'),
                     'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
-                    'delivery_cost' => $request->get('delivery_cost') ?: 0,
-                    'rep_cut_amount' => $request->get('rep_cut_amount') ?: 0,
+                    'delivery_cost' => branchSetting('enable_delivery_cost') ? ($request->get('delivery_cost') ?: 0) : 0,
+                    'rep_cut_amount' => branchSetting('enable_rep_cut') ? ($request->get('rep_cut_amount') ?: 0) : 0,
                     'status' => 1,
                     'cash_name' => $request->get('cash_name'),
                     'bank_name' => $request->get('bank_name'),
@@ -246,6 +246,8 @@ class SaleInvoiceContoller extends Controller
                 $product->stocks()->updateExistingPivot($item->stock_id, ['quantity' => $stock->pivot->quantity + $qtyBack]);
             }
 
+            $originalDeliveryCost = $sale_invoice->delivery_cost;
+            $originalRepCutAmount = $sale_invoice->rep_cut_amount;
             $invoice_number = $sale_invoice->invoice_number;
             $sale_invoice->delete();
 
@@ -259,8 +261,8 @@ class SaleInvoiceContoller extends Controller
                 'tax_amount' => $request->tax,
                 'tax_status' => $request->tax_status ? 1 : 0,
                 'total_amount' => $request->total,
-                'delivery_cost' => $request->get('delivery_cost') ?: 0,
-                'rep_cut_amount' => $request->get('rep_cut_amount') ?: 0,
+                'delivery_cost' => branchSetting('enable_delivery_cost') ? ($request->get('delivery_cost') ?: 0) : $originalDeliveryCost,
+                'rep_cut_amount' => branchSetting('enable_rep_cut') ? ($request->get('rep_cut_amount') ?: 0) : $originalRepCutAmount,
                 'status' => 1,
                 'cash_name' => $request->cash_name,
                 'bank_name' => $request->bank_name,

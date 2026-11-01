@@ -272,14 +272,24 @@
                             </div>
 
                             <div class="row g-2">
-                                <div class="col-md-3">
-                                    <label>تكلفة التوصيل</label>
-                                    <input type="text" name="delivery_cost" id="delivery_cost" class="form-control" value="0.00">
-                                </div>
-                                <div class="col-md-2">
-                                    <label>عمولة المندوب</label>
-                                    <input type="text" name="rep_cut_amount" id="rep_cut_amount" class="form-control" value="0.00">
-                                </div>
+                                @if (branchSetting('enable_delivery_cost'))
+                                    <div class="col-md-3">
+                                        <label>تكلفة التوصيل</label>
+                                        <input type="text" name="delivery_cost" id="delivery_cost" class="form-control" value="0.00">
+                                    </div>
+                                @else
+                                    <input type="hidden" id="delivery_cost" name="delivery_cost" value="0.00">
+                                    <div class="col-md-3"></div>
+                                @endif
+                                @if (branchSetting('enable_rep_cut'))
+                                    <div class="col-md-2">
+                                        <label>عمولة المندوب</label>
+                                        <input type="text" name="rep_cut_amount" id="rep_cut_amount" class="form-control" value="0.00">
+                                    </div>
+                                @else
+                                    <input type="hidden" id="rep_cut_amount" name="rep_cut_amount" value="0.00">
+                                    <div class="col-md-2"></div>
+                                @endif
                                 <div class="col-md-7">
                                     <label>كاش</label>
                                     <div class="form-row-inline">
