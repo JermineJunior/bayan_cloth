@@ -81,7 +81,7 @@
                                             <input type="hidden" name="show_invoices" value="0">
                                             <input type="checkbox" name="show_invoices" value="1" id="show_invoices"
                                                 class="form-check-input" checked>
-                                            <label class="form-check-label" for="show_invoices">عرض تفاصيل الفواتير</label>
+                                            <label class="form-check-label mr-3" for="show_invoices">عرض تفاصيل الفواتير</label>
                                         </div>
                                     </div>
                                 </div>

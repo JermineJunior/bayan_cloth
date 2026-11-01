@@ -200,6 +200,7 @@ Route::group(
         Route::post(uri: 'report/customer/account', action: [ReportController::class, 'customerAccountShow'])->name(name: 'report.customer.show');
         Route::get(uri: 'report/customer-debts', action: [CustomerDebtReportController::class, 'index'])->name(name: 'report.customer_debts.index');
         Route::get(uri: 'report/customer-debts/show', action: [CustomerDebtReportController::class, 'show'])->name(name: 'report.customer_debts.show');
+        Route::view(uri: 'reports', view: 'reports.index')->name(name: 'reports.index');
         Route::get(uri: 'report/supplier/account', action: [ReportController::class, 'supplierAccount'])->name(name: 'report.supplier.account');
         Route::post(uri: 'report/supplier/account', action: [ReportController::class, 'supplierAccountShow'])->name(name: 'report.supplier.show');
         Route::get(uri: 'report/safe/account', action: [ReportController::class, 'safeAccount'])->name(name: 'report.safe.account');

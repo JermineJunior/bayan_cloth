@@ -1043,7 +1043,7 @@ class ReportController extends Controller
 
         $results = [];
 
-        // ✅ مجاميع عامة
+        // مجاميع عامة
         $grand_total_madin = 0;
         $grand_total_dain = 0;
 
