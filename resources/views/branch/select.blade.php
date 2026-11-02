@@ -95,8 +95,10 @@
 
             <!-- صورة النظام -->
             <div class="col-md-4 col-lg-6 col-xl-7 d-none d-md-flex bg-primary-transparent">
+                @php($logo = GeneralSiteSettings('logo'))
                 <div class="system-image-container w-100">
-                    <img src="{{ asset('image/login/bayan.jpg') }}" alt="شعار النظام">
+                    <img src="{{ $logo ? asset('image/logo/' . $logo) : asset('image/login/bayan.jpg') }}"
+                        alt="شعار النظام">
                 </div>
             </div>
 

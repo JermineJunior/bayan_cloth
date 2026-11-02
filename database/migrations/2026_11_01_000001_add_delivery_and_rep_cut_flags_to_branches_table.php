@@ -14,10 +14,6 @@ return new class extends Migration
             $table->boolean('enable_rep_cut')->default(false);
         });
 
-        DB::table('branches')->update([
-            'enable_delivery_cost' => true,
-            'enable_rep_cut' => true,
-        ]);
     }
 
     public function down(): void
