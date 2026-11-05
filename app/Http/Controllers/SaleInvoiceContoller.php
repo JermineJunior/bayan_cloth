@@ -49,11 +49,12 @@ class SaleInvoiceContoller extends Controller
             $invoice_number = SaleInvoice::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
+            $representativeId = auth()->user()->invoiceRepresentative($request->representative_id);
 
             $sale_invoice = SaleInvoice::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
-                    'representative_id' => $request->get('representative_id'),
+                    'representative_id' => $representativeId,
                     'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'sub_total_amount' => $request->get('sub_total'),
@@ -169,7 +170,7 @@ class SaleInvoiceContoller extends Controller
                 }
             }
 
-            if ($request->representative_id && branchSetting('enable_rep_cut')) { $sale_invoice->update(['rep_cut_amount' => round($repCut, 2)]); }
+            if ($representativeId && branchSetting('enable_rep_cut')) { $sale_invoice->update(['rep_cut_amount' => round($repCut, 2)]); }
             DB::commit();
 
             return redirect()->route('sale_invoice.print', [$sale_invoice, 'new' => 1]);
@@ -250,12 +251,15 @@ class SaleInvoiceContoller extends Controller
             }
 
             $originalDeliveryCost = $sale_invoice->delivery_cost;
+            $originalRepresentativeId = $sale_invoice->representative_id;
             $invoice_number = $sale_invoice->invoice_number;
             $sale_invoice->delete();
 
+            $representativeId = auth()->user()->invoiceRepresentative($request->representative_id, true, $originalRepresentativeId);
+
             $sale_invoice = SaleInvoice::create([
                 'customer_id' => $request->customer_id,
-                'representative_id' => $request->representative_id,
+                'representative_id' => $representativeId,
                 'invoice_number' => $invoice_number,
                 'date' => $request->date,
                 'sub_total_amount' => $request->sub_total,
@@ -367,7 +371,7 @@ class SaleInvoiceContoller extends Controller
                 }
             }
 
-            if ($request->representative_id && branchSetting('enable_rep_cut')) { $sale_invoice->update(['rep_cut_amount' => round($repCut, 2)]); }
+            if ($representativeId && branchSetting('enable_rep_cut')) { $sale_invoice->update(['rep_cut_amount' => round($repCut, 2)]); }
             DB::commit();
 
             return redirect()->route('sale_invoice.index')->with('success_updated', 'تم تحديث البيانات بنجاج');

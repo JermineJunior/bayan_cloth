@@ -39,9 +39,10 @@ class PreliminaryInvoiceController extends Controller
         try {
             DB::beginTransaction();
             $invoice_number = PreliminaryInvoice::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
+            $representativeId = auth()->user()->invoiceRepresentative($request->representative_id);
             $preliminary_invoice = PreliminaryInvoice::create([
                 'customer_id' => $request->customer_id,
-                'representative_id' => $request->representative_id,
+                'representative_id' => $representativeId,
                 'date' => $request->date,
                 'invoice_number' => $invoice_number,
                 'sub_total_amount' => $request->sub_total,
@@ -112,8 +113,10 @@ class PreliminaryInvoiceController extends Controller
         try {
             DB::beginTransaction();
 
+            $originalRepresentativeId = $preliminaryInvoice->representative_id;
             $preliminaryInvoice->delete();
 
+            $representativeId = auth()->user()->invoiceRepresentative($request->representative_id, true, $originalRepresentativeId);
             $invoice_number = SaleInvoice::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $invoice_status = $request->deferend_amount != '0.00' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
@@ -121,7 +124,7 @@ class PreliminaryInvoiceController extends Controller
             $sale_invoice = SaleInvoice::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
-                    'representative_id' => $request->get('representative_id'),
+                    'representative_id' => $representativeId,
                     'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'sub_total_amount' => $request->get('sub_total'),
@@ -192,7 +195,7 @@ class PreliminaryInvoiceController extends Controller
                 }
             }
 
-            if ($request->representative_id && branchSetting('enable_rep_cut')) {
+            if ($representativeId && branchSetting('enable_rep_cut')) {
                 $sale_invoice->update(['rep_cut_amount' => round($repCut, 2)]);
             }
 

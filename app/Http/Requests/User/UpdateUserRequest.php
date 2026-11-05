@@ -26,7 +26,8 @@ class UpdateUserRequest extends FormRequest
             'name' => 'required|string|max:225',
             'username' => ['nullable',Rule::unique('users','username')->ignore($this->user->id, 'id')],
             'password' => 'nullable|string|confirmed',
-            'roles_name' => 'required|numeric|exists:roles,id'
+            'roles_name' => 'required|numeric|exists:roles,id',
+            'representative_id' => 'nullable|exists:tree4s,id'
 
         ];
     }

@@ -42,11 +42,12 @@ class SaleInvoiceReturnController extends Controller
             $invoice_number = SaleInvoiceReturn::where('branch_id', session('branch_id'))->lockForUpdate()->max('invoice_number') + 1;
             $invoice_status = $request->deferend_amount != '' ? 0 : 1;
             $transaction_no = (float) str_replace(',', '', $request->bank_amount_total ?? '') > 0 ? $request->transaction_no : null;
+            $representativeId = auth()->user()->invoiceRepresentative($request->representative_id);
 
             $sale_invoice_return = SaleInvoiceReturn::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
-                    'representative_id' => $request->get('representative_id'),
+                    'representative_id' => $representativeId,
                     'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
@@ -157,7 +158,7 @@ class SaleInvoiceReturnController extends Controller
                 }
             }
 
-            if ($request->representative_id && branchSetting('enable_rep_cut')) { $sale_invoice_return->update(['rep_cut_amount' => round($repCut, 2)]); }
+            if ($representativeId && branchSetting('enable_rep_cut')) { $sale_invoice_return->update(['rep_cut_amount' => round($repCut, 2)]); }
             DB::commit();
 
             return redirect()->route('sale_invoice_return.show', $sale_invoice_return->id);
@@ -221,13 +222,16 @@ class SaleInvoiceReturnController extends Controller
             StockDetail::where('sale_invoice_return_id', $sale_invoice_return->id)->where('branch_id', session('branch_id'))->delete();
 
             $originalDeliveryCost = $sale_invoice_return->delivery_cost;
+            $originalRepresentativeId = $sale_invoice_return->representative_id;
             $invoice_number = $sale_invoice_return->invoice_number;
             $sale_invoice_return->delete();
+
+            $representativeId = auth()->user()->invoiceRepresentative($request->representative_id, true, $originalRepresentativeId);
 
             $sale_invoice_return = SaleInvoiceReturn::create(
                 attributes: [
                     'customer_id' => $request->get('customer_id'),
-                    'representative_id' => $request->get('representative_id'),
+                    'representative_id' => $representativeId,
                     'invoice_number' => $invoice_number,
                     'date' => $request->get('date'),
                     'stock_id' => $request->get('stock_id'),
@@ -334,7 +338,7 @@ class SaleInvoiceReturnController extends Controller
                 }
             }
 
-            if ($request->representative_id && branchSetting('enable_rep_cut')) { $sale_invoice_return->update(['rep_cut_amount' => round($repCut, 2)]); }
+            if ($representativeId && branchSetting('enable_rep_cut')) { $sale_invoice_return->update(['rep_cut_amount' => round($repCut, 2)]); }
             DB::commit();
 
             return redirect()->route('sale_invoice_return.index')->with('success_created', 'Product created successfully.');

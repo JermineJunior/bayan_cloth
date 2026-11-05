@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'name',
         'password',
         'username',
+        'representative_id',
     ];
 
     /**
@@ -53,5 +55,19 @@ class User extends Authenticatable
 {
     return $this->belongsToMany(Branch::class, 'branch_user', 'user_id', 'branch_id');
 }
+
+    public function representative(): BelongsTo
+    {
+        return $this->belongsTo(Tree4::class, 'representative_id');
+    }
+
+    public function invoiceRepresentative($posted, bool $isUpdate = false, $existing = null)
+    {
+        if ($this->can('تغيير مندوب الفاتورة')) {
+            return $posted ?: null;
+        }
+
+        return $isUpdate ? $existing : $this->representative_id;
+    }
 
 }

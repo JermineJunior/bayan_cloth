@@ -183,20 +183,27 @@
                                 <div class="col-md-3">
                                     <div class="form-group">
                                         <label for="representative_id">المندوب</label>
-                                        <div class="d-flex">
-                                            <a class="modal-effect btn btn-outline-info" data-target="#representativeModal"
-                                                data-toggle="modal" href="#representativeModal" data-id=""
-                                                title="اضافة مندوب جديد">
-                                                <i class="fa fa-plus">
-                                                </i></a>
-                                            <select name="representative_id" id="representative_id" class="form-control">
-                                                <option value="">-- اختر اسم المندوب -- </option>
-                                                @foreach ($representatives as $representative)
-                                                    <option @selected($representative->id == $sale_invoice->representative_id) value="{{ $representative->id }}">
-                                                        {{ $representative->tree4_name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                        @can('تغيير مندوب الفاتورة')
+                                            <div class="d-flex">
+                                                <a class="modal-effect btn btn-outline-info" data-target="#representativeModal"
+                                                    data-toggle="modal" href="#representativeModal" data-id=""
+                                                    title="اضافة مندوب جديد">
+                                                    <i class="fa fa-plus">
+                                                    </i></a>
+                                                <select name="representative_id" id="representative_id" class="form-control">
+                                                    <option value="">-- اختر اسم المندوب -- </option>
+                                                    @foreach ($representatives as $representative)
+                                                        <option @selected($representative->id == $sale_invoice->representative_id) value="{{ $representative->id }}">
+                                                            {{ $representative->tree4_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        @else
+                                            <input type="hidden" name="representative_id" id="representative_id"
+                                                value="{{ $sale_invoice->representative_id }}">
+                                            <input type="text" class="form-control" readonly
+                                                value="{{ $sale_invoice->representative?->tree4_name ?? 'غير محدد' }}">
+                                        @endcan
                                     </div>
                                 </div>
                             </div>
@@ -1185,19 +1192,21 @@
                                     $('#customer_id').append(newOption).trigger(
                                         'change');
 
-                                    var select = $('#representative_id');
-                                    var value = String(response.representative.id);
-                                    var text = response.representative.name;
+                                    if ($('#representative_id').is('select')) {
+                                        var select = $('#representative_id');
+                                        var value = String(response.representative.id);
+                                        var text = response.representative.name;
 
-                                    // لو المندوب غير موجود ضيفه
-                                    if (select.find('option[value="' + value + '"]')
-                                        .length === 0) {
-                                        select.append(new Option(text, value, true,
-                                            true));
+                                        // لو المندوب غير موجود ضيفه
+                                        if (select.find('option[value="' + value + '"]')
+                                            .length === 0) {
+                                            select.append(new Option(text, value, true,
+                                                true));
+                                        }
+
+                                        // اعمل select
+                                        select.val(value).trigger('change');
                                     }
-
-                                    // اعمل select
-                                    select.val(value).trigger('change');
 
                                 } else {
                                     notif({
@@ -1230,18 +1239,20 @@
 
                             if (response.success) {
 
-                                var select = $('#representative_id');
-                                var value = String(response.representative.id);
-                                var text = response.representative.name;
+                                if ($('#representative_id').is('select')) {
+                                    var select = $('#representative_id');
+                                    var value = String(response.representative.id);
+                                    var text = response.representative.name;
 
-                                // لو المندوب غير موجود ضيفه
-                                if (select.find('option[value="' + value + '"]')
-                                    .length === 0) {
-                                    select.append(new Option(text, value, true, true));
+                                    // لو المندوب غير موجود ضيفه
+                                    if (select.find('option[value="' + value + '"]')
+                                        .length === 0) {
+                                        select.append(new Option(text, value, true, true));
+                                    }
+
+                                    // اعمل select
+                                    select.val(value).trigger('change');
                                 }
-
-                                // اعمل select
-                                select.val(value).trigger('change');
                             }
                         }
                     });

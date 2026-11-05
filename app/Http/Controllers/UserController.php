@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\Branch;
+use App\Models\Tree4;
 
 class UserController extends Controller
 {
@@ -30,7 +31,8 @@ class UserController extends Controller
     {
         $roles = Role::select('name', 'id')->get();
         $branches = Branch::get();
-        return view('user.create', compact('roles', 'branches'));
+        $representatives = Tree4::where('tree3_code', '1206')->get();
+        return view('user.create', compact('roles', 'branches', 'representatives'));
     }
 
     public function store(StoreUserRequest $request): RedirectResponse
@@ -41,7 +43,7 @@ class UserController extends Controller
                 'name' => $request->name,
                 'username' => $request->username,
                 'password' => bcrypt($request->password),
-                
+                'representative_id' => $request->representative_id,
             ]);
             foreach ($request->branch as $branch) {
                 $user->branches()->syncWithoutDetaching([$branch]);
@@ -62,7 +64,8 @@ class UserController extends Controller
     {
         $roles = Role::select('id', 'name')->get();
         $branches = Branch::get();
-        return view('user.edit', compact('user', 'roles', 'branches'));
+        $representatives = Tree4::where('tree3_code', '1206')->get();
+        return view('user.edit', compact('user', 'roles', 'branches', 'representatives'));
     }
 
     public function update(UpdateUserRequest $request, User $user): RedirectResponse
@@ -74,6 +77,7 @@ class UserController extends Controller
             $user->update([
                 'name' => $request->name,
                 'username' => $request->username,
+                'representative_id' => $request->representative_id,
             ]);
 
             if ($request->filled('password')) {

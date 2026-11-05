@@ -152,20 +152,27 @@
                             <div class="col-md-2">
                                 <div class="form-group">
                                     <label for="representative_id">المندوب</label>
-                                    <div class="d-flex">
-                                        <a class="modal-effect btn btn-outline-info" data-target="#representativeModal"
-                                            data-toggle="modal" href="#representativeModal" data-id=""
-                                            title="اضافة مندوب جديد">
-                                            <i class="fa fa-plus">
-                                            </i></a>
-                                        <select name="representative_id" id="representative_id" class="form-control">
-                                            <option value="">-- اختر اسم المندوب -- </option>
-                                            @foreach ($representatives as $representative)
-                                                <option @selected($preliminaryInvoice->representative_id == $representative->id) value="{{ $representative->id }}">
-                                                    {{ $representative->tree4_name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    @can('تغيير مندوب الفاتورة')
+                                        <div class="d-flex">
+                                            <a class="modal-effect btn btn-outline-info" data-target="#representativeModal"
+                                                data-toggle="modal" href="#representativeModal" data-id=""
+                                                title="اضافة مندوب جديد">
+                                                <i class="fa fa-plus">
+                                                </i></a>
+                                            <select name="representative_id" id="representative_id" class="form-control">
+                                                <option value="">-- اختر اسم المندوب -- </option>
+                                                @foreach ($representatives as $representative)
+                                                    <option @selected($preliminaryInvoice->representative_id == $representative->id) value="{{ $representative->id }}">
+                                                        {{ $representative->tree4_name }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @else
+                                        <input type="hidden" name="representative_id" id="representative_id"
+                                            value="{{ $preliminaryInvoice->representative_id }}">
+                                        <input type="text" class="form-control" readonly
+                                            value="{{ $preliminaryInvoice->representative?->tree4_name ?? 'غير محدد' }}">
+                                    @endcan
                                 </div>
                             </div>
                         </div>

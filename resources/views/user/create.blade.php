@@ -94,6 +94,18 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="row mg-b-20">
+                            <div class="parsley-input col-md-6 mg-t-20 mg-md-t-0">
+                                <label> المندوب المرتبط: </label>
+                                <select name="representative_id" id="representative_id" class="form-control">
+                                    <option value="">بدون</option>
+                                    @foreach ($representatives as $representative)
+                                        <option @selected(old('representative_id') == $representative->id)
+                                            value="{{ $representative->id }}">{{ $representative->tree4_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                         <div class="col-xs-12 col-sm-12 col-md-12 text-center">
                             <button class="btn btn-main-primary pd-x-20" type="submit">اضافة</button>
                         </div>
