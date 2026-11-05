@@ -430,4 +430,112 @@ class SaleInvoiceReportController extends Controller
 
         return view('report.representative.customer_show', compact('results', 'representative', 'curencey'));
     }
+
+    public function representative_cut_index(): View
+    {
+        $curenceies = Curencey::get();
+        $restrictedRepresentativeId = $this->restrictedRepresentativeId();
+
+        $representatives = Tree4::whereTree3_code('1206')
+            ->when($restrictedRepresentativeId, fn($query) => $query->whereKey($restrictedRepresentativeId))
+            ->orderBy('tree4_name')
+            ->get();
+
+        $repCutEnabled = branchSetting('enable_rep_cut');
+
+        return view('report.representative.cut_index', compact('representatives', 'curenceies', 'restrictedRepresentativeId', 'repCutEnabled'));
+    }
+
+    public function representative_cut_show(Request $request): View
+    {
+        $curencey = Curencey::find($request->curencey_id) ?? Curencey::where('is_base', true)->first() ?? Curencey::first();
+        $start = $request->start;
+        $end = $request->end;
+        $repCutEnabled = branchSetting('enable_rep_cut');
+        $restrictedRepresentativeId = $this->restrictedRepresentativeId();
+        $representativeId = $restrictedRepresentativeId ?: ($request->filled('representative_id') ? $request->representative_id : null);
+
+        $sales = SaleInvoice::where('branch_id', session('branch_id'))
+            ->whereNotNull('representative_id')
+            ->when($start, fn($query) => $query->whereDate('date', '>=', $start))
+            ->when($end, fn($query) => $query->whereDate('date', '<=', $end))
+            ->when($representativeId, fn($query) => $query->where('representative_id', $representativeId))
+            ->groupBy('representative_id')
+            ->selectRaw('representative_id, SUM(total_amount) as invoices_total, SUM(rep_cut_amount) as sales_cut')
+            ->get()
+            ->keyBy('representative_id');
+
+        $returns = SaleInvoiceReturn::where('branch_id', session('branch_id'))
+            ->whereNotNull('representative_id')
+            ->when($start, fn($query) => $query->whereDate('date', '>=', $start))
+            ->when($end, fn($query) => $query->whereDate('date', '<=', $end))
+            ->when($representativeId, fn($query) => $query->where('representative_id', $representativeId))
+            ->groupBy('representative_id')
+            ->selectRaw('representative_id, SUM(total_amount) as returns_total, SUM(rep_cut_amount) as returns_cut')
+            ->get()
+            ->keyBy('representative_id');
+
+        $representativeIds = $sales->keys()->merge($returns->keys())->unique();
+        if ($representativeId) {
+            $representativeIds->push($representativeId);
+        }
+        $representativeIds = $representativeIds->unique()->values();
+
+        $representativeNames = Tree4::whereIn('id', $representativeIds)->pluck('tree4_name', 'id');
+
+        $rows = $representativeIds->map(function ($id) use ($sales, $returns, $representativeNames, $repCutEnabled) {
+            $sale = $sales->get($id);
+            $return = $returns->get($id);
+            $salesCut = $repCutEnabled ? (float) ($sale->sales_cut ?? 0) : 0;
+            $returnsCut = $repCutEnabled ? (float) ($return->returns_cut ?? 0) : 0;
+
+            return (object) [
+                'representative_id' => $id,
+                'representative_name' => $representativeNames->get($id),
+                'invoices_total' => (float) ($sale->invoices_total ?? 0),
+                'returns_total' => (float) ($return->returns_total ?? 0),
+                'sales_cut' => $salesCut,
+                'returns_cut' => $returnsCut,
+                'net_cut' => $salesCut - $returnsCut,
+            ];
+        })->sortBy('representative_name')->values();
+
+        $invoices = collect();
+        $invoiceReturns = collect();
+
+        if ($representativeId) {
+            $invoices = SaleInvoice::with('customer')
+                ->where('branch_id', session('branch_id'))
+                ->where('representative_id', $representativeId)
+                ->when($start, fn($query) => $query->whereDate('date', '>=', $start))
+                ->when($end, fn($query) => $query->whereDate('date', '<=', $end))
+                ->orderBy('date')
+                ->orderBy('invoice_number')
+                ->get();
+
+            $invoiceReturns = SaleInvoiceReturn::with('customer')
+                ->where('branch_id', session('branch_id'))
+                ->where('representative_id', $representativeId)
+                ->when($start, fn($query) => $query->whereDate('date', '>=', $start))
+                ->when($end, fn($query) => $query->whereDate('date', '<=', $end))
+                ->orderBy('date')
+                ->orderBy('invoice_number')
+                ->get();
+        }
+
+        $representative = $representativeId ? Tree4::find($representativeId) : null;
+
+        return view('report.representative.cut_show', compact('rows', 'invoices', 'invoiceReturns', 'representative', 'start', 'end', 'curencey', 'repCutEnabled'));
+    }
+
+    private function restrictedRepresentativeId(): ?int
+    {
+        $user = auth()->user();
+
+        if ($user && $user->representative_id && ! $user->can('عرض كل الفواتير')) {
+            return (int) $user->representative_id;
+        }
+
+        return null;
+    }
 }

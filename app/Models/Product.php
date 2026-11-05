@@ -29,6 +29,11 @@ class Product extends Model
         return $this->belongsToMany(Stock::class, 'product_stocks')->withPivot('quantity', 'unit_stock');
     }
 
+    public function scopeAvailable($q)
+    {
+        return auth()->user()->can('بيع منتجات غير متوفرة') ? $q : $q->whereHas('stocks', fn($s) => $s->where('product_stocks.quantity', '>', 0));
+    }
+
     public function convertQuantity($quantity)
     {
         if ($this->units()->count() > 0) {

@@ -37,7 +37,7 @@ class SaleInvoiceContoller extends Controller
         $stocks = Stock::get();
         $safes = Tree4::where('tree3_code', '1202')->get();
         $banks = Tree4::where('tree3_code', '1203')->get();
-        $products = Product::with('stocks', 'units')->inRandomOrder()->get();
+        $products = Product::with('stocks', 'units')->available()->inRandomOrder()->get();
 
         return view('sale.create', compact('customers', 'representatives', 'invoice_number', 'stocks', 'safes', 'banks', 'products'));
     }
@@ -214,8 +214,15 @@ class SaleInvoiceContoller extends Controller
         $representatives = Tree4::where('tree3_code', '1206')->get();
         $safes = Tree4::where('tree3_code', '1202')->get();
         $banks = Tree4::where('tree3_code', '1203')->get();
-        $products = Product::with('stocks', 'units')->inRandomOrder()->get();
         $productIds = $sale_invoice->details()->pluck('product_id')->toArray();
+        $products = Product::with('stocks', 'units')
+            ->when(! auth()->user()->can('بيع منتجات غير متوفرة'), function ($query) use ($productIds) {
+                $query->where(function ($query) use ($productIds) {
+                    $query->available()->orWhereIn('id', $productIds);
+                });
+            })
+            ->inRandomOrder()
+            ->get();
 
         return view('sale.edit', compact('sale_invoice', 'customers', 'representatives', 'stocks', 'safes', 'banks', 'products', 'productIds'));
     }
@@ -415,9 +422,26 @@ class SaleInvoiceContoller extends Controller
 
     public function getProduct(Request $request): JsonResponse
     {
-        $product = Product::with(['units:id,name', 'stocks:id,name']) // تحميل علاقة الوحدات
-            ->where('id', $request->product_id)
-            ->first(); // جلب أول منتج مطابق
+        $productIds = collect($request->input('product_ids', []))
+            ->filter(fn($id) => is_numeric($id))
+            ->map(fn($id) => (int) $id);
+
+        $productQuery = Product::with(['units:id,name', 'stocks:id,name']);
+
+        if ($request->filled('product_id')) {
+            $productQuery->where('id', $request->product_id);
+        } else {
+            $productName = $request->input('name');
+            $productQuery->where(function ($query) use ($productName) {
+                $query->where('name', $productName)->orWhere('barcode', $productName);
+            });
+        }
+
+        $product = (clone $productQuery)->available()->first();
+
+        if (!$product && $productIds->isNotEmpty()) {
+            $product = (clone $productQuery)->whereIn('id', $productIds)->first();
+        }
 
         // إذا لم يتم العثور على المنتج
         if (!$product) {
@@ -426,6 +450,8 @@ class SaleInvoiceContoller extends Controller
                 'message' => 'هذا المنتج غير متوفر .',
             ]);
         }
+
+        $isInInvoice = $productIds->contains($product->id);
         // EXPIRY-HIDDEN
         // إذا كان تاريخ الصلاحية قد انتهى
         // if ($product->expire_date && $product->expire_date < now()) {
@@ -438,7 +464,7 @@ class SaleInvoiceContoller extends Controller
         $requireStock = $request->boolean('require_stock');
         $availableStocks = $product->stocks()->wherePivot('quantity', '>', 0)->get(['stocks.id', 'stocks.name']);
 
-        if ($requireStock && $availableStocks->isEmpty()) {
+        if ($requireStock && $availableStocks->isEmpty() && !$isInInvoice) {
             return response()->json([
                 'success' => false,
                 'no_stock' => true,
@@ -482,16 +508,13 @@ class SaleInvoiceContoller extends Controller
     {
         $search = $request->input('search');
         $type = $request->type;
-        $available = $request->boolean('available');
 
         $products = Product::query()
             ->select('id', 'name', 'barcode')
             ->where(function ($query) use ($search) {
                 $query->where('name', 'LIKE', "%$search%")->orWhere('barcode', $search);
             })
-            ->when($available, function ($query) {
-                $query->whereHas('stocks', fn ($q) => $q->where('product_stocks.quantity', '>', 0));
-            })
+            ->available()
             ->with('units')
             ->when($search !== null && $search !== '', fn ($query) => $query->limit(20))
             ->get();

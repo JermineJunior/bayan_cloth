@@ -15,7 +15,9 @@
     @php
         $categories = collect(config('reports_menu'))->map(function ($cat) {
             $cat['items'] = collect($cat['items'])
-                ->filter(fn($i) => \Illuminate\Support\Facades\Route::has($i['route']) && auth()->user()->can($i['can']))
+                ->filter(fn($i) => \Illuminate\Support\Facades\Route::has($i['route'])
+                    && auth()->user()->can($i['can'])
+                    && (! isset($i['branch_setting']) || branchSetting($i['branch_setting'])))
                 ->values();
             return $cat;
         })->filter(fn($cat) => $cat['items']->isNotEmpty());

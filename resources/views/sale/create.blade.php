@@ -471,7 +471,7 @@
             function lookupProduct(showError) {
                     const productName = $('#add-product').val().trim();
                     if (productName) {
-                        fetch('{{ route('product.getProduct') }}', {
+                        fetch('{{ route('invoice.getProduct') }}', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

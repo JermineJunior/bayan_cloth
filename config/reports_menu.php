@@ -56,6 +56,7 @@ return [
             ['label' => 'تقرير المبيعات حسب المندوب', 'route' => 'report.sale_invoice.representative.index', 'can' => 'تقرير المبيعات حسب المندوب'],
             ['label' => 'تقرير مردود المبيعات حسب المندوب', 'route' => 'report.sale_invoice_return.representative.index', 'can' => 'تقرير مردود المبيعات حسب المندوب'],
             ['label' => 'تقرير مديونيات عملاء المندوب', 'route' => 'report.representative.customer.index', 'can' => 'تقرير مديونيات عملاء المندوب'],
+            ['label' => 'تقرير عمولة المندوب', 'route' => 'report.representative.cut.index', 'can' => 'تقرير عمولة المندوب', 'branch_setting' => 'enable_rep_cut'],
         ],
     ],
     'stock' => [

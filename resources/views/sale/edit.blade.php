@@ -554,7 +554,7 @@
             function lookupProduct(showError) {
                     const productName = $('#add-product').val().trim();
                     if (productName) {
-                        fetch('{{ route('product.getProduct') }}', {
+                        fetch('{{ route('invoice.getProduct') }}', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -563,7 +563,8 @@
                                 body: JSON.stringify({
                                     name: productName,
                                     type: 1,
-                                    require_stock: 1
+                                    require_stock: 1,
+                                    product_ids: productIds
                                 })
                             })
                             .then(response => response.json())
@@ -1435,7 +1436,8 @@
                     data: JSON.stringify({
                         product_id: button.data('id'),
                         stock_id: $('#stock_id').val(),
-                        require_stock: 1
+                        require_stock: 1,
+                        product_ids: productIds
                     }),
                     success(data) {
                         if (data.success) {
