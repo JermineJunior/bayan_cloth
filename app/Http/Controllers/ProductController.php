@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
 use App\Models\Unit;
 use App\Models\Stock;
 use App\Models\Product;
@@ -376,15 +375,14 @@ class ProductController extends Controller
     public function opening(): View
     {
         $products = Product::with('stocks', 'units')->inRandomOrder()->take(5)->get();
-        $stock_details = StockDetail::where('type', 7)->where('branch_id', session('branch_id'))->get();
         $stocks = Stock::get();
-        foreach ($stock_details as $value) {
-            $product = Product::with('units')->find($value->product_id);
-            $conversion_factor = $product->units()->firstWhere('unit_id', $value->unit_id)->pivot->conversion_factor;
-            $qty = $value->wared / $conversion_factor;
-            $value->qty = $qty;
-        }
-        return view('product.open', compact('products', 'stock_details', 'stocks'));
+        $history = StockDetail::with(['product.units', 'unit', 'stock', 'user'])
+            ->where('type', 7)
+            ->where('branch_id', session('branch_id'))
+            ->latest()
+            ->get();
+
+        return view('product.open', compact('products', 'history', 'stocks'));
     }
 
     public function opening_store(Request $request): RedirectResponse
@@ -401,28 +399,6 @@ class ProductController extends Controller
                 'qty' => 'required|array',
                 'qty.*' => 'numeric',
             ]);
-
-            $productStockQunatity = StockDetail::where('branch_id', session('branch_id'))->where('type', 7)->get();
-
-            StockDetail::where([
-                'type' => 7,
-                'branch_id' => session('branch_id'),
-            ])->delete();
-            foreach ($productStockQunatity as $item) {
-                $product = Product::with(['stocks', 'units'])->find($item->product_id);
-                if (!$product) {
-                    continue;
-                }
-
-                $stock = $product->stocks()->where('stock_id', $item->stock_id)->first();
-
-                if (!$stock) {
-                    continue;
-                }
-
-                $qtyBack = $item->wared;
-                $product->stocks()->updateExistingPivot($item->stock_id, ['quantity' => $stock->pivot->quantity - $qtyBack]);
-            }
 
             $product_ids = array_values($request->product_id);
             $unit_ids = array_values($request->unit_id);
@@ -510,22 +486,38 @@ class ProductController extends Controller
         }
     }
 
-    public function updateQty(Request $request)
+    public function opening_destroy(StockDetail $stockDetail): RedirectResponse
     {
-        foreach ($request->deleted_products as $product) {
-            StockDetail::where(['type' => 7, 'product_id' => $product['id'], 'stock_id' => $product['stockId'], 'branch_id' => session('branch_id')])
-                ->whereYear('created_at', Carbon::now()->year)
-                ->delete();
-            $productqty = Product::with('units', 'stocks')->firstWhere('id', $product['id']);
-            $conversion_factor = $productqty->units()->firstWhere('unit_id', $product['unitId'])->pivot->conversion_factor;
-            $qty = $product['qty'] * $conversion_factor;
-            $productStock = $productqty->stocks->where('id', $product['stockId'])->first();
-            $newQuantity = $productStock->pivot->quantity - $qty;
-            $productqty->stocks()->syncWithoutDetaching([
-                $product['stockId'] => ['quantity' => $newQuantity],
-            ]);
+        abort_unless($stockDetail->type == 7 && $stockDetail->branch_id == session('branch_id'), 404);
+
+        try {
+            DB::beginTransaction();
+
+            $product = Product::with('stocks')->find($stockDetail->product_id);
+            $stock = $product?->stocks()->where('stock_id', $stockDetail->stock_id)->first();
+
+            if (!$product || !$stock) {
+                DB::rollBack();
+                return back()->withErrors('حدث خطا ما ');
+            }
+
+            $newQuantity = (float) $stock->pivot->quantity - (float) $stockDetail->wared;
+
+            if ($newQuantity < 0) {
+                DB::rollBack();
+                return back()->withErrors('لا يمكن حذف الرصيد لأن الكمية الحالية أقل منه');
+            }
+
+            $product->stocks()->updateExistingPivot($stockDetail->stock_id, ['quantity' => $newQuantity]);
+            $stockDetail->delete();
+
+            DB::commit();
+
+            return back()->with('success_deleted', 'تم الحذف بنجاح');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors('حدث خطا ما ');
         }
-        return response()->json(['success' => true, 'message' => 'تم تحديث الكمية بنجاح']);
     }
 
     public function excel_create()

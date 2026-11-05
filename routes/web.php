@@ -84,7 +84,7 @@ Route::group(
         Route::get(uri: '/check-name', action: [ProductController::class, 'checkName'])->name(name: 'product.checkName');
         Route::get(uri: '/product/opening', action: [ProductController::class, 'opening'])->name(name: 'product.opening');
         Route::post(uri: '/product/opening', action: [ProductController::class, 'opening_store'])->name(name: 'product.opening.store');
-        Route::post(uri: 'product/checkQty', action: [ProductController::class, 'updateQty'])->name(name: 'product.updateQty');
+        Route::delete(uri: '/product/opening/{stockDetail}', action: [ProductController::class, 'opening_destroy'])->name(name: 'product.opening.destroy');
         Route::get(uri: 'product/excel/create', action: [ProductController::class, 'excel_create'])->name(name: 'product.excel.create');
         Route::post(uri: 'product/excel/store', action: [ProductController::class, 'excel_store'])->name(name: 'product.excel.store');
         Route::post(uri:'product/percent',action:[ProductController::class,'percent'])->name(name:'product.percent');

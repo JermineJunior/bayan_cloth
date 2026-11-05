@@ -55,53 +55,7 @@
                                         <th>حذف</th>
                                     </tr>
                                 </thead>
-                                <tbody id="product-rows">
-                                    @foreach ($stock_details as $stock_detail)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
-                                                <input type="text" id="product_name_{{ $loop->iteration }}"
-                                                    name="product_name[{{ $loop->iteration }}]"
-                                                    class="form-control product_name"
-                                                    value="{{ $stock_detail->product->name }}" readonly>
-                                                <input type="hidden" id="product_id_{{ $loop->iteration }}"
-                                                    name="product_id[{{ $loop->iteration }}]" class="product_id"
-                                                    value="{{ $stock_detail->product_id }}">
-                                            </td>
-                                            <td>
-                                                <select id="unit_id_{{ $loop->iteration }}" class="form-control unit_id"
-                                                    name="unit_id[{{ $loop->iteration }}]"
-                                                    data-product-id="{{ $stock_detail->product_id }}"
-                                                    data-unit_id="{{ $stock_detail->unit_id }}">
-                                                    @foreach ($stock_detail->product->units as $unit)
-                                                        <option @selected($unit->id == $stock_detail->unit_id) value="{{ $unit->id }}">
-                                                            {{ $unit->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input type="text" id="qty_{{ $loop->iteration }}"
-                                                    class="form-control qty" name="qty[{{ $loop->iteration }}]"
-                                                    value="{{ number_format($stock_detail->qty) }}"
-                                                    data-qty="{{ $stock_detail->qty }}">
-                                            </td>
-                                            <td>
-                                                <select id="stock_id_{{ $loop->iteration }}" class="form-control stock_id"
-                                                    name="stock_id[{{ $loop->iteration }}]"
-                                                    data-stock_id="{{ $stock_detail->stock_id }}">
-                                                    @foreach ($stocks as $stock)
-                                                        <option @selected($stock->id == $stock_detail->stock_id) value="{{ $stock->id }}">
-                                                            {{ $stock->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn btn-danger remove-product"><i
-                                                        class="fa fa-trash"></i></button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
+                                <tbody id="product-rows"></tbody>
                             </table>
                             <div class="col-12 text-center">
                                 <button type="submit" class="btn btn-primary mb-4" id="save-invoice">حفظ</button>
@@ -116,8 +70,90 @@
             </div>
         </div>
     </form>
+
+    <div class="row row-sm">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-outline-primary" type="button" data-toggle="collapse"
+                        data-target="#openingHistory" aria-expanded="false" aria-controls="openingHistory">
+                        سجل الأرصدة الافتتاحية
+                    </button>
+                </div>
+                <div class="collapse" id="openingHistory">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>التاريخ</th>
+                                        <th>المنتج</th>
+                                        <th>الوحدة</th>
+                                        <th>الكمية</th>
+                                        <th>المخزن</th>
+                                        <th>المستخدم</th>
+                                        <th>حذف</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($history as $historyItem)
+                                        @php
+                                            $conversionFactor =
+                                                $historyItem->product?->units->firstWhere('id', $historyItem->unit_id)
+                                                    ?->pivot->conversion_factor ?: 1;
+                                        @endphp
+                                        <tr>
+                                            <td>{{ $historyItem->created_at?->format('Y-m-d') }}</td>
+                                            <td>{{ $historyItem->product?->name }}</td>
+                                            <td>{{ $historyItem->unit?->name }}</td>
+                                            <td>{{ number_format($historyItem->wared / $conversionFactor, 2) }}</td>
+                                            <td>{{ $historyItem->stock?->name }}</td>
+                                            <td>{{ $historyItem->user?->name }}</td>
+                                            <td>
+                                                <button type="button"
+                                                    class="btn btn-outline-danger btn-sm modal-effect"
+                                                    data-toggle="modal" data-target="#deleteOpeningModal"
+                                                    data-id="{{ $historyItem->id }}">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center">لا توجد أرصدة افتتاحية</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    </div>
+
+    <div class="modal" id="deleteOpeningModal">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content modal-content-demo">
+                <div class="modal-header">
+                    <h6 class="modal-title">حذف الرصيد الافتتاحي</h6>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6>هل تريد حذف هذا السجل بالفعل ؟</h6>
+                </div>
+                <div class="modal-footer">
+                    <form action="#" method="POST" id="delete_opening">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn ripple btn-danger" type="submit">حذف</button>
+                    </form>
+                    <button class="btn ripple btn-secondary" data-dismiss="modal" type="button">إلغاء</button>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -130,11 +166,10 @@
     <script src="{{ URL::asset('assets/plugins/form_validation/jquery.validate.min.js') }}"></script>
     <script src="{{ URL::asset('assets/plugins/form_validation/additional-methods.min.js') }}"></script>
     <script src="{{ URL::asset('assets/plugins/form_validation/messages_ar.js') }}"></script>
+    <script src="{{ URL::asset('assets/js/modal.js') }}"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            let deletedProducts = [];
-
             document.getElementById('add-product').focus();
             $('select').select2();
             $('#cash_name').select2();
@@ -270,16 +305,7 @@
             $(document).on('click', '.remove-product', function() {
                 let currentRow = $(this).closest('tr');
                 let productId = currentRow.find('.product_id').val();
-                let originalQuantity = currentRow.find('.qty').data('qty');
-                let stockId = currentRow.find('.stock_id').data('stock_id');
-                let unitId = currentRow.find('.unit_id').data('unit_id');
                 addedProducts = addedProducts.filter(id => id !== productId);
-                deletedProducts.push({
-                    id: productId,
-                    qty: originalQuantity,
-                    stockId: stockId,
-                    unitId: unitId,
-                });
                 currentRow.remove();
             });
 
@@ -373,9 +399,15 @@
                 },
                 submitHandler: function(form) {
                     cleanNumbersBeforeSubmit();
-                    updateProductQty(deletedProducts);
                     form.submit();
                 }
+            });
+
+            $('#deleteOpeningModal').on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var id = button.data('id');
+                $('#delete_opening').attr('action', '{{ route('product.opening.destroy', ':id') }}'.replace(
+                    ':id', id));
             });
 
 
@@ -601,27 +633,5 @@
             });
         }
 
-        function updateProductQty(deletedProducts) {
-            if (deletedProducts.length > 0) {
-                $.ajax({
-                    url: '{{ route('product.updateQty') }}',
-                    type: "POST",
-                    data: {
-                        deleted_products: deletedProducts,
-                        _token: '{{ csrf_token() }}',
-                        stock_id: $('#stock_id').data('stock_id'),
-                    },
-                    success: function(response) {
-                        deletedProducts = []; // مسح المصفوفة بعد الحفظ
-                    },
-                    error: function(xhr) {
-                        notif({
-                            type: 'error',
-                            message: 'حدث خطأ أثنا�� تحديث الكمية'
-                        });
-                    }
-                });
-            }
-        }
     </script>
 @endsection
