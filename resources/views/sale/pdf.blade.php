@@ -262,13 +262,6 @@
                         <td colspan="2">{{ number_format($sale_invoice->delivery_cost, 2) }}</td>
                     </tr>
                 @endif
-                @if ((float) $sale_invoice->rep_cut_amount > 0)
-                    <tr>
-                        <td colspan="3"></td>
-                        <td colspan="2">عمولة المندوب</td>
-                        <td colspan="2">{{ number_format($sale_invoice->rep_cut_amount, 2) }}</td>
-                    </tr>
-                @endif
                 <tr>
                     <td colspan="3"></td>
                     <td colspan="2">صافي الفاتورة</td>

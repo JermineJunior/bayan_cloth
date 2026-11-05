@@ -56,7 +56,7 @@ class SaleInvoiceReturnController extends Controller
                     'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
                     'delivery_cost' => branchSetting('enable_delivery_cost') ? ($request->get('delivery_cost') ?: 0) : 0,
-                    'rep_cut_amount' => branchSetting('enable_rep_cut') ? ($request->get('rep_cut_amount') ?: 0) : 0,
+                    'rep_cut_amount' => 0,
                     'status' => 1,
                     'cash_name' => $request->get('cash_name'),
                     'bank_name' => $request->get('bank_name'),
@@ -72,6 +72,7 @@ class SaleInvoiceReturnController extends Controller
                 ],
             );
 
+            $repCut = 0;
             foreach ($request->product_id as $index => $product_id) {
                 $sale_invoice_return->details()->create(
                     attributes: [
@@ -88,6 +89,7 @@ class SaleInvoiceReturnController extends Controller
 
                 $product = Product::whereId($product_id)->first();
                 $product_unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
+                $repCut += (float) $request->qty[$index] * (float) ($product_unit->pivot->rep_cut ?? 0);
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $product_unit->pivot->conversion_factor;
 
                 $productStock = $product->stocks()->where('stock_id', $request->stock_id)->first();
@@ -155,6 +157,7 @@ class SaleInvoiceReturnController extends Controller
                 }
             }
 
+            if ($request->representative_id && branchSetting('enable_rep_cut')) { $sale_invoice_return->update(['rep_cut_amount' => round($repCut, 2)]); }
             DB::commit();
 
             return redirect()->route('sale_invoice_return.show', $sale_invoice_return->id);
@@ -218,7 +221,6 @@ class SaleInvoiceReturnController extends Controller
             StockDetail::where('sale_invoice_return_id', $sale_invoice_return->id)->where('branch_id', session('branch_id'))->delete();
 
             $originalDeliveryCost = $sale_invoice_return->delivery_cost;
-            $originalRepCutAmount = $sale_invoice_return->rep_cut_amount;
             $invoice_number = $sale_invoice_return->invoice_number;
             $sale_invoice_return->delete();
 
@@ -235,7 +237,7 @@ class SaleInvoiceReturnController extends Controller
                     'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
                     'delivery_cost' => branchSetting('enable_delivery_cost') ? ($request->get('delivery_cost') ?: 0) : $originalDeliveryCost,
-                    'rep_cut_amount' => branchSetting('enable_rep_cut') ? ($request->get('rep_cut_amount') ?: 0) : $originalRepCutAmount,
+                    'rep_cut_amount' => 0,
                     'payment_status' => $request->get('payment_status'),
                     'status' => 1,
                     'cash_name' => $request->get('cash_name'),
@@ -252,6 +254,7 @@ class SaleInvoiceReturnController extends Controller
                 ],
             );
 
+            $repCut = 0;
             foreach ($request->product_id as $index => $product_id) {
                 $sale_invoice_return->details()->create(
                     attributes: [
@@ -268,6 +271,7 @@ class SaleInvoiceReturnController extends Controller
 
                 $product = Product::whereId($product_id)->first();
                 $unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
+                $repCut += (float) $request->qty[$index] * (float) ($unit->pivot->rep_cut ?? 0);
                 $stock = $product->stocks()->where('stock_id', $request->stock_id)->first();
 
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $unit->pivot->conversion_factor;
@@ -330,6 +334,7 @@ class SaleInvoiceReturnController extends Controller
                 }
             }
 
+            if ($request->representative_id && branchSetting('enable_rep_cut')) { $sale_invoice_return->update(['rep_cut_amount' => round($repCut, 2)]); }
             DB::commit();
 
             return redirect()->route('sale_invoice_return.index')->with('success_created', 'Product created successfully.');

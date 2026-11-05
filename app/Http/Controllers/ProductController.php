@@ -62,6 +62,7 @@ class ProductController extends Controller
                         'price' => $unit['price'] ?? 0,
                         'conversion_factor' => $unit['conversion_factor'],
                         'price_purchase' => $unit['price_purchase'] ?? 0,
+                        'rep_cut' => $unit['rep_cut'] ?? 0,
                     ],
                 ];
             });
@@ -164,6 +165,7 @@ class ProductController extends Controller
                             'price' => $unit['price'] ?? 0,
                             'conversion_factor' => $unit['conversion_factor'],
                             'price_purchase' => $unit['price_purchase'] ?? 0,
+                            'rep_cut' => $unit['rep_cut'] ?? 0,
                         ],
                     ];
                 })

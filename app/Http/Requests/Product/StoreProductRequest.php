@@ -57,6 +57,7 @@ class StoreProductRequest extends FormRequest
             'units.*.unit_id' => 'required|exists:units,id',
             'units.*.price' => 'nullable|numeric|min:0',
             'units.*.price_purchase' => 'nullable|numeric|min:0',
+            'units.*.rep_cut' => 'nullable|numeric|min:0',
         ];
     }
 

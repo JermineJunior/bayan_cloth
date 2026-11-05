@@ -135,6 +135,12 @@
                                                 value="{{ old('units.0.price_purchase', 0) }}">
                                         </div>
                                         <div class="col-md-3">
+                                            <label for="rep_cut" class="form-label">عمولة المندوب</label>
+                                            <input type="text" name="units[0][rep_cut]" id="rep_cut"
+                                                class="form-control product_rep_cut" placeholder="0"
+                                                value="{{ old('units.0.rep_cut', 0) }}" min="0">
+                                        </div>
+                                        <div class="col-md-3">
                                             <input type="hidden" name="units[0][conversion_factor]"
                                                 id="conversion_factor" class="form-control product_conversion_factor"
                                                 placeholder="ادخل كمية الوحدة" value="1" readonly>
@@ -195,6 +201,10 @@
                                             <label for="price_purchase_${unitIndex}" class="form-label">سعر الشراء</label>
                                             <input type="text" name="units[${unitIndex}][price_purchase]" id="price_purchase_${unitIndex}" class="form-control product_price_purchase" placeholder="ادخل سعر شراء الوحدة" value="0">
                                         </div>
+                                        <div class="col-md-3">
+                                            <label for="rep_cut_${unitIndex}" class="form-label">عمولة المندوب</label>
+                                            <input type="text" name="units[${unitIndex}][rep_cut]" id="rep_cut_${unitIndex}" class="form-control product_rep_cut" placeholder="0" value="0" min="0">
+                                        </div>
                                         <div class="col-md-2">
                                             <label for="conversion_factor_${unitIndex}" class="form-label">معامل الوحدة</label>
                                             <input type="text" name="units[${unitIndex}][conversion_factor]" id="conversion_factor_${unitIndex}" class="form-control product_conversion_factor" required placeholder="كم تساوي من اصغر وحدة">
@@ -244,6 +254,7 @@
                 // **هنا: استدعاء دالة attachCommaFormatter على الحقول الجديدة فقط**
                 attachCommaFormatter(`#price_${unitIndex}`);
                 attachCommaFormatter(`#price_purchase_${unitIndex}`);
+                attachCommaFormatter(`#rep_cut_${unitIndex}`);
                 attachCommaFormatter(`#conversion_factor_${unitIndex}`);
 
                 unitIndex++;
@@ -390,6 +401,7 @@
 
             attachCommaFormatter('#price');
             attachCommaFormatter('#price_purchase');
+            attachCommaFormatter('#rep_cut');
             attachCommaFormatter('#conversion_factor');
 
 
@@ -448,6 +460,11 @@
                 }
             });
             document.querySelectorAll('.product_price_purchase').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+            document.querySelectorAll('.product_rep_cut').forEach(el => {
                 if (el.value) {
                     el.value = el.value.replace(/,/g, '');
                 }

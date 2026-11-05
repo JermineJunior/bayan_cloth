@@ -129,6 +129,7 @@ class PreliminaryInvoiceController extends Controller
                     'tax_amount' => $request->get('tax'),
                     'tax_status' => $request->get('tax_status') ? 1 : 0,
                     'total_amount' => $request->get('total'),
+                    'rep_cut_amount' => 0,
                     'status' => 1,
                     'cash_name' => $request->get('cash_name'),
                     'bank_name' => $request->get('bank_name'),
@@ -144,6 +145,7 @@ class PreliminaryInvoiceController extends Controller
                 ],
             );
 
+            $repCut = 0;
             foreach ($request->product_id as $index => $product_id) {
                 $sale_invoice->details()->create(
                     attributes: [
@@ -160,6 +162,7 @@ class PreliminaryInvoiceController extends Controller
                 );
                 $product = Product::whereId($product_id)->first();
                 $product_unit = $product->units()->where('unit_id', $request->unit_id[$index])->first();
+                $repCut += (float) $request->qty[$index] * (float) ($product_unit->pivot->rep_cut ?? 0);
                 $qty = ($request->qty[$index] + $request->bounce[$index]) * $product_unit->pivot->conversion_factor;
                 $productStock = $product->stocks()->where('stock_id', $request->stock_id[$index])->first();
                 $availableQty = $productStock ? $productStock->pivot->quantity : 0;
@@ -187,6 +190,10 @@ class PreliminaryInvoiceController extends Controller
                         $request->stock_id[$index] => ['quantity' => $newQuantity],
                     ]);
                 }
+            }
+
+            if ($request->representative_id && branchSetting('enable_rep_cut')) {
+                $sale_invoice->update(['rep_cut_amount' => round($repCut, 2)]);
             }
 
             $last_constant_number = Restriction::where('branch_id', session('branch_id'))->max('constant_number');

@@ -143,6 +143,14 @@
                                                     placeholder="ادخل سعر الشراء الوحدة"
                                                     value="{{ number_format($item->pivot->price_purchase) }}">
                                             </div>
+                                            <div class="col-md-3">
+                                                <label for="rep_cut" class="form-label">عمولة المندوب</label>
+                                                <input type="text" name="units[{{ $loop->index }}][rep_cut]"
+                                                    id="rep_cut_{{ $loop->index }}"
+                                                    class="form-control product_rep_cut"
+                                                    placeholder="0" min="0"
+                                                    value="{{ number_format($item->pivot->rep_cut ?? 0, 2) }}">
+                                            </div>
                                             <div class="{{ $loop->index != 0 ? 'col-md-2' : 'col-md-3' }}">
                                                 @if ($loop->index != 0)
                                                     <label for="conversion_factor" class="form-label">عامل الوحدة</label>
@@ -185,6 +193,12 @@
                                                     <input type="text" name="units[0][price_purchase]"
                                                         id="price_purchase" class="form-control product_price_purchase"
                                                         placeholder="ادخل سعر الشراء الوحدة">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label for="rep_cut" class="form-label">عمولة المندوب</label>
+                                                    <input type="text" name="units[0][rep_cut]" id="rep_cut"
+                                                        class="form-control product_rep_cut"
+                                                        placeholder="0" min="0" value="{{ old('units.0.rep_cut', 0) }}">
                                                 </div>
                                                 <div class="col-md-3">
                                                     <input type="hidden" name="units[0][conversion_factor]"
@@ -245,6 +259,10 @@
                             <label for="price_purchase_${unitIndex}" class="form-label">سعر الشراء</label>
                             <input type="text" name="units[${unitIndex}][price_purchase]" id="price_purchase_${unitIndex}" class="form-control product_price_purchase" required placeholder="ادخل سعر الشراء الوحدة">
                         </div>
+                        <div class="col-md-3">
+                            <label for="rep_cut_${unitIndex}" class="form-label">عمولة المندوب</label>
+                            <input type="text" name="units[${unitIndex}][rep_cut]" id="rep_cut_${unitIndex}" class="form-control product_rep_cut" placeholder="0" value="0" min="0">
+                        </div>
                         <div class="col-md-2">
                             <label for="conversion_factor_${unitIndex}" class="form-label">معامل الوحدة</label>
                             <input type="text" name="units[${unitIndex}][conversion_factor]" id="conversion_factor_${unitIndex}" class="form-control product_conversion_factor" required placeholder="كم تساوي من اصفر وحدة">
@@ -296,6 +314,7 @@
 
                 attachCommaFormatter(`#price_${unitIndex}`);
                 attachCommaFormatter(`#price_purchase_${unitIndex}`);
+                attachCommaFormatter(`#rep_cut_${unitIndex}`);
                 attachCommaFormatter(`#conversion_factor_${unitIndex}`);
 
                 unitIndex++;
@@ -501,6 +520,7 @@
 
             attachCommaFormatter('.product_price');
             attachCommaFormatter('.product_price_purchase');
+            attachCommaFormatter('.product_rep_cut');
             attachCommaFormatter('.product_conversion_factor');
 
         });
@@ -557,6 +577,11 @@
                 }
             });
             document.querySelectorAll('.product_price_purchase').forEach(el => {
+                if (el.value) {
+                    el.value = el.value.replace(/,/g, '');
+                }
+            });
+            document.querySelectorAll('.product_rep_cut').forEach(el => {
                 if (el.value) {
                     el.value = el.value.replace(/,/g, '');
                 }

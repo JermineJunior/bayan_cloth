@@ -21,7 +21,7 @@ class Product extends Model
 
     public function units(): BelongsToMany
     {
-        return $this->belongsToMany(Unit::class, 'product_units')->withPivot('price', 'price_purchase', 'conversion_factor');
+        return $this->belongsToMany(Unit::class, 'product_units')->withPivot('price', 'price_purchase', 'conversion_factor', 'rep_cut');
     }
 
     public function stocks(): BelongsToMany

@@ -281,15 +281,6 @@
                                     <input type="hidden" id="delivery_cost" name="delivery_cost" value="0.00">
                                     <div class="col-md-3"></div>
                                 @endif
-                                @if (branchSetting('enable_rep_cut'))
-                                    <div class="col-md-2">
-                                        <label>عمولة المندوب</label>
-                                        <input type="text" name="rep_cut_amount" id="rep_cut_amount" class="form-control" value="0.00">
-                                    </div>
-                                @else
-                                    <input type="hidden" id="rep_cut_amount" name="rep_cut_amount" value="0.00">
-                                    <div class="col-md-2"></div>
-                                @endif
                                 <div class="col-md-7">
                                     <label>كاش</label>
                                     <div class="form-row-inline">
@@ -731,10 +722,6 @@
             });
 
             document.getElementById('delivery_cost').addEventListener('input', function() {
-                totalPrice();
-            });
-
-            document.getElementById('rep_cut_amount').addEventListener('input', function() {
                 totalPrice();
             });
 
@@ -1363,7 +1350,6 @@
             attachCommaFormatter(
                 '#discount');
             attachCommaFormatter('#delivery_cost');
-            attachCommaFormatter('#rep_cut_amount');
 
             document.getElementById('invoiceForm').addEventListener('submit', function(e) {
                 cleanNumbersBeforeSubmit();
@@ -1435,14 +1421,13 @@
 
             let discount = unformat(document.getElementById('discount').value) || 0;
             let delivery_cost = unformat(document.getElementById('delivery_cost').value) || 0;
-            let rep_cut_amount = unformat(document.getElementById('rep_cut_amount').value) || 0;
             let tax = $('#apply_tax').is(':checked') ? unformat(sub_total * 17 / 100) || 0 : 0;
             document.getElementById('tax').value = format(tax);
 
             let cash = unformat(document.getElementById('cash_amount_total').value) || 0;
             let bank = unformat(document.getElementById('bank_amount_total').value) || 0;
 
-            let total = unformat(sub_total + tax - discount + delivery_cost + rep_cut_amount);
+            let total = unformat(sub_total + tax - discount + delivery_cost);
             document.getElementById('total').value = format(total);
             document.getElementById('deferend_amount').value = format(total - cash - bank);
 
@@ -1493,7 +1478,7 @@
 
             // نفس الشيء للحقول الفردية:
             let singleFields = ['cash_amount_total', 'bank_amount_total', 'discount', 'sub_total', 'tax', 'total',
-                'deferend_amount', 'delivery_cost', 'rep_cut_amount'
+                'deferend_amount', 'delivery_cost'
             ];
             singleFields.forEach(id => {
                 let el = document.getElementById(id);
