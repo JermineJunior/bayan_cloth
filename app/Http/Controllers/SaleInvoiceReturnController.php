@@ -20,7 +20,7 @@ class SaleInvoiceReturnController extends Controller
 {
     public function index()
     {
-        $sale_invoice_returns = SaleInvoiceReturn::where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
+        $sale_invoice_returns = SaleInvoiceReturn::visible()->where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
         return view('sale_return.index', compact('sale_invoice_returns'));
     }
     public function create(Request $request): View
@@ -223,6 +223,7 @@ class SaleInvoiceReturnController extends Controller
 
             $originalDeliveryCost = $sale_invoice_return->delivery_cost;
             $originalRepresentativeId = $sale_invoice_return->representative_id;
+            $originalUserId = $sale_invoice_return->user_id;
             $invoice_number = $sale_invoice_return->invoice_number;
             $sale_invoice_return->delete();
 
@@ -253,7 +254,7 @@ class SaleInvoiceReturnController extends Controller
                     'deferend_amount' => $request->get('deferend_amount'),
                     'invoice_status' => $invoice_status,
                     'note' => $request->note,
-                    'user_id' => Auth::id(),
+                    'user_id' => $originalUserId,
                     'branch_id' => session('branch_id'),
                 ],
             );

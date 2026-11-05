@@ -21,7 +21,7 @@ class PurchaseInvoiceController extends Controller
 {
     public function index(): View
     {
-        $purchase_invoices = PurchaseInvoice::where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
+        $purchase_invoices = PurchaseInvoice::visible()->where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
         return view('purchase.index', compact('purchase_invoices'));
     }
 
@@ -223,6 +223,7 @@ class PurchaseInvoiceController extends Controller
                 $product->stocks()->updateExistingPivot($purchase_invoice->stock_id, ['quantity' => $stock->pivot->quantity - $qtyBack]);
             }
 
+            $originalUserId = $purchase_invoice->user_id;
             $invoice_number = $purchase_invoice->invoice_number;
             $purchase_invoice->delete();
 
@@ -250,7 +251,7 @@ class PurchaseInvoiceController extends Controller
                     'invoice_status' => $invoice_status,
                     'note' => $request->note,
                     'branch_id' => session('branch_id'),
-                    'user_id' => Auth::id(),
+                    'user_id' => $originalUserId,
                 ],
             );
 

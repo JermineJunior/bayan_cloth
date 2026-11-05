@@ -20,7 +20,7 @@ class PreliminaryInvoiceController extends Controller
 {
     public function index(): View
     {
-        $preliminaryInvoices = PreliminaryInvoice::where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
+        $preliminaryInvoices = PreliminaryInvoice::visible()->where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
         return view('preliminaryInvoice.index', compact('preliminaryInvoices'));
     }
 
@@ -52,6 +52,7 @@ class PreliminaryInvoiceController extends Controller
                 'total_amount' => $request->total,
                 'note' => $request->note,
                 'branch_id' => session('branch_id'),
+                'user_id' => Auth::id(),
             ]);
 
             foreach ($request->product_id as $index => $product_id) {

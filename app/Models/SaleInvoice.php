@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\VisibleToOwner;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SaleInvoice extends Model
 {
+    use VisibleToOwner;
+
     protected $fillable = ['customer_id', '
     _id', 'representative_id', 'invoice_number', 'date', 'sub_total_amount', 'discount_amount', 'tax_amount', 'tax_status', 'total_amount', 'process_no', 'status', 'deferend_amount', 'cash_name', 'bank_name', 'cash_amount_total', 'bank_amount_total', 'transaction_no', 'branch_id', 'invoice_status', 'note', 'delivery_cost', 'rep_cut_amount'];
 

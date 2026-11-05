@@ -24,7 +24,7 @@ class SaleInvoiceContoller extends Controller
 {
     public function index(): View
     {
-        $sale_invoices = SaleInvoice::withCount('allocations')->where('branch_id', session('branch_id'))->orderBy('invoice_number', 'DESC')->get();
+        $sale_invoices = SaleInvoice::withCount('allocations')->visible()->where('branch_id', session('branch_id'))->orderBy('invoice_number', 'DESC')->get();
         return view('sale.index', compact('sale_invoices'));
     }
 
@@ -252,6 +252,7 @@ class SaleInvoiceContoller extends Controller
 
             $originalDeliveryCost = $sale_invoice->delivery_cost;
             $originalRepresentativeId = $sale_invoice->representative_id;
+            $originalUserId = $sale_invoice->user_id;
             $invoice_number = $sale_invoice->invoice_number;
             $sale_invoice->delete();
 
@@ -280,7 +281,7 @@ class SaleInvoiceContoller extends Controller
                 'invoice_status' => $invoice_status,
                 'note' => $request->note,
                 'branch_id' => session('branch_id'),
-                'user_id' => Auth::id(),
+                'user_id' => $originalUserId,
             ]);
 
             $repCut = 0;
@@ -515,7 +516,7 @@ class SaleInvoiceContoller extends Controller
 
     public function generatePDF($id)
     {
-        $sale_invoice = SaleInvoice::with(['tree4', 'details', 'details.product', 'details.unit', 'representative'])->findOrFail($id);
+        $sale_invoice = SaleInvoice::with(['tree4', 'details', 'details.product', 'details.unit', 'representative'])->visible()->findOrFail($id);
         $madinTotal = $dainTotal = $allDainTotal = $allMadinTotal = 0;
         if ($sale_invoice->customer_id) {
             $firstId = Restriction::where('sale_invoice_id', $sale_invoice->id)->min('id');

@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\VisibleToOwner;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PreliminaryInvoice extends Model
 {
-    protected $fillable = ['customer_id', 'representative_id', 'date', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount','tax_status', 'discount_amount','branch_id', 'note'];
+    use VisibleToOwner;
+
+    protected $fillable = ['customer_id', 'representative_id', 'date', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount','tax_status', 'discount_amount','branch_id', 'note', 'user_id'];
 
     public function details(): HasMany
     {

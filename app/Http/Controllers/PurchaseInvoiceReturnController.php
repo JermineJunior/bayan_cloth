@@ -20,7 +20,7 @@ class PurchaseInvoiceReturnController extends Controller
 {
     public function index(): View
     {
-        $purchase_invoice_returns = PurchaseInvoiceReturn::where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
+        $purchase_invoice_returns = PurchaseInvoiceReturn::visible()->where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
         return view('purchase_return.index', compact('purchase_invoice_returns'));
     }
 
@@ -215,6 +215,7 @@ class PurchaseInvoiceReturnController extends Controller
                 $product->stocks()->updateExistingPivot($purchase_invoice_return->stock_id, ['quantity' => $stock->pivot->quantity + $qtyBack]);
             }
 
+            $originalUserId = $purchase_invoice_return->user_id;
             $invoice_number = $purchase_invoice_return->invoice_number;
             $purchase_invoice_return->delete();
 
@@ -241,7 +242,7 @@ class PurchaseInvoiceReturnController extends Controller
                     'invoice_status' => $invoice_status,
                     'note' => $request->note,
                     'branch_id' => session('branch_id'),
-                    'user_id' => Auth::id(),
+                    'user_id' => $originalUserId,
                 ],
             );
 

@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\VisibleToOwner;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseInvoice extends Model
 {
+    use VisibleToOwner;
+
     protected $fillable = ['supplier_id', 'representative_id', 'invoice_number', 'stock_id', 'date', 'sub_total_amount', 'discount_amount', 'tax_amount', 'tax_status', 'total_amount', 'status', 'cash_name', 'bank_name', 'cash_amount_total', 'bank_amount_total', 'process_no','deferend_amount','transaction_no','branch_id','invoice_status','user_id','note'];
 
     public function supplier(): BelongsTo
