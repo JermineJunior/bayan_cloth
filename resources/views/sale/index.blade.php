@@ -109,13 +109,15 @@
                                         <td>{{ $sale_invoice->customer->tree4_name ?? '-' }}</td>
                                         <td>{{ number_format($sale_invoice->total_amount, 2) }}</td>
                                         <td>
-                                            @if ($sale_invoice->deferend_amount > 0)
-                                                <a class="btn btn-outline-primary btn-sm"
-                                                    href="{{ route('sale_invoice.pay.create', $sale_invoice->id) }}"
-                                                    title="سداد">
-                                                    <i class="fas fa-dollar-sign"></i>
-                                                </a>
-                                            @endif
+                                            @can('سداد فواتير المبيعات')
+                                                @if ($sale_invoice->deferend_amount > 0)
+                                                    <a class="btn btn-outline-primary btn-sm"
+                                                        href="{{ route('sale_invoice.pay.create', $sale_invoice->id) }}"
+                                                        title="سداد">
+                                                        <i class="fas fa-dollar-sign"></i>
+                                                    </a>
+                                                @endif
+                                            @endcan
                                             @can('طباعة فاتورة مبيعات')
                                                 <a class="btn btn-outline-info btn-sm"
                                                     href="{{ route('sale_invoice.print', $sale_invoice->id) }}" title="عرض">

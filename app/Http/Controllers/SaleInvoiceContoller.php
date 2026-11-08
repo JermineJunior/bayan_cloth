@@ -575,6 +575,8 @@ class SaleInvoiceContoller extends Controller
 
     public function pay_create(SaleInvoice $sale_invoice)
     {
+        abort_unless(auth()->user()->can('سداد فواتير المبيعات'), 403);
+
         $safes = Tree4::where('tree3_code', '1202')->get();
         $banks = Tree4::where('tree3_code', '1203')->get();
         return view('sale.pay', compact('sale_invoice', 'safes', 'banks'));
@@ -582,6 +584,8 @@ class SaleInvoiceContoller extends Controller
 
     public function pay_store(SaleInvoice $sale_invoice, Request $request)
     {
+        abort_unless(auth()->user()->can('سداد فواتير المبيعات'), 403);
+
         if ($request->cash_name == null and $request->bank_name == null) {
             return back()->withErrors('لا يمكنك اتمام العميلة في حالة م ادخلت اسم خزنة او اسم بنك');
         }
