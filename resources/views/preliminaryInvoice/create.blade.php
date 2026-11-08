@@ -6,20 +6,20 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <style>
         .invoice-card {
-            min-height: 75vh;
-            /* الكرت بطول الشاشة */
+            height: auto;
         }
 
         .invoice-body {
+            height: auto;
             display: flex;
             flex-direction: column;
         }
 
         /* فقط المنتجات تتحرك */
         .invoice-products {
-            flex: 0 0 auto;
-            min-height: 260px;
-            max-height: 50vh;
+            flex: none;
+            min-height: 140px;
+            max-height: max(160px, calc(100vh - 480px));
             overflow-y: auto;
             /* اسكرول رأسي */
             overflow-x: auto;

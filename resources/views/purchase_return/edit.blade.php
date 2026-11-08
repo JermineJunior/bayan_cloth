@@ -6,20 +6,20 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/select2/css/select2.min.css') }}" rel="stylesheet">
     <style>
         .invoice-card {
-            min-height: 75vh;
-            /* الكرت بطول الشاشة */
+            height: auto;
         }
 
         .invoice-body {
+            height: auto;
             display: flex;
             flex-direction: column;
         }
 
         /* فقط المنتجات تتحرك */
         .invoice-products {
-            flex: 0 0 auto;
-            min-height: 260px;
-            max-height: 50vh;
+            flex: none;
+            min-height: 140px;
+            max-height: max(160px, calc(100vh - 480px));
             overflow-y: auto;
             /* اسكرول رأسي */
             overflow-x: auto;
@@ -329,8 +329,7 @@
                                 </div>
 
                                 <div class="row g-2">
-                                    <div class="col-md-5"></div>
-                                    <div class="col-md-7">
+                                    <div class="col-md-6">
                                         <label>كاش</label>
                                         <div class="form-row-inline">
                                             <select id="cash_name" name="cash_name" class="form-control">
@@ -345,8 +344,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-5"></div>
-                                    <div class="col-md-7">
+                                    <div class="col-md-6">
                                         <label>بنك</label>
                                         <div class="form-row-inline">
                                             <select id="bank_name" name="bank_name" class="form-control">
