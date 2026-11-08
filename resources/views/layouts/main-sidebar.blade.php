@@ -96,7 +96,7 @@
                     </ul>
                 </li>
             @endcanany
-            @canany(['قائمة المخازن', 'قائمة المنتجات', 'التحويل بين المخازن', 'الارصدة الافتتاحية للمنتجات'])
+            @canany(['قائمة المخازن', 'قائمة المنتجات', 'التحويل بين المخازن', 'الارصدة الافتتاحية للمنتجات', 'تأكيد استلام المخزون'])
                 <li class="slide">
                     <a class="side-menu__item" data-toggle="slide" href="#"><svg xmlns="http://www.w3.org/2000/svg"
                             class="side-menu__icon" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
@@ -119,6 +119,9 @@
                         @can('الارصدة الافتتاحية للمنتجات')
                             <li><a class="slide-item" href="{{ route('product.opening') }}">الارصدة الافتتاحية للمنتجات</a>
                             </li>
+                        @endcan
+                        @can('تأكيد استلام المخزون')
+                            <li><a class="slide-item" href="{{ route('receipts.index') }}">تأكيد الاستلام</a></li>
                         @endcan
                     </ul>
                 </li>

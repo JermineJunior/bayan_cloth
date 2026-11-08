@@ -53,6 +53,11 @@ class PurchaseInvoice extends Model
         return $this->belongsTo(Branch::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function getDisplayNumberAttribute()
     {
         return ($this->branch?->code ? $this->branch->code . '-' : '') . $this->invoice_number;

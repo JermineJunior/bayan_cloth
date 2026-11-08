@@ -11,6 +11,7 @@ use App\Models\Restriction;
 use App\Models\StockDetail;
 use Illuminate\Http\Request;
 use App\Models\PurchaseInvoice;
+use App\Models\ReceiptConfirmation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
@@ -22,7 +23,11 @@ class PurchaseInvoiceController extends Controller
     public function index(): View
     {
         $purchase_invoices = PurchaseInvoice::visible()->where('branch_id', session('branch_id'))->orderByDesc('invoice_number')->get();
-        return view('purchase.index', compact('purchase_invoices'));
+        $confirmedInvoiceIds = ReceiptConfirmation::where('document_type', ReceiptConfirmation::TYPE_PURCHASE)
+            ->whereIn('document_id', $purchase_invoices->pluck('id'))
+            ->pluck('document_id')
+            ->all();
+        return view('purchase.index', compact('purchase_invoices', 'confirmedInvoiceIds'));
     }
 
     public function create(): View
@@ -182,11 +187,19 @@ class PurchaseInvoiceController extends Controller
         }
 
         $bank = Tree4::where('tree3_code', 1203)->select('no_bank')->first();
-        return view('purchase.print', compact('purchase_invoice', 'allDainTotal', 'allMadinTotal', 'dainTotal', 'madinTotal', 'bank'));
+        $receiptConfirmation = ReceiptConfirmation::with('user')
+            ->where('document_type', ReceiptConfirmation::TYPE_PURCHASE)
+            ->where('document_id', $purchase_invoice->id)
+            ->first();
+        return view('purchase.print', compact('purchase_invoice', 'allDainTotal', 'allMadinTotal', 'dainTotal', 'madinTotal', 'bank', 'receiptConfirmation'));
     }
 
-    public function edit(PurchaseInvoice $purchase_invoice): View
+    public function edit(PurchaseInvoice $purchase_invoice): View|RedirectResponse
     {
+        if ($this->receiptConfirmed($purchase_invoice->id)) {
+            return back()->withErrors('تم تأكيد استلام هذا المستند، يجب إلغاء التأكيد أولاً');
+        }
+
         $suppliers = Tree4::whereTree3_code(1205)->orWhere('tree3_code','2301')->get();
         $representatives = Tree4::where('tree3_code', '1206')->get();
         $stocks = Stock::get();
@@ -199,6 +212,10 @@ class PurchaseInvoiceController extends Controller
 
     public function update(UpdatePurchaseRequest $request, PurchaseInvoice $purchase_invoice): RedirectResponse
     {
+        if ($this->receiptConfirmed($purchase_invoice->id)) {
+            return back()->withErrors('تم تأكيد استلام هذا المستند، يجب إلغاء التأكيد أولاً');
+        }
+
         try {
             DB::beginTransaction();
             $invoice_status = $request->deferend_amount != '' ? 0 : 1;
@@ -349,6 +366,10 @@ class PurchaseInvoiceController extends Controller
 
     public function destroy(PurchaseInvoice $purchase_invoice): RedirectResponse
     {
+        if ($this->receiptConfirmed($purchase_invoice->id)) {
+            return back()->withErrors('تم تأكيد استلام هذا المستند، يجب إلغاء التأكيد أولاً');
+        }
+
         foreach ($purchase_invoice->details as $item) {
             $product = Product::with('stocks', 'units')->find($item->product_id);
             $product_unit = $product->units()->where('unit_id', $item->unit_id)->first();
@@ -362,6 +383,13 @@ class PurchaseInvoiceController extends Controller
 
         $purchase_invoice->delete();
         return back()->with('success_deleted', 'تم الحذف بنجاح ');
+    }
+
+    private function receiptConfirmed(int $purchaseInvoiceId): bool
+    {
+        return ReceiptConfirmation::where('document_type', ReceiptConfirmation::TYPE_PURCHASE)
+            ->where('document_id', $purchaseInvoiceId)
+            ->exists();
     }
 
     private function restriction($tree_id, $tree4_code, $madin, $dain, $constant_number, $purchase_invoice, $node, $date, $transactionNo = null): Restriction

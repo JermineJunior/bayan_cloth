@@ -104,15 +104,19 @@
                                         <td>{{ $transform->fromStock->name }}</td>
                                         <td>{{ $transform->toStock->name }}</td>
                                         <td>
-                                            <a class="btn btn-outline-success btn-sm"
-                                                href="{{ route('stock.transform.edit', $transform->id) }}" title="تعديل">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-                                            <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
-                                                data-toggle="modal" href="#deleteModal" data-id="{{ $transform->id }}"
-                                                title="حذف">
-                                                <i class="fa fa-trash">
-                                                </i></a>
+                                            @if (in_array($transform->id, $confirmedTransformIds))
+                                                <span class="badge badge-success">مؤكد</span>
+                                            @else
+                                                <a class="btn btn-outline-success btn-sm"
+                                                    href="{{ route('stock.transform.edit', $transform->id) }}" title="تعديل">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
+                                                    data-toggle="modal" href="#deleteModal" data-id="{{ $transform->id }}"
+                                                    title="حذف">
+                                                    <i class="fa fa-trash">
+                                                    </i></a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @endforeach

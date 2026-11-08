@@ -6,6 +6,7 @@ use App\Models\Unit;
 use App\Models\Stock;
 use App\Models\Branch;
 use App\Models\Product;
+use App\Models\ReceiptConfirmation;
 use App\Models\Transform;
 use Illuminate\View\View;
 use App\Models\StockDetail;
@@ -99,7 +100,11 @@ class StockController extends Controller
     public function transform_list(): View
     {
         $transforms = Transform::with('fromStock', 'toStock')->where('branch_id', session('branch_id'))->get();
-        return view('stock.transform.list', compact('transforms'));
+        $confirmedTransformIds = ReceiptConfirmation::where('document_type', ReceiptConfirmation::TYPE_TRANSFORM)
+            ->whereIn('document_id', $transforms->pluck('id'))
+            ->pluck('document_id')
+            ->all();
+        return view('stock.transform.list', compact('transforms', 'confirmedTransformIds'));
     }
     public function transform_create(): View
     {
@@ -207,6 +212,10 @@ class StockController extends Controller
 
     public function transform_edit(Transform $transform)
     {
+        if ($this->transformReceiptConfirmed($transform->id)) {
+            return back()->withErrors('تم تأكيد استلام هذا المستند، يجب إلغاء التأكيد أولاً');
+        }
+
         $products = Product::with('stocks', 'units')->inRandomOrder()->take(7)->get();
         $stocks_from = Stock::get();
         $stocks_to = Stock::where('id', '!=', $transform->stock_from)->get();
@@ -217,6 +226,10 @@ class StockController extends Controller
 
     public function transform_update(Request $request, Transform $transform)
     {
+        if ($this->transformReceiptConfirmed($transform->id)) {
+            return back()->withErrors('تم تأكيد استلام هذا المستند، يجب إلغاء التأكيد أولاً');
+        }
+
         $request->validate([
             'stock_id_from' => ['required', Rule::exists('branch_stock', 'stock_id')->where('branch_id', session('branch_id'))],
             'stock_id_to' => ['required', Rule::exists('branch_stock', 'stock_id')->where('branch_id', session('branch_id'))],
@@ -319,6 +332,10 @@ class StockController extends Controller
 
     public function destory(Transform $transform)
     {
+        if ($this->transformReceiptConfirmed($transform->id)) {
+            return back()->withErrors('تم تأكيد استلام هذا المستند، يجب إلغاء التأكيد أولاً');
+        }
+
         try {
             DB::beginTransaction();
             foreach ($transform->transformDetails as $item) {
@@ -355,6 +372,13 @@ class StockController extends Controller
         $end = $request->end;
         $transforms = Transform_details::with('product.units', 'stockFrom', 'stockTo', 'unit')->whereDate('created_at', '>=', $request->start)->whereDate('created_at', '<=', $request->end)->get();
         return view('stock.transform.show', compact('transforms', 'start', 'end'));
+    }
+
+    private function transformReceiptConfirmed(int $transformId): bool
+    {
+        return ReceiptConfirmation::where('document_type', ReceiptConfirmation::TYPE_TRANSFORM)
+            ->where('document_id', $transformId)
+            ->exists();
     }
 
     public function select2(Request $request)

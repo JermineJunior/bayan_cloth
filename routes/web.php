@@ -33,6 +33,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SaleInvoiceContoller;
 use App\Http\Controllers\RepresentativeController;
 use App\Http\Controllers\PurchaseInvoiceController;
+use App\Http\Controllers\ReceiptController;
 use App\Http\Controllers\SaleInvoiceReturnController;
 use App\Http\Controllers\PreliminaryInvoiceController;
 use App\Http\Controllers\PurchaseInvoiceReportContorller;
@@ -77,6 +78,11 @@ Route::group(
         Route::delete('stock/transform/{transform}', [StockController::class, 'destory'])->name('stock.transform.destroy');
         Route::get(uri: '/stock/transform/index', action: [StockController::class, 'transform_index'])->name(name: 'stock.transform.index');
         Route::post(uri: '/stock/transform/show', action: [StockController::class, 'transform_show'])->name(name: 'stock.transform.show');
+        // Receipt Confirmation Route
+        Route::get(uri: '/receipts', action: [ReceiptController::class, 'index'])->name(name: 'receipts.index');
+        Route::get(uri: '/receipts/{type}/{id}', action: [ReceiptController::class, 'show'])->name(name: 'receipts.show')->whereIn('type', ['purchase', 'transform']);
+        Route::post(uri: '/receipts/{type}/{id}/confirm', action: [ReceiptController::class, 'confirm'])->name(name: 'receipts.confirm')->whereIn('type', ['purchase', 'transform']);
+        Route::delete(uri: '/receipts/{type}/{id}', action: [ReceiptController::class, 'unconfirm'])->name(name: 'receipts.unconfirm')->whereIn('type', ['purchase', 'transform']);
         // Product Route
         Route::resource(name: 'product', controller: ProductController::class)->except(methods: 'show');
         Route::post(uri: 'product/toggleStatus/{product}', action: [ProductController::class, 'toggleStatus'])->name(name: 'product.toggleStatus');

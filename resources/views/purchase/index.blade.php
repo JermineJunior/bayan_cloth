@@ -111,19 +111,24 @@
                                         </td>
                                         <td>{{ number_format($purchase_invoice->total_amount, 2) }}</td>
                                         <td>
+                                            @if (in_array($purchase_invoice->id, $confirmedInvoiceIds))
+                                                <span class="badge badge-success">مؤكد</span>
+                                            @endif
                                             @can('طباعة فاتورة مشتريات')
                                                 <a class="btn btn-outline-info btn-sm"
                                                     href="{{ route('purchase_invoice.show', $purchase_invoice->id) }}" title="طباعة">
                                                     <i class="fa fa-print"></i>
                                                 </a>
                                             @endcan
-                                            @can('تعديل فاتورة مشتريات')
-                                                <a class="btn btn-outline-success btn-sm"
-                                                    href="{{ route('purchase_invoice.edit', $purchase_invoice->id) }}"
-                                                    title="تعديل">
-                                                    <i class="fa fa-edit"></i>
-                                                </a>
-                                            @endcan
+                                            @if (!in_array($purchase_invoice->id, $confirmedInvoiceIds))
+                                                @can('تعديل فاتورة مشتريات')
+                                                    <a class="btn btn-outline-success btn-sm"
+                                                        href="{{ route('purchase_invoice.edit', $purchase_invoice->id) }}"
+                                                        title="تعديل">
+                                                        <i class="fa fa-edit"></i>
+                                                    </a>
+                                                @endcan
+                                            @endif
                                             @can('منصرفات مشتريات خارجية')
                                                 <a class="btn btn-outline-warning btn-sm"
                                                     href="{{ route('external.purchase.create', $purchase_invoice->id) }}"
@@ -131,13 +136,15 @@
                                                     <i class="fa fa-link"></i>
                                                 </a>
                                             @endcan
-                                            @can('حذف فاتورة مشتريات')
-                                                <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
-                                                    data-toggle="modal" href="#deleteModal"
-                                                    data-id="{{ $purchase_invoice->id }}" title="حذف">
-                                                    <i class="fa fa-trash">
-                                                    </i></a>
-                                            @endcan
+                                            @if (!in_array($purchase_invoice->id, $confirmedInvoiceIds))
+                                                @can('حذف فاتورة مشتريات')
+                                                    <a class="modal-effect btn btn-outline-danger btn-sm" data-target="#deleteModal"
+                                                        data-toggle="modal" href="#deleteModal"
+                                                        data-id="{{ $purchase_invoice->id }}" title="حذف">
+                                                        <i class="fa fa-trash">
+                                                        </i></a>
+                                                @endcan
+                                            @endif
                                             {{-- @if (!$purchase_invoice->returnInvoice)
                                                 @can('اضافة مردودات المشتريات')
                                                     <a class="btn btn-outline-info btn-sm"

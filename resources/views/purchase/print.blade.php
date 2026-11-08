@@ -182,6 +182,16 @@
                                                 <span
                                                     class="value">{{ $purchase_invoice->stock->name ?? '---' }}</span>
                                             </div>
+                                            <div class="detail-box">
+                                                <span class="label">حالة الاستلام</span>
+                                                <span class="value">
+                                                    @if ($receiptConfirmation)
+                                                        <span class="badge badge-success">مؤكد</span>
+                                                    @else
+                                                        <span class="badge badge-warning">بانتظار التأكيد</span>
+                                                    @endif
+                                                </span>
+                                            </div>
                                         </div>
 
 
