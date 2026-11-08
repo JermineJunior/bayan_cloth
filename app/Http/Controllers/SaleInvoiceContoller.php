@@ -437,9 +437,13 @@ class SaleInvoiceContoller extends Controller
             });
         }
 
-        $product = (clone $productQuery)->available()->first();
+        $availableOnly = $request->boolean('available');
 
-        if (!$product && $productIds->isNotEmpty()) {
+        $product = $availableOnly
+            ? (clone $productQuery)->available()->first()
+            : (clone $productQuery)->first();
+
+        if ($availableOnly && !$product && $productIds->isNotEmpty()) {
             $product = (clone $productQuery)->whereIn('id', $productIds)->first();
         }
 
@@ -514,7 +518,7 @@ class SaleInvoiceContoller extends Controller
             ->where(function ($query) use ($search) {
                 $query->where('name', 'LIKE', "%$search%")->orWhere('barcode', $search);
             })
-            ->available()
+            ->when($request->boolean('available'), fn ($query) => $query->available())
             ->with('units')
             ->when($search !== null && $search !== '', fn ($query) => $query->limit(20))
             ->get();

@@ -91,6 +91,9 @@
                                     <th class="wd-10p border-bottom-0">م</th>
                                     <th class="wd-15p border-bottom-0">الاسم </th>
                                     <th class="wd-20p border-bottom-0">اسم المستخدم</th>
+                                    @can('عرض مستخدمي كل الفروع')
+                                        <th class="wd-20p border-bottom-0">الفروع</th>
+                                    @endcan
                                     <th class="wd-10p border-bottom-0">العمليات</th>
                                 </tr>
                             </thead>
@@ -100,6 +103,9 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $user->name }}</td>
                                         <td>{{ $user->username }}</td>
+                                        @can('عرض مستخدمي كل الفروع')
+                                            <td>{{ $user->branches->pluck('name')->implode(', ') }}</td>
+                                        @endcan
                                         <td>
                                             @can('تعديل مستخدم')
                                                 <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-success"

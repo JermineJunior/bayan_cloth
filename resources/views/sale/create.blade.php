@@ -480,7 +480,8 @@
                                 body: JSON.stringify({
                                     name: productName,
                                     type: 1,
-                                    require_stock: 1
+                                    require_stock: 1,
+                                    available: 1
                                 })
                             })
                             .then(response => response.json())
@@ -1386,7 +1387,8 @@
                     data: JSON.stringify({
                         product_id: button.data('id'),
                         stock_id: $('#stock_id').val(),
-                        require_stock: 1
+                        require_stock: 1,
+                        available: 1
                     }),
                     success(data) {
                         if (data.success) {

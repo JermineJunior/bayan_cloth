@@ -21,9 +21,16 @@ class UserController extends Controller
 {
     public function index(): View
     {
-        $users = User::whereHas('branches',function($query){
-            $query->where('branch_id',session('branch_id'));
-        })->where('username', '!=', 'bayan')->get(); //TODO::not all users appear
+        $usersQuery = User::where('id', '!=', 1);
+
+        if (auth()->user()->can('عرض مستخدمي كل الفروع')) {
+            $users = $usersQuery->with('branches')->get();
+        } else {
+            $users = $usersQuery->whereHas('branches', function ($query) {
+                $query->where('branch_id', session('branch_id'));
+            })->get();
+        }
+
         return view('user.index', compact('users'));
     }
 

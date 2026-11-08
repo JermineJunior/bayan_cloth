@@ -564,7 +564,8 @@
                                     name: productName,
                                     type: 1,
                                     require_stock: 1,
-                                    product_ids: productIds
+                                    product_ids: productIds,
+                                    available: 1
                                 })
                             })
                             .then(response => response.json())
@@ -1437,7 +1438,8 @@
                         product_id: button.data('id'),
                         stock_id: $('#stock_id').val(),
                         require_stock: 1,
-                        product_ids: productIds
+                        product_ids: productIds,
+                        available: 1
                     }),
                     success(data) {
                         if (data.success) {
