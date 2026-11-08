@@ -133,6 +133,11 @@
                         {{-- <p class="tx-12 tx-gray-500 mb-2">Example of Valex Simple Table. <a href="">Learn more</a></p>  --}}
                     </div>
                     <div class="card-body">
+                        @if ($sale_invoice_return->sale_invoice_id)
+                            <div class="text-muted mb-2">
+                                مردود من فاتورة رقم {{ $sale_invoice_return->saleInvoice?->display_number ?? $sale_invoice_return->sale_invoice_id }}
+                            </div>
+                        @endif
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="form-group">

@@ -82,8 +82,16 @@
 @endsection
 
 @section('content')
+    @isset($sourceInvoice)
+        <div class="alert alert-info py-2">
+            مردود من فاتورة رقم {{ $sourceInvoice->display_number }}
+        </div>
+    @endisset
     <form id="invoiceForm" action="{{ route('sale_invoice_return.store') }}" method="POST">
         @csrf
+        @isset($sourceInvoice)
+            <input type="hidden" name="sale_invoice_id" value="{{ $sourceInvoice->id }}">
+        @endisset
         <input type="hidden" name="_branch" value="{{ session('branch_id') }}">
         <div class="row row-sm">
             <div class="col-xl-12">
@@ -152,7 +160,7 @@
                                     <label for="stock_id">المخزن</label>
                                     <select name="stock_id" id="stock_id" class="form-control">
                                         @foreach ($stocks as $stock)
-                                            <option value="{{ $stock->id }}">{{ $stock->name }}</option>
+                                            <option @selected(isset($sourceInvoice) && $sourceInvoice->details->first()?->stock_id == $stock->id) value="{{ $stock->id }}">{{ $stock->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -173,7 +181,7 @@
                                             <select name="customer_id" id="customer_id" class="form-control select2">
                                                 <option value="">-- اختر اسم العميل --</option>
                                                 @foreach ($customers as $customer)
-                                                    <option value="{{ $customer->id }}">{{ $customer->tree4_name }}
+                                                    <option @selected(isset($sourceInvoice) && $sourceInvoice->customer_id == $customer->id) value="{{ $customer->id }}">{{ $customer->tree4_name }}
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -199,7 +207,7 @@
                                                 class="form-control">
                                                 <option value=""> -- اختر المندوب --</option>
                                                 @foreach ($representatives as $representative)
-                                                    <option @selected(auth()->user()->representative_id == $representative->id)
+                                                    <option @selected((isset($sourceInvoice) ? $sourceInvoice->representative_id : auth()->user()->representative_id) == $representative->id)
                                                         value="{{ $representative->id }}">
                                                         {{ $representative->tree4_name }}</option>
                                                 @endforeach
@@ -207,9 +215,9 @@
                                         </div>
                                     @else
                                         <input type="hidden" name="representative_id" id="representative_id"
-                                            value="{{ auth()->user()->representative_id }}">
+                                            value="{{ isset($sourceInvoice) ? $sourceInvoice->representative_id : auth()->user()->representative_id }}">
                                         <input type="text" class="form-control" readonly
-                                            value="{{ auth()->user()->representative?->tree4_name ?? 'غير محدد' }}">
+                                            value="{{ isset($sourceInvoice) ? ($sourceInvoice->representative?->tree4_name ?? 'غير محدد') : (auth()->user()->representative?->tree4_name ?? 'غير محدد') }}">
                                     @endcan
                                 </div>
                             </div>
@@ -225,7 +233,7 @@
                             placeholder="قم بالبحث هنا ">
                         <div id="body_search">
                             @foreach ($products as $product)
-                                <a href="#" class="product-pick-item product-pick-item--grad btn btn-primary btn-add-invoice" data-id="{{ $product->id }}">{{ $product->name }}</a>
+                                <a href="#" class="product-pick-item product-pick-item--grad btn btn-add-invoice {{ isset($sourceInvoice) && in_array($product->id, $productIds) ? 'btn-white disabled' : 'btn-primary' }}" data-id="{{ $product->id }}">{{ $product->name }}</a>
                             @endforeach
                         </div>
                     </div>
@@ -252,7 +260,75 @@
                                         <th>حذف</th>
                                     </tr>
                                 </thead>
-                                <tbody id="product-rows"></tbody>
+                                <tbody id="product-rows">
+                                    @isset($sourceInvoice)
+                                        @foreach ($sourceInvoice->details as $item)
+                                            <tr>
+                                                <td>
+                                                    <input type="text" id="product_name_{{ $loop->iteration }}"
+                                                        name="product_name[{{ $loop->iteration }}]" style="width:130px"
+                                                        class="form-control product_name" value="{{ $item->product->name }}"
+                                                        readonly>
+                                                    <input type="hidden" id="product_id_{{ $loop->iteration }}"
+                                                        name="product_id[{{ $loop->iteration }}]" class="product_id"
+                                                        value="{{ $item->product_id }}">
+                                                </td>
+                                                <td>
+                                                    <select id="unit_id_{{ $loop->iteration }}" class="form-control unit_id"
+                                                        style="width:120px" name="unit_id[{{ $loop->iteration }}]"
+                                                        data-product-id="{{ $item->product_id }}"
+                                                        data-unit_id="{{ $item->unit_id }}">
+                                                        @foreach ($item->product->units as $unit)
+                                                            <option
+                                                                {{ $item->unit_id == $unit->pivot->unit_id ? 'selected' : '' }}
+                                                                value="{{ $unit->pivot->unit_id }}">
+                                                                {{ $unit->name }}</option>
+                                                        @endforeach
+
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="qty_{{ $loop->iteration }}"
+                                                        class="form-control qty" style="width:90px"
+                                                        name="qty[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->qty) }}"
+                                                        data-qty="{{ $item->qty }}">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="bounce_{{ $loop->iteration }}"
+                                                        class="form-control bounce" style="width:90px"
+                                                        name="bounce[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->bounce ?? 0) }}"
+                                                        data-bounce="{{ $item->bounce }}">
+                                                </td>
+{{-- EXPIRY-HIDDEN
+                                                <td>
+                                                    <input type="date" id="expire_date_{{ $loop->iteration }}"
+                                                        class="form-control expire_date"
+                                                        name="expire_date[{{ $loop->iteration }}]"
+                                                        value="{{ $item->expire_date }}">
+                                                </td>
+--}}
+                                                <td>
+                                                    <input type="text" id="price_{{ $loop->iteration }}"
+                                                        class="form-control price" style="width:120px"
+                                                        name="price[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->price, 2) }}">
+                                                </td>
+                                                <td>
+                                                    <input type="text" id="row_sub_total_{{ $loop->iteration }}"
+                                                        class="form-control row_sub_total" style="width:130px"
+                                                        name="row_sub_total[{{ $loop->iteration }}]"
+                                                        value="{{ number_format($item->row_sub_total, 2) }}" readonly>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn btn-danger remove-product"><i
+                                                            class="fa fa-trash"></i></button>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endisset
+                                </tbody>
                             </table>
                         </div>
                         <div class="invoice-summary">
@@ -262,7 +338,7 @@
                                 <div class="col-md-3">
                                     <label>
                                         قيمة الضريبة (17%)
-                                        <input type="checkbox" name="tax_status" id="apply_tax"> تطبيق
+                                        <input type="checkbox" @checked(isset($sourceInvoice) && $sourceInvoice->tax_status) name="tax_status" id="apply_tax"> تطبيق
                                     </label>
                                     <input type="text" name="tax" class="form-control" id="tax"
                                         value="0.00" readonly>
@@ -271,7 +347,7 @@
                                 <div class="col-md-2">
                                     <label>الخصم</label>
                                     <input type="text" name="discount" class="form-control" id="discount"
-                                        value="0.00">
+                                        value="{{ isset($sourceInvoice) ? number_format($sourceInvoice->discount_amount, 2) : '0.00' }}">
                                 </div>
                                 <div class="col-md-7">
                                     <label>الإجمالي النهائي</label>
@@ -447,6 +523,7 @@
             $('#cash_id').select2();
             $('#bank_id').select2();
             let addedProducts = [];
+            let productIds = @json($productIds ?? []);
 
             let debounceTimer;
             function lookupProduct(showError) {
@@ -1313,8 +1390,9 @@
                             tbody.empty();
                             let rows = '';
                             result.products.forEach((product, index) => {
+                                let isAdded = productIds.includes(product.id);
                                 rows += `
-                                    <a href="#" class="product-pick-item product-pick-item--grad btn btn-primary btn-add-invoice" data-id="${product.id}">${product.name}</a>
+                                    <a href="#" class="product-pick-item product-pick-item--grad btn btn-add-invoice ${isAdded ? 'btn-white disabled' : 'btn-primary'}" data-id="${product.id}">${product.name}</a>
                                 `;
                             });
 
@@ -1358,6 +1436,12 @@
             attachCommaFormatter(
                 '#discount');
             attachCommaFormatter('#delivery_cost');
+
+            @isset($sourceInvoice)
+                attachCommaFormatter('.price');
+                attachCommaFormatter('.qty');
+                totalPrice();
+            @endisset
 
             document.getElementById('invoiceForm').addEventListener('submit', function(e) {
                 cleanNumbersBeforeSubmit();

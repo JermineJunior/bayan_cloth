@@ -318,6 +318,11 @@
                         <a href="{{ route('sale_invoice.pdf', $sale_invoice->id) }}" class="btn btn-outline-danger float-left mt-3 mr-2 download-pdf">
                             <i class="mdi mdi-file-pdf ml-1"></i> تحميل PDF
                         </a>
+                        @can('تحويل فاتورة مبيعات إلى مردود')
+                            <a href="{{ route('sale_invoice.return.create', $sale_invoice->id) }}" class="btn btn-outline-info float-left mt-3 mr-2" title="تحويل إلى مردود مبيعات">
+                                <i class="fa fa-undo ml-1"></i> تحويل إلى مردود مبيعات
+                            </a>
+                        @endcan
                         <a href="{{ route('sale_invoice.index') }}" class="btn btn-outline-secondary float-left mt-3 mr-2 back-to-list">
                             <i class="mdi mdi-arrow-right ml-1"></i> رجوع للقائمة
                         </a>

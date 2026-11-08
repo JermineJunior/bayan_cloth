@@ -9,6 +9,7 @@ use App\Models\Product;
 use Illuminate\View\View;
 use App\Models\Restriction;
 use App\Models\SaleInvoice;
+use App\Models\SaleInvoiceReturn;
 use App\Models\StockDetail;
 use Illuminate\Http\Request;
 use Mpdf\Mpdf;
@@ -40,6 +41,27 @@ class SaleInvoiceContoller extends Controller
         $products = Product::with('stocks', 'units')->available()->inRandomOrder()->get();
 
         return view('sale.create', compact('customers', 'representatives', 'invoice_number', 'stocks', 'safes', 'banks', 'products'));
+    }
+
+    public function return_create(SaleInvoice $sale_invoice): View
+    {
+        abort_unless(auth()->user()->can('تحويل فاتورة مبيعات إلى مردود'), 403);
+
+        if ($sale_invoice->branch_id != session('branch_id')) {
+            abort(404);
+        }
+
+        $sourceInvoice = $sale_invoice->load(['details.product', 'details.unit', 'representative']);
+        $invoice_number = SaleInvoiceReturn::where('branch_id', session('branch_id'))->max('invoice_number') + 1;
+        $customers = Tree4::whereTree3_code(1205)->orWhere('tree3_code', '2301')->get();
+        $representatives = Tree4::where('tree3_code', '1206')->get();
+        $stocks = Stock::get();
+        $safes = Tree4::where('tree3_code', '1202')->get();
+        $banks = Tree4::where('tree3_code', '1203')->get();
+        $products = Product::with('stocks', 'units')->take(7)->inRandomOrder()->get();
+        $productIds = $sourceInvoice->details->pluck('product_id')->unique()->values()->all();
+
+        return view('sale_return.create', compact('sourceInvoice', 'customers', 'representatives', 'invoice_number', 'stocks', 'safes', 'banks', 'products', 'productIds'));
     }
 
     public function store(StoreSaleInvoiceRequest $request): View|RedirectResponse

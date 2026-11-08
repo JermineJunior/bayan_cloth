@@ -24,6 +24,7 @@ class StoreSaleInvoiceReturnRequest extends FormRequest
     {
         return [
             'supplier_id' => 'nullable|exists:tree4s,id',
+            'sale_invoice_id' => 'nullable|exists:sale_invoices,id',
             'invoice_number' => 'required|numeric',
             'date' => 'required|date',
             'sub_total' => 'required|numeric|min:0',

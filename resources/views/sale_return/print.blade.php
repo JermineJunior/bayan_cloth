@@ -186,6 +186,11 @@
                                             </div>
                                         </div>
 
+                                        @if ($sale_invoice_return->sale_invoice_id)
+                                            <div class="text-center text-muted mt-2">
+                                                مردود من فاتورة رقم {{ $sale_invoice_return->saleInvoice?->display_number ?? $sale_invoice_return->sale_invoice_id }}
+                                            </div>
+                                        @endif
 
                                         <div class="table-container">
                                             <table class="invoice-table">

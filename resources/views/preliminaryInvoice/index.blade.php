@@ -114,8 +114,8 @@
                                             @can('تحويل لفاتورة مبيعات')
                                                 <a class="btn btn-outline-info btn-sm"
                                                     href="{{ route('preliminaryInvoice.transform', $preliminaryInvoice->id) }}"
-                                                    title="اضافة مردودات مبيعات">
-                                                    <i class="fa fa-reply"></i>
+                                                    title="تحويل إلى فاتورة مبيعات">
+                                                    <i class="fa fa-exchange-alt"></i>
                                                 </a>
                                             @endcan
                                         </td>

@@ -43,12 +43,12 @@
             'border' => 'dotted',
         ],
         'preliminary_transform' => [
-            'title' => 'تحويل إلى مردود مبيعات',
-            'badge' => 'مردود',
-            'chip' => 'ر',
-            'color' => '#ea580c',
-            'tint' => '#fff7ed',
-            'border' => 'dashed',
+            'title' => 'تحويل إلى فاتورة مبيعات',
+            'badge' => 'مبيعات',
+            'chip' => 'ب',
+            'color' => '#2563eb',
+            'tint' => '#eff6ff',
+            'border' => 'solid',
         ],
     ];
 

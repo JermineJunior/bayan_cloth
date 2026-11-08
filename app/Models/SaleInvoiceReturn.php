@@ -11,7 +11,7 @@ class SaleInvoiceReturn extends Model
 {
     use VisibleToOwner;
 
-    protected $fillable = ['customer_id', 'representative_id', 'user_id', 'date', 'stock_id', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount', 'tax_status', 'discount_amount', 'status', 'bank_name', 'cash_name', 'cash_amount_total', 'bank_amount_total', 'transaction_no', 'process_no', 'deferend_amount', 'branch_id', 'invoice_status', 'note', 'delivery_cost', 'rep_cut_amount'];
+    protected $fillable = ['customer_id', 'representative_id', 'user_id', 'date', 'stock_id', 'invoice_number', 'total_amount', 'sub_total_amount', 'tax_amount', 'tax_status', 'discount_amount', 'status', 'bank_name', 'cash_name', 'cash_amount_total', 'bank_amount_total', 'transaction_no', 'process_no', 'deferend_amount', 'branch_id', 'invoice_status', 'note', 'delivery_cost', 'rep_cut_amount', 'sale_invoice_id'];
 
     public function details(): HasMany
     {
@@ -26,6 +26,11 @@ class SaleInvoiceReturn extends Model
     public function restrictions(): HasMany
     {
         return $this->hasMany(Restriction::class);
+    }
+
+    public function saleInvoice(): BelongsTo
+    {
+        return $this->belongsTo(SaleInvoice::class, 'sale_invoice_id');
     }
 
     public function customer(): BelongsTo

@@ -70,6 +70,7 @@ class SaleInvoiceReturnController extends Controller
                     'note' => $request->note,
                     'branch_id' => session('branch_id'),
                     'user_id' => Auth::id(),
+                    'sale_invoice_id' => $request->sale_invoice_id,
                 ],
             );
 
@@ -176,12 +177,13 @@ class SaleInvoiceReturnController extends Controller
 
     public function show(SaleInvoiceReturn $sale_invoice_return)
     {
-        $sale_invoice_return = $sale_invoice_return->load('details');
+        $sale_invoice_return = $sale_invoice_return->load('details', 'saleInvoice');
         return view('sale_return.print', compact('sale_invoice_return'));
     }
 
     public function edit(SaleInvoiceReturn $sale_invoice_return): View
     {
+        $sale_invoice_return->loadMissing('saleInvoice');
         $customers = Tree4::whereTree3_code(1205)->orWhere('tree3_code','2301')->get();
         $stocks = Stock::get();
         $representatives = Tree4::where('tree3_code', '1206')->get();
@@ -224,6 +226,7 @@ class SaleInvoiceReturnController extends Controller
             $originalDeliveryCost = $sale_invoice_return->delivery_cost;
             $originalRepresentativeId = $sale_invoice_return->representative_id;
             $originalUserId = $sale_invoice_return->user_id;
+            $originalSaleInvoiceId = $sale_invoice_return->sale_invoice_id;
             $invoice_number = $sale_invoice_return->invoice_number;
             $sale_invoice_return->delete();
 
@@ -256,6 +259,7 @@ class SaleInvoiceReturnController extends Controller
                     'note' => $request->note,
                     'user_id' => $originalUserId,
                     'branch_id' => session('branch_id'),
+                    'sale_invoice_id' => $originalSaleInvoiceId,
                 ],
             );
 

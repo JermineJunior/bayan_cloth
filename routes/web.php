@@ -117,6 +117,7 @@ Route::group(
         Route::post(uri: 'extenal/purchase/{purchase_invoice}', action: [PurchaseInvoiceController::class, 'externalPurchase_store'])->name(name: 'external.purchase.store');
         // Sale Invoice Route
         Route::resource(name: 'sale_invoice', controller: SaleInvoiceContoller::class)->except(methods: ['show']);
+        Route::get(uri: 'sale_invoice/return/{sale_invoice}', action: [SaleInvoiceContoller::class, 'return_create'])->name(name: 'sale_invoice.return.create');
         Route::post(uri: '/get-product', action: [ProductController::class, 'getProduct'])->name(name: 'product.getProduct');
         Route::post(uri: '/get-unit-price-product', action: [ProductController::class, 'getUnitPrice'])->name(name: 'product.getUnitPrice');
         Route::post(uri: '/check-qty', action: [ProductController::class, 'checkQty'])->name(name: 'product.checkQty');

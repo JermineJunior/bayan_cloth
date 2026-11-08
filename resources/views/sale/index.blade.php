@@ -145,15 +145,13 @@
                                                         </i></a>
                                                 @endif
                                             @endcan
-                                            {{-- @if (!$sale_invoice->returnInvoice)
-                                                @can('اضافة مردودات المبيعات')
-                                                    <a class="btn btn-outline-info btn-sm"
-                                                        href="{{ route('sale_invoice_return.create', ['sale_invoice' => $sale_invoice->id]) }}"
-                                                        title="اضافة مردودات مبيعات">
-                                                        <i class="fa fa-reply"></i>
-                                                    </a>
-                                                @endcan
-                                            @endif --}}
+                                            @can('تحويل فاتورة مبيعات إلى مردود')
+                                                <a class="btn btn-outline-info btn-sm"
+                                                    href="{{ route('sale_invoice.return.create', $sale_invoice->id) }}"
+                                                    title="تحويل إلى مردود مبيعات">
+                                                    <i class="fa fa-undo"></i>
+                                                </a>
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach
